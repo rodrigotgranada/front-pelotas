@@ -1,0 +1,80 @@
+<section class="mx-auto max-w-md rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+  <p class="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-700">Autenticacao</p>
+  @if (!pendingEmailVerification()) {
+    <h1 class="mt-2 text-2xl font-black tracking-tight text-slate-900">Entrar no sistema</h1>
+    <p class="mt-2 text-sm text-slate-600">Use suas credenciais do backend para obter o JWT.</p>
+
+    <form class="mt-6 space-y-4" [formGroup]="loginForm" (ngSubmit)="onLogin()">
+      <div>
+        <label class="block text-sm font-semibold text-slate-700" for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 outline-none ring-cyan-200 transition focus:ring"
+          placeholder="rodrigo@pelotas.dev"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-slate-700" for="password">Senha</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 outline-none ring-cyan-200 transition focus:ring"
+          placeholder="Senha123"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="w-full rounded-xl bg-cyan-700 px-4 py-2 font-semibold text-white transition hover:bg-cyan-800 disabled:cursor-not-allowed disabled:opacity-60"
+        [disabled]="loading()"
+      >
+        @if (loading()) {
+          <app-spinner label="Entrando..." size="sm" [inline]="true" />
+        } @else {
+          Login
+        }
+      </button>
+    </form>
+  } @else {
+    <h1 class="mt-2 text-2xl font-black tracking-tight text-slate-900">Verificar email</h1>
+    <p class="mt-2 text-sm text-slate-600">
+      Enviamos um codigo para <span class="font-semibold">{{ verificationEmail() }}</span>.
+    </p>
+
+    <form class="mt-6 space-y-4" [formGroup]="verifyEmailForm" (ngSubmit)="onVerifyEmail()">
+      <div>
+        <label class="block text-sm font-semibold text-slate-700" for="verification-code">Codigo de 6 digitos</label>
+        <input
+          id="verification-code"
+          type="text"
+          formControlName="code"
+          maxlength="6"
+          class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 outline-none ring-cyan-200 transition focus:ring"
+          placeholder="123456"
+        />
+      </div>
+
+      <div class="flex gap-2">
+        <button
+          type="submit"
+          class="flex-1 rounded-xl bg-cyan-700 px-4 py-2 font-semibold text-white transition hover:bg-cyan-800 disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="loading()"
+        >
+          Confirmar codigo
+        </button>
+        <button
+          type="button"
+          class="rounded-xl border border-slate-300 px-4 py-2 font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+          (click)="resendCode()"
+          [disabled]="loading()"
+        >
+          Reenviar
+        </button>
+      </div>
+    </form>
+  }
+</section>

@@ -1,1 +1,44 @@
 @use "tailwindcss";
+
+@keyframes panel-reveal {
+	from {
+		opacity: 0;
+		transform: translateY(6px) scale(0.995);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+.panel-reveal {
+	animation: panel-reveal 180ms ease-out;
+}
+
+.panel-reveal-delay-1 {
+	animation-delay: 40ms;
+	animation-fill-mode: both;
+}
+
+.panel-reveal-delay-2 {
+	animation-delay: 80ms;
+	animation-fill-mode: both;
+}
+
+.panel-reveal-delay-3 {
+	animation-delay: 120ms;
+	animation-fill-mode: both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.panel-reveal {
+		animation: none;
+	}
+
+	.panel-reveal-delay-1,
+	.panel-reveal-delay-2,
+	.panel-reveal-delay-3 {
+		animation-delay: 0ms;
+	}
+}

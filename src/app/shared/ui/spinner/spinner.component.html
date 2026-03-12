@@ -1,0 +1,8 @@
+<div class="flex items-center gap-2" role="status" aria-live="polite" [class.justify-center]="!inline()">
+  <span
+    class="inline-block animate-spin rounded-full border-slate-300 border-t-cyan-700"
+    [class]="circleSizeClass()"
+    aria-hidden="true"
+  ></span>
+  <span class="text-sm font-medium text-slate-600">{{ label() }}</span>
+</div>
