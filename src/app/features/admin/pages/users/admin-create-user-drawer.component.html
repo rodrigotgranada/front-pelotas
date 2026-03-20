@@ -120,9 +120,9 @@
                 <!-- Opção de Senha Fixa -->
                 <div class="space-y-1.5">
                   <label for="password" class="text-sm font-semibold text-slate-700">Senha (Opcional)</label>
-                  <input id="password" type="password" formControlName="password"
-                    class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none transition focus:border-cyan-500 focus:bg-white focus:ring-1 focus:ring-cyan-500"
-                    placeholder="Deixe em branco para gerar aleatória" />
+                  <app-password-input id="password" formControlName="password"
+                    class="block w-full"
+                    placeholder="Deixe em branco para gerar aleatória"></app-password-input>
                   <p class="text-xs text-slate-500">Se deixada em branco, uma senha aleatória será gerada e registrada no console do servidor.</p>
                 </div>
               </div>

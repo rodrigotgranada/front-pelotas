@@ -140,6 +140,10 @@ export class UsersApiService {
     return this.http.delete<void>(`${environment.apiBaseUrl}/users/${id}`);
   }
 
+  hardDelete(id: string): Observable<void> {
+    return this.http.delete<void>(`${environment.apiBaseUrl}/users/${id}/hard`);
+  }
+
   reactivate(id: string): Observable<UserResponse> {
     return this.http.patch<UserResponse>(`${environment.apiBaseUrl}/users/${id}/reactivate`, {});
   }

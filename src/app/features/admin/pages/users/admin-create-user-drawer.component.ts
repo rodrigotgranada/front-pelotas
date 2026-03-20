@@ -24,6 +24,7 @@ import { PhoneInputComponent } from '../../../../shared/ui/phone-input/phone-inp
 import { CepInputComponent } from '../../../../shared/ui/cep-input/cep-input.component';
 import { PhotoUploadComponent } from '../../../../shared/ui/photo-upload/photo-upload.component';
 import { ImageCropperDialogComponent } from '../../../../shared/ui/image-cropper/image-cropper-dialog.component';
+import { PasswordInputComponent } from '../../../../shared/ui/password-input/password-input.component';
 import { UserResponse, UserContactResponse, UserAddressResponse } from '../../../../core/models/user.model';
 
 interface ViaCepResponse {
@@ -47,6 +48,7 @@ interface ViaCepResponse {
     CepInputComponent,
     PhotoUploadComponent,
     ImageCropperDialogComponent,
+    PasswordInputComponent,
   ],
   templateUrl: './admin-create-user-drawer.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

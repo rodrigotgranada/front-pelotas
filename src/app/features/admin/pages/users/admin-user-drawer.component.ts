@@ -8,6 +8,7 @@ import { AuthApiService } from '../../../../core/services/auth-api.service';
 import { ToastMessagesService, ToastTitle } from '../../../../core/notifications/toast-messages.service';
 import { SpinnerComponent } from '../../../../shared/ui/spinner/spinner.component';
 import { firstValueFrom } from 'rxjs';
+import { AuthSessionService } from '../../../../core/auth/auth-session.service';
 
 @Component({
   selector: 'app-admin-user-drawer',
@@ -20,6 +21,7 @@ export class AdminUserDrawerComponent implements OnChanges {
   private readonly usersApi = inject(UsersApiService);
   private readonly authApi = inject(AuthApiService);
   private readonly toast = inject(ToastMessagesService);
+  readonly session = inject(AuthSessionService);
 
   @Input({ required: true }) user!: UserResponse;
   @Output() close = new EventEmitter<void>();
@@ -136,6 +138,31 @@ export class AdminUserDrawerComponent implements OnChanges {
       this.toast.showSuccess('Sessoes encerradas com sucesso.', ToastTitle.Success);
     } catch (error) {
       this.toast.showApiError(error, 'Falha ao encerrar sessoes');
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  async hardDeleteUser() {
+    const confirmationText = prompt(
+      `ATENÇÃO OWNER!\n\nVocê está prestes a EXCLUIR PERMANENTEMENTE o usuário ${this.user.firstName} ${this.user.lastName}.\nIsso removerá TODOS os dados dele de forma irreversível (Hard Delete).\n\nPara prosseguir, digite a palavra "CONFIRMAR" abaixo:`
+    );
+
+    if (confirmationText !== 'CONFIRMAR') {
+      if (confirmationText !== null) {
+        this.toast.showError('Exclusão cancelada. Você não digitou CONFIRMAR.', ToastTitle.Error);
+      }
+      return;
+    }
+
+    this.loading.set(true);
+    try {
+      await firstValueFrom(this.usersApi.hardDelete(this.user.id));
+      this.toast.showSuccess('Usuário removido permanentemente do sistema.', ToastTitle.Success);
+      this.userUpdated.emit();
+      this.close.emit();
+    } catch (error) {
+      this.toast.showApiError(error, 'Falha ao realizar Hard Delete');
     } finally {
       this.loading.set(false);
     }
