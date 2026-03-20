@@ -7,7 +7,8 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   document: string;
@@ -51,7 +52,8 @@ export interface LoginPayload {
 }
 
 export interface UpdateOwnUserPayload {
-  name?: string;
+  firstName?: string;
+  lastName?: string;
   email?: string;
   password?: string;
   document?: string;
@@ -101,4 +103,14 @@ export interface RequestPhoneVerificationPayload {
 
 export interface ConfirmPhoneVerificationPayload {
   code: string;
+}
+
+export interface RequestPasswordResetPayload {
+  email: string;
+}
+
+export interface ConfirmPasswordResetPayload {
+  email: string;
+  code: string;
+  newPassword: string;
 }

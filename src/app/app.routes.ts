@@ -15,6 +15,21 @@ export const routes: Routes = [
 		loadComponent: () => import('./features/login/pages/login-page.component').then((m) => m.LoginPageComponent),
 	},
 	{
+		path: 'forgot-password',
+		canActivate: [guestGuard],
+		loadComponent: () => import('./features/forgot-password/pages/forgot-password-page.component').then((m) => m.ForgotPasswordPageComponent),
+	},
+	{
+		path: 'reset-password',
+		canActivate: [guestGuard],
+		loadComponent: () => import('./features/reset-password/pages/reset-password-page.component').then((m) => m.ResetPasswordPageComponent),
+	},
+	{
+		path: 'register',
+		canActivate: [guestGuard],
+		loadComponent: () => import('./features/register/pages/register-page.component').then((m) => m.RegisterPageComponent),
+	},
+	{
 		path: 'app',
 		canActivate: [authGuard],
 		children: [
@@ -44,6 +59,11 @@ export const routes: Routes = [
 				redirectTo: 'me',
 			},
 		],
+	},
+	{
+		path: 'admin',
+		canActivate: [authGuard],
+		loadChildren: () => import('./features/admin/admin.routes'),
 	},
 	{
 		path: '**',

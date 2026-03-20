@@ -3,13 +3,14 @@ import { RoleCode } from '../models/role.model';
 
 export type AppRole = RoleCode;
 
-const KNOWN_ROLES: readonly AppRole[] = ['owner', 'admin', 'editor', 'socio'];
+const KNOWN_ROLES: readonly AppRole[] = ['owner', 'admin', 'editor', 'socio', 'user'];
 
 const ROLE_ALIASES: Record<AppRole, readonly string[]> = {
   owner: ['owner', 'proprietario', 'proprietary'],
   admin: ['admin', 'administrador', 'administrator'],
   editor: ['editor'],
   socio: ['socio', 'associado', 'associate', 'member'],
+  user: ['user', 'usuario', 'usuário'],
 };
 
 const ROLE_ID_MAP: Record<string, AppRole> = {
@@ -17,6 +18,7 @@ const ROLE_ID_MAP: Record<string, AppRole> = {
   '2': 'admin',
   '3': 'editor',
   '4': 'socio',
+  '5': 'user',
 };
 
 function isAppRole(value: string): value is AppRole {

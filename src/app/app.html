@@ -10,7 +10,7 @@
           <p class="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-700">Pelotas Front</p>
           <h1 class="mt-1 text-2xl font-black tracking-tight">Console de Integracao</h1>
           @if (me()) {
-            <p class="mt-1 text-sm text-slate-600">{{ me()?.name }} - {{ me()?.email }}</p>
+            <p class="mt-1 text-sm text-slate-600">{{ me()?.firstName }} {{ me()?.lastName }} - {{ me()?.email }}</p>
           }
         </div>
 
@@ -63,18 +63,11 @@
 
           @if (canAccessAdminData()) {
             <a
-              routerLink="/app/users"
+              routerLink="/admin"
               routerLinkActive="bg-cyan-700 text-white"
-              class="rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+              class="rounded-xl bg-slate-800 text-white px-3 py-2 text-sm font-semibold transition hover:bg-slate-700"
             >
-              Users
-            </a>
-            <a
-              routerLink="/app/logs"
-              routerLinkActive="bg-cyan-700 text-white"
-              class="rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
-            >
-              Logs
+              Admin Painel
             </a>
           }
         }

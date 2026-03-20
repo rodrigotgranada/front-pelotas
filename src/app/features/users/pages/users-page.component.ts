@@ -26,8 +26,8 @@ export class UsersPageComponent implements OnInit {
     this.loading.set(true);
 
     try {
-      const users = await firstValueFrom(this.usersApi.list());
-      this.users.set(users);
+      const response = await firstValueFrom(this.usersApi.list());
+      this.users.set(response.data);
     } catch (error) {
       this.toast.showApiError(error, ToastTitle.UsersLoadFailure);
     } finally {

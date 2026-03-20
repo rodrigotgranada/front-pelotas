@@ -19,6 +19,7 @@ export const ToastTitle = {
   ProfileLoadFailure: 'Falha ao carregar perfil',
   ProfileUpdateSuccess: 'Perfil atualizado',
   ProfileUpdateFailure: 'Falha ao atualizar perfil',
+  UserRegistrationFailure: 'Falha ao cadastrar usuario',
 } as const;
 
 export type ToastTitleValue = (typeof ToastTitle)[keyof typeof ToastTitle];

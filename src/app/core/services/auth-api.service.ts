@@ -8,6 +8,8 @@ import {
   LoginRequest,
   ResendVerificationCodePayload,
   VerifyEmailPayload,
+  RequestPasswordResetPayload,
+  ConfirmPasswordResetPayload,
 } from '../models/auth.model';
 import { AuthTokenService } from '../auth/auth-token.service';
 import { maybeNormalizeContactValue, onlyDigits } from '../utils/normalize.util';
@@ -49,6 +51,14 @@ export class AuthApiService {
       `${environment.apiBaseUrl}/auth/resend-verification-code`,
       payload,
     );
+  }
+
+  requestPasswordReset(payload: RequestPasswordResetPayload): Observable<{ message?: string }> {
+    return this.http.post<{ message?: string }>(`${environment.apiBaseUrl}/auth/request-password-reset`, payload);
+  }
+
+  confirmPasswordReset(payload: ConfirmPasswordResetPayload): Observable<void> {
+    return this.http.post<void>(`${environment.apiBaseUrl}/auth/confirm-password-reset`, payload);
   }
 
   logout(): void {

@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AuthTokenService } from '../../../core/auth/auth-token.service';
 
 @Component({
   selector: 'app-landing-page',
@@ -7,4 +8,8 @@ import { RouterLink } from '@angular/router';
   templateUrl: './landing-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LandingPageComponent {}
+export class LandingPageComponent {
+  private readonly authTokenService = inject(AuthTokenService);
+
+  readonly isAuthenticated = () => !!this.authTokenService.getToken();
+}

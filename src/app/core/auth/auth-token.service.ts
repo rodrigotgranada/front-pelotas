@@ -60,7 +60,7 @@ export class AuthTokenService {
     try {
       const value = localStorage.getItem(ROLE_CODE_STORAGE_KEY);
 
-      if (value === 'owner' || value === 'admin' || value === 'editor' || value === 'socio') {
+      if (value === 'owner' || value === 'admin' || value === 'editor' || value === 'socio' || value === 'user') {
         return value;
       }
 

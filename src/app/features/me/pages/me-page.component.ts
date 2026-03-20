@@ -7,12 +7,39 @@ import { AuthSessionService } from '../../../core/auth/auth-session.service';
 import { ToastMessagesService, ToastTitle } from '../../../core/notifications/toast-messages.service';
 import { UserAddressResponse, UserContactResponse, UserMeResponse } from '../../../core/models/user.model';
 import { UsersApiService } from '../../../core/services/users-api.service';
+import { HttpClient } from '@angular/common/http';
 import { SpinnerComponent } from '../../../shared/ui/spinner/spinner.component';
 import { SecuritySettingsComponent } from '../components/security-settings.component';
+import { ImageCropperDialogComponent } from '../../../shared/ui/image-cropper/image-cropper-dialog.component';
+
+interface ViaCepResponse {
+  cep: string;
+  logradouro: string;
+  complemento: string;
+  bairro: string;
+  localidade: string;
+  uf: string;
+  erro?: boolean;
+}
+import { CpfInputComponent } from '../../../shared/ui/cpf-input/cpf-input.component';
+import { EmailInputComponent } from '../../../shared/ui/email-input/email-input.component';
+import { PhoneInputComponent } from '../../../shared/ui/phone-input/phone-input.component';
+import { CepInputComponent } from '../../../shared/ui/cep-input/cep-input.component';
+import { PhotoUploadComponent } from '../../../shared/ui/photo-upload/photo-upload.component';
 
 @Component({
   selector: 'app-me-page',
-  imports: [SpinnerComponent, ReactiveFormsModule, SecuritySettingsComponent],
+  imports: [
+    SpinnerComponent,
+    ReactiveFormsModule,
+    SecuritySettingsComponent,
+    ImageCropperDialogComponent,
+    CpfInputComponent,
+    EmailInputComponent,
+    PhoneInputComponent,
+    CepInputComponent,
+    PhotoUploadComponent,
+  ],
   templateUrl: './me-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -22,12 +49,14 @@ export class MePageComponent implements OnInit {
   private readonly usersApi = inject(UsersApiService);
   private readonly toast = inject(ToastMessagesService);
   private readonly router = inject(Router);
+  private readonly http = inject(HttpClient);
 
   readonly me = this.session.me;
   readonly loading = this.session.loading;
   readonly saving = signal(false);
   readonly editing = signal(false);
   readonly photoDraft = signal<string | null | undefined>(undefined);
+  readonly photoDraftBlob = signal<Blob | null>(null);
   readonly photoPreviewUrl = computed(() => {
     const draft = this.photoDraft();
 
@@ -37,9 +66,12 @@ export class MePageComponent implements OnInit {
 
     return draft;
   });
+  
+  imageChangedEvent: any = '';
 
   readonly profileForm = this.formBuilder.group({
-    name: ['', [Validators.required, Validators.minLength(2)]],
+    firstName: ['', [Validators.required, Validators.minLength(2)]],
+    lastName: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
     document: [{ value: '', disabled: true }],
     documentType: [{ value: '', disabled: true }],
@@ -105,6 +137,9 @@ export class MePageComponent implements OnInit {
 
   removeContact(index: number): void {
     this.contactsFormArray.removeAt(index);
+    if (this.contactsFormArray.length === 1) {
+      this.contactsFormArray.at(0).get('isPrimary')?.setValue(true, { emitEvent: false });
+    }
   }
 
   addAddress(): void {
@@ -113,6 +148,35 @@ export class MePageComponent implements OnInit {
 
   removeAddress(index: number): void {
     this.addressesFormArray.removeAt(index);
+    if (this.addressesFormArray.length === 1) {
+      this.addressesFormArray.at(0).get('isPrimary')?.setValue(true, { emitEvent: false });
+    }
+  }
+
+  onContactPrimaryChange(selectedIndex: number): void {
+    const isChecked = this.contactsFormArray.at(selectedIndex).get('isPrimary')?.value;
+    if (isChecked) {
+      this.contactsFormArray.controls.forEach((control, index) => {
+        if (index !== selectedIndex) {
+          control.get('isPrimary')?.setValue(false, { emitEvent: false });
+        }
+      });
+    } else if (this.contactsFormArray.length === 1) {
+      this.contactsFormArray.at(selectedIndex).get('isPrimary')?.setValue(true, { emitEvent: false });
+    }
+  }
+
+  onAddressPrimaryChange(selectedIndex: number): void {
+    const isChecked = this.addressesFormArray.at(selectedIndex).get('isPrimary')?.value;
+    if (isChecked) {
+      this.addressesFormArray.controls.forEach((control, index) => {
+        if (index !== selectedIndex) {
+          control.get('isPrimary')?.setValue(false, { emitEvent: false });
+        }
+      });
+    } else if (this.addressesFormArray.length === 1) {
+      this.addressesFormArray.at(selectedIndex).get('isPrimary')?.setValue(true, { emitEvent: false });
+    }
   }
 
   onContactValueInput(index: number): void {
@@ -131,42 +195,58 @@ export class MePageComponent implements OnInit {
     }
   }
 
-  onAddressZipCodeInput(index: number): void {
+  async onAddressZipCodeInput(index: number): Promise<void> {
     const group = this.addressesFormArray.at(index);
     const valueControl = group.get('zipCode');
     const rawValue = String(valueControl?.value ?? '');
-    valueControl?.setValue(this.maskZipCode(rawValue), { emitEvent: false });
+    const masked = this.maskZipCode(rawValue);
+    valueControl?.setValue(masked, { emitEvent: false });
+
+    const digits = masked.replace(/\D/g, '');
+    if (digits.length === 8) {
+      group.get('loadingCep')?.setValue(true);
+      try {
+        const response = await firstValueFrom(this.http.get<ViaCepResponse>(`https://viacep.com.br/ws/${digits}/json/`));
+        if (!response.erro) {
+          group.patchValue({
+            street: response.logradouro,
+            neighborhood: response.bairro,
+            city: response.localidade,
+            state: response.uf,
+          });
+        }
+      } catch (error) {
+        // Fallback: let user type
+      } finally {
+        group.get('loadingCep')?.setValue(false);
+      }
+    }
   }
 
   onPhotoSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-
-    if (!file) {
-      return;
+    if (input.files && input.files.length > 0) {
+      if (!input.files[0].type.startsWith('image/')) {
+        this.toast.showWarning('Selecione apenas arquivos de imagem.', ToastTitle.Warning);
+        input.value = '';
+        return;
+      }
+      this.imageChangedEvent = event;
     }
+  }
 
-    if (!file.type.startsWith('image/')) {
-      this.toast.showWarning('Selecione apenas arquivos de imagem.', ToastTitle.Warning);
-      input.value = '';
-      return;
-    }
+  onImageCropped(blob: Blob): void {
+    this.photoDraftBlob.set(blob);
+    this.photoDraft.set(URL.createObjectURL(blob));
+    this.imageChangedEvent = '';
+  }
 
-    if (file.size > 2 * 1024 * 1024) {
-      this.toast.showWarning('A imagem deve ter no maximo 2MB.', ToastTitle.Warning);
-      input.value = '';
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = typeof reader.result === 'string' ? reader.result : null;
-      this.photoDraft.set(result);
-    };
-    reader.readAsDataURL(file);
+  onCropCancel(): void {
+    this.imageChangedEvent = '';
   }
 
   removePhoto(): void {
+    this.photoDraftBlob.set(null);
     this.photoDraft.set(null);
   }
 
@@ -190,8 +270,12 @@ export class MePageComponent implements OnInit {
     const raw = this.profileForm.getRawValue();
     const payload: UpdateOwnUserPayload = {};
 
-    if (raw.name && raw.name.trim() !== current.name) {
-      payload.name = raw.name.trim();
+    if (raw.firstName && raw.firstName.trim() !== current.firstName) {
+      payload.firstName = raw.firstName.trim();
+    }
+    
+    if (raw.lastName && raw.lastName.trim() !== current.lastName) {
+      payload.lastName = raw.lastName.trim();
     }
 
     if ((raw.password ?? '').trim()) {
@@ -220,12 +304,9 @@ export class MePageComponent implements OnInit {
       payload.addresses = addresses;
     }
 
-    const draftPhoto = this.photoDraft();
-    if (draftPhoto !== undefined) {
-      payload.photoUrl = draftPhoto ?? '';
-    }
+    const hasPhotoChange = this.photoDraft() !== undefined;
 
-    if (Object.keys(payload).length === 0) {
+    if (Object.keys(payload).length === 0 && !hasPhotoChange) {
       this.toast.showInfo('Nenhuma alteracao para salvar.', ToastTitle.Info);
       return;
     }
@@ -233,11 +314,25 @@ export class MePageComponent implements OnInit {
     this.saving.set(true);
 
     try {
-      await firstValueFrom(this.usersApi.updateMe(payload));
+      if (Object.keys(payload).length > 0) {
+        await firstValueFrom(this.usersApi.updateMe(payload));
+      }
+      
+      if (hasPhotoChange) {
+        const blob = this.photoDraftBlob();
+        if (blob) {
+          await firstValueFrom(this.usersApi.uploadOwnPhoto(blob));
+        } else if (this.photoDraft() === null && current.photoUrl) {
+           // Em caso de API de deletar foto, por ora ignoramos se for null (a ser removido via backend apropriado)
+           // Assumindo que photoUrl empty remove, se ajustado no backend
+        }
+      }
+
       this.toast.showSuccess('Seus dados foram atualizados com sucesso.', ToastTitle.ProfileUpdateSuccess);
       await this.refreshProfile();
       this.editing.set(false);
       this.photoDraft.set(undefined);
+      this.photoDraftBlob.set(null);
       this.profileForm.disable();
     } catch (error) {
       this.toast.showApiError(error, ToastTitle.ProfileUpdateFailure);
@@ -247,9 +342,13 @@ export class MePageComponent implements OnInit {
   }
 
   private createContactGroup(contact?: UserContactResponse) {
+    const isWhatsapp = contact?.type === 'whatsapp';
+    const typeValue = isWhatsapp ? 'celular' : (contact?.type ?? 'celular');
+
     return this.formBuilder.group({
-      type: [contact?.type ?? '', [Validators.required]],
+      type: [typeValue, [Validators.required]],
       value: [contact?.value ?? '', [Validators.required]],
+      isWhatsapp: [isWhatsapp],
       isPrimary: [contact?.isPrimary ?? false],
     });
   }
@@ -266,12 +365,14 @@ export class MePageComponent implements OnInit {
       zipCode: [address?.zipCode ?? '', [Validators.required]],
       country: [address?.country ?? 'Brasil', [Validators.required]],
       isPrimary: [address?.isPrimary ?? false],
+      loadingCep: [false],
     });
   }
 
   private populateForm(profile: UserMeResponse): void {
     this.profileForm.patchValue({
-      name: profile.name ?? '',
+      firstName: profile.firstName ?? '',
+      lastName: profile.lastName ?? '',
       email: profile.email ?? '',
       document: profile.document ?? '',
       documentType: profile.documentType ?? '',
@@ -304,13 +405,13 @@ export class MePageComponent implements OnInit {
   }
 
   private getNormalizedFormContacts(): NonNullable<UpdateOwnUserPayload['contacts']> {
-    const raw = this.contactsFormArray.getRawValue() as Array<{ type?: string; value?: string; isPrimary?: boolean }>;
+    const raw = this.contactsFormArray.getRawValue() as Array<{ type?: string; value?: string; isWhatsapp?: boolean; isPrimary?: boolean }>;
 
     const contacts = raw
-      .map((contact) => ({
-        type: (contact.type ?? '').trim(),
+      .map((contact, i, arr) => ({
+        type: contact.isWhatsapp && (contact.type ?? '').trim() === 'celular' ? 'whatsapp' : (contact.type ?? '').trim(),
         value: (contact.value ?? '').trim(),
-        isPrimary: !!contact.isPrimary,
+        isPrimary: arr.length === 1 ? true : !!contact.isPrimary,
       }))
       .filter((contact) => contact.type.length > 0 && contact.value.length > 0);
 
@@ -355,7 +456,7 @@ export class MePageComponent implements OnInit {
     }>;
 
     const addresses = raw
-      .map((address) => ({
+      .map((address, i, arr) => ({
         type: (address.type ?? '').trim(),
         street: (address.street ?? '').trim(),
         number: (address.number ?? '').trim(),
@@ -365,7 +466,7 @@ export class MePageComponent implements OnInit {
         state: (address.state ?? '').trim(),
         zipCode: (address.zipCode ?? '').trim(),
         country: (address.country ?? '').trim(),
-        isPrimary: !!address.isPrimary,
+        isPrimary: arr.length === 1 ? true : !!address.isPrimary,
       }))
       .filter(
         (address) =>

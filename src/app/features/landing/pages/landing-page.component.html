@@ -8,17 +8,26 @@
   </p>
 
   <div class="mt-8 flex flex-wrap gap-3">
-    <a
-      routerLink="/login"
-      class="rounded-xl bg-white px-5 py-3 text-sm font-bold text-sky-900 transition hover:bg-slate-100"
-    >
-      Area do usuario
-    </a>
-    <a
-      routerLink="/app/me"
-      class="rounded-xl border border-white/50 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
-    >
-      Meu perfil
-    </a>
+    @if (!isAuthenticated()) {
+      <a
+        routerLink="/login"
+        class="rounded-xl bg-white px-5 py-3 text-sm font-bold text-sky-900 transition hover:bg-slate-100"
+      >
+        Login
+      </a>
+      <a
+        routerLink="/register"
+        class="rounded-xl border border-white/50 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+      >
+        Cadastre-se
+      </a>
+    } @else {
+      <a
+        routerLink="/app/me"
+        class="rounded-xl bg-white px-5 py-3 text-sm font-bold text-sky-900 transition hover:bg-slate-100"
+      >
+        Meu perfil
+      </a>
+    }
   </div>
 </section>

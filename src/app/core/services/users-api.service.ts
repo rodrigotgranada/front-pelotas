@@ -10,7 +10,13 @@ import {
   RegisterRequest,
   UpdateOwnUserPayload,
 } from '../models/auth.model';
-import { UpdateUserRequest, UserMeResponse, UserResponse } from '../models/user.model';
+import { 
+  UpdateUserRequest, 
+  UserMeResponse, 
+  UserResponse, 
+  PaginatedUsersResponse, 
+  ListUsersQuery 
+} from '../models/user.model';
 import { skipGlobalLoadingContext } from '../http/http-options.util';
 import { maybeNormalizeContactValue, onlyDigits } from '../utils/normalize.util';
 
@@ -31,8 +37,31 @@ export class UsersApiService {
     return this.http.post<UserResponse>(`${environment.apiBaseUrl}/users`, body);
   }
 
-  list(): Observable<UserResponse[]> {
-    return this.http.get<UserResponse[]>(`${environment.apiBaseUrl}/users`, skipGlobalLoadingContext());
+  createAdmin(payload: RegisterRequest): Observable<UserResponse> {
+    const body: RegisterRequest = {
+      ...payload,
+      document: payload.document ? onlyDigits(payload.document) : '',
+      contacts: payload.contacts?.map((contact) => ({
+        ...contact,
+        value: maybeNormalizeContactValue(contact.type, contact.value),
+      })),
+    };
+
+    return this.http.post<UserResponse>(`${environment.apiBaseUrl}/users/admin`, body);
+  }
+
+  list(query?: ListUsersQuery): Observable<PaginatedUsersResponse> {
+    const params = new URLSearchParams();
+    if (query?.search) params.append('search', query.search);
+    if (query?.role) params.append('role', query.role);
+    if (query?.isActive !== undefined) params.append('isActive', String(query.isActive));
+    if (query?.page) params.append('page', String(query.page));
+    if (query?.limit) params.append('limit', String(query.limit));
+
+    const queryString = params.toString();
+    const url = queryString ? `${environment.apiBaseUrl}/users?${queryString}` : `${environment.apiBaseUrl}/users`;
+
+    return this.http.get<PaginatedUsersResponse>(url, skipGlobalLoadingContext());
   }
 
   getById(id: string): Observable<UserResponse> {
@@ -101,7 +130,32 @@ export class UsersApiService {
     return this.http.post<UserMeResponse>(`${environment.apiBaseUrl}/users/me/confirm-phone-verification`, payload);
   }
 
+  uploadOwnPhoto(file: File | Blob): Observable<UserMeResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<UserMeResponse>(`${environment.apiBaseUrl}/users/me/photo`, formData);
+  }
+
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${environment.apiBaseUrl}/users/${id}`);
   }
+
+  reactivate(id: string): Observable<UserResponse> {
+    return this.http.patch<UserResponse>(`${environment.apiBaseUrl}/users/${id}/reactivate`, {});
+  }
+
+  uploadUserPhoto(userId: string, file: File | Blob): Observable<UserResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<UserResponse>(`${environment.apiBaseUrl}/users/${userId}/photo`, formData);
+  }
+
+  suspend(id: string, reason: string): Observable<UserResponse> {
+    return this.http.patch<UserResponse>(`${environment.apiBaseUrl}/users/${id}/suspend`, { reason });
+  }
+
+  forceLogout(id: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${environment.apiBaseUrl}/users/${id}/force-logout`, {});
+  }
 }
+

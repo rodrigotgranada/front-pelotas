@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'http://localhost:3000/api',
+  // Esta URL deve ser substituída para a URL que o Render vai te fornecer após subir o backend
+  apiBaseUrl: 'https://back-pelotas.onrender.com/api',
 };

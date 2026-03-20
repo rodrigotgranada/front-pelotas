@@ -6,10 +6,12 @@ import { AuthSessionService } from '../../../core/auth/auth-session.service';
 import { ToastMessagesService, ToastTitle } from '../../../core/notifications/toast-messages.service';
 import { AuthApiService } from '../../../core/services/auth-api.service';
 import { SpinnerComponent } from '../../../shared/ui/spinner/spinner.component';
+import { PasswordInputComponent } from '../../../shared/ui/password-input/password-input.component';
+import { CodeInputComponent } from '../../../shared/ui/code-input/code-input.component';
 
 @Component({
   selector: 'app-login-page',
-  imports: [ReactiveFormsModule, SpinnerComponent],
+  imports: [ReactiveFormsModule, SpinnerComponent, PasswordInputComponent, CodeInputComponent],
   templateUrl: './login-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

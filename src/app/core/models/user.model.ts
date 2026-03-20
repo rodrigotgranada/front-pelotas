@@ -3,7 +3,8 @@ import { RoleCode } from './role.model';
 
 export interface UserResponse {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   document: string;
   documentType: string;
@@ -11,6 +12,8 @@ export interface UserResponse {
   roleCode?: RoleCode;
   photoUrl?: string;
   isActive: boolean;
+  status: 'active' | 'pending' | 'blocked' | 'suspended';
+  statusReason?: string | null;
   emailVerified: boolean;
   lastLoginAt?: string;
   passwordUpdatedAt?: string;
@@ -45,7 +48,8 @@ export interface UserAddress {
 }
 
 export interface UpdateUserRequest {
-  name?: string;
+  firstName?: string;
+  lastName?: string;
   email?: string;
   password?: string;
   document?: string;
@@ -81,7 +85,8 @@ export interface UserAddressResponse {
 
 export interface UserMeResponse {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   document?: string;
   documentType?: string;
@@ -106,4 +111,20 @@ export interface UserMeResponse {
   deletedBy?: string;
   contacts?: UserContactResponse[];
   addresses?: UserAddressResponse[];
+}
+
+export interface ListUsersQuery {
+  search?: string;
+  role?: string;
+  isActive?: boolean;
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginatedUsersResponse {
+  data: UserResponse[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
