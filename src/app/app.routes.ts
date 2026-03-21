@@ -66,7 +66,11 @@ export const routes: Routes = [
 		loadChildren: () => import('./features/admin/admin.routes'),
 	},
 	{
+		path: 'noticias/:slug',
+		loadComponent: () => import('./features/public-news/pages/news-article-page.component').then((m) => m.NewsArticlePageComponent),
+	},
+	{
 		path: '**',
-		redirectTo: '',
+		loadComponent: () => import('./core/pages/not-found/not-found.component').then((m) => m.NotFoundComponent),
 	},
 ];

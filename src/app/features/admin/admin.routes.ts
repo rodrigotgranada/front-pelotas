@@ -24,6 +24,16 @@ export default [
         canActivate: [rolesGuard(['owner', 'socio', 'admin'])],
       },
       {
+        path: 'news',
+        loadComponent: () => import('./pages/news/admin-news-page.component').then((c) => c.AdminNewsPageComponent),
+        canActivate: [rolesGuard(['owner', 'socio', 'admin', 'editor'])],
+      },
+      {
+        path: 'news/editor/:id',
+        loadComponent: () => import('./pages/news/admin-news-editor.component').then((c) => c.AdminNewsEditorComponent),
+        canActivate: [rolesGuard(['owner', 'socio', 'admin', 'editor'])],
+      },
+      {
         path: 'logs',
         loadComponent: () => import('../../features/logs/pages/logs-page.component').then((c) => c.LogsPageComponent),
         canActivate: [rolesGuard(['owner', 'admin'])],

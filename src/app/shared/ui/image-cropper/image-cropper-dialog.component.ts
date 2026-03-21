@@ -38,13 +38,13 @@ import { SpinnerComponent } from '../spinner/spinner.component';
           <image-cropper
             class="max-h-[350px]"
             [imageChangedEvent]="imageChangedEvent"
-            [maintainAspectRatio]="true"
-            [aspectRatio]="1 / 1"
-            [resizeToWidth]="400"
+            [maintainAspectRatio]="maintainAspectRatio"
+            [aspectRatio]="aspectRatio"
+            [resizeToWidth]="resizeToWidth"
             [cropperMinHeight]="100"
             [cropperMinWidth]="100"
-            [roundCropper]="true"
-            format="png"
+            [roundCropper]="roundCropper"
+            [format]="format"
             (imageCropped)="imageCropped($event)"
             (imageLoaded)="imageLoaded()"
             (cropperReady)="cropperReady()"
@@ -103,6 +103,12 @@ import { SpinnerComponent } from '../spinner/spinner.component';
 })
 export class ImageCropperDialogComponent {
   @Input() imageChangedEvent: any = '';
+  @Input() aspectRatio: number = 1 / 1;
+  @Input() maintainAspectRatio: boolean = true;
+  @Input() resizeToWidth: number = 400;
+  @Input() roundCropper: boolean = true;
+  @Input() format: 'png' | 'jpeg' | 'webp' | 'bmp' | 'ico' = 'webp';
+
   @Output() imageCroppedEvent = new EventEmitter<Blob>();
   @Output() cancel = new EventEmitter<void>();
 

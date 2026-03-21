@@ -1,5 +1,8 @@
 @use "tailwindcss";
 
+@import 'quill/dist/quill.core.css';
+@import 'quill/dist/quill.snow.css';
+
 @keyframes panel-reveal {
 	from {
 		opacity: 0;
