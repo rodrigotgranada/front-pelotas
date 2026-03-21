@@ -307,20 +307,18 @@
                       Invalida silenciosamente o acesso do usuário em todos os dispositivos que tiverem sessões em aberto.
                     </p>
 
-                    @if (session.me()?.roleCode === 'owner') {
-                      <div class="mt-4 border-t border-rose-100 pt-4">
-                        <button 
-                          (click)="hardDeleteUser()"
-                          class="inline-flex items-center gap-2 rounded-md bg-rose-600 px-3 py-2 text-sm font-bold text-white shadow-sm hover:bg-rose-500 w-fit transition focus:outline-none focus:ring-2 focus:ring-rose-600 focus:ring-offset-2"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                          Excluir LOGICAMENTE (Hard Delete)
-                        </button>
-                        <p class="text-xs text-rose-500 mt-2 font-medium">
-                          <span class="font-bold">Ação Irreversível!</span> Exclui permanentemente todos os dados deste usuário da base, ignorando lixeira. Apenas visível para cargo Owner.
-                        </p>
-                      </div>
-                    }
+                    <div class="mt-4 border-t border-rose-100 pt-4">
+                      <button 
+                        (click)="showDeleteModal.set(true)"
+                        class="inline-flex items-center gap-2 rounded-md bg-rose-100 px-3 py-2 text-sm font-bold text-rose-800 shadow-sm ring-1 ring-inset ring-rose-200 hover:bg-rose-200 w-fit transition focus:outline-none focus:ring-2 focus:ring-rose-600 focus:ring-offset-2"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                        Painel de Desligamento e Exclusão
+                      </button>
+                      <p class="text-xs text-rose-600 mt-2 font-medium">
+                        Inativar o acesso do usuário ou removê-lo definitivamente do sistema (Hard Delete). Opções variam por cargo.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -331,3 +329,11 @@
     </div>
   </div>
 </div>
+
+@if (showDeleteModal()) {
+  <app-delete-user-modal
+    [user]="user"
+    (close)="showDeleteModal.set(false)"
+    (deleted)="onUserDeleted()"
+  />
+}

@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthSessionService } from '../auth/auth-session.service';
+import { AuthTokenService } from '../auth/auth-token.service';
 import { ToastMessagesService, ToastTitle } from '../notifications/toast-messages.service';
 
 /**
@@ -11,25 +12,25 @@ import { ToastMessagesService, ToastTitle } from '../notifications/toast-message
 export const rolesGuard = (allowedRoles: string[]): CanActivateFn => {
   return () => {
     const session = inject(AuthSessionService);
+    const tokenService = inject(AuthTokenService);
     const router = inject(Router);
     const toast = inject(ToastMessagesService);
     
-    // Check if the user is authenticated at all
     const me = session.me();
-    if (!me) {
+    // Use fallback from TokenService if session is not yet hydrated (e.g. F5 page refresh)
+    const userRole = me?.roleCode || me?.roleId || tokenService.getRoleCode() || 'user';
+
+    // Se não há token sequer, ele já está deslogado
+    if (!tokenService.getToken()) {
       toast.showWarning('Você precisa estar logado para acessar esta área.', ToastTitle.Warning);
       return router.parseUrl('/login');
     }
-
-    // Role code é o código legível (owner, admin, editor...), roleId é o ObjectId do MongoDB
-    const userRole = me.roleCode || me.roleId || 'user';
 
     if (allowedRoles.includes(userRole)) {
       return true;
     }
 
-    toast.showError('Você não tem o nivel de permissao exigido para acessar essa pagina.', 'Acesso Negado');
-    // Send user to a safe page since they lack roles.
+    toast.showError('Você não tem o nível de permissão exigido para acessar essa página.', 'Acesso Negado');
     return router.parseUrl('/app/me');
   };
 };

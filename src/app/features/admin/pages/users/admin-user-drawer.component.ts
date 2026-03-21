@@ -9,11 +9,12 @@ import { ToastMessagesService, ToastTitle } from '../../../../core/notifications
 import { SpinnerComponent } from '../../../../shared/ui/spinner/spinner.component';
 import { firstValueFrom } from 'rxjs';
 import { AuthSessionService } from '../../../../core/auth/auth-session.service';
+import { DeleteUserModalComponent } from './delete-user-modal.component';
 
 @Component({
   selector: 'app-admin-user-drawer',
   standalone: true,
-  imports: [CommonModule, FormsModule, SpinnerComponent],
+  imports: [CommonModule, FormsModule, SpinnerComponent, DeleteUserModalComponent],
   templateUrl: './admin-user-drawer.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -143,28 +144,11 @@ export class AdminUserDrawerComponent implements OnChanges {
     }
   }
 
-  async hardDeleteUser() {
-    const confirmationText = prompt(
-      `ATENÇÃO OWNER!\n\nVocê está prestes a EXCLUIR PERMANENTEMENTE o usuário ${this.user.firstName} ${this.user.lastName}.\nIsso removerá TODOS os dados dele de forma irreversível (Hard Delete).\n\nPara prosseguir, digite a palavra "CONFIRMAR" abaixo:`
-    );
+  readonly showDeleteModal = signal(false);
 
-    if (confirmationText !== 'CONFIRMAR') {
-      if (confirmationText !== null) {
-        this.toast.showError('Exclusão cancelada. Você não digitou CONFIRMAR.', ToastTitle.Error);
-      }
-      return;
-    }
-
-    this.loading.set(true);
-    try {
-      await firstValueFrom(this.usersApi.hardDelete(this.user.id));
-      this.toast.showSuccess('Usuário removido permanentemente do sistema.', ToastTitle.Success);
-      this.userUpdated.emit();
-      this.close.emit();
-    } catch (error) {
-      this.toast.showApiError(error, 'Falha ao realizar Hard Delete');
-    } finally {
-      this.loading.set(false);
-    }
+  onUserDeleted(): void {
+    this.showDeleteModal.set(false);
+    this.userUpdated.emit();
+    this.close.emit();
   }
 }

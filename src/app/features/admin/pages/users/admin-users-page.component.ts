@@ -9,11 +9,13 @@ import { ToastMessagesService, ToastTitle } from '../../../../core/notifications
 import { PaginatedUsersResponse, UserResponse } from '../../../../core/models/user.model';
 import { AdminCreateUserDrawerComponent } from './admin-create-user-drawer.component';
 import { AdminUserDrawerComponent } from './admin-user-drawer.component';
+import { AuthSessionService } from '../../../../core/auth/auth-session.service';
+import { DeleteUserModalComponent } from './delete-user-modal.component';
 
 @Component({
   selector: 'app-admin-users-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, SpinnerComponent, AdminCreateUserDrawerComponent, AdminUserDrawerComponent],
+  imports: [CommonModule, ReactiveFormsModule, SpinnerComponent, AdminCreateUserDrawerComponent, AdminUserDrawerComponent, DeleteUserModalComponent],
   template: `
     <div class="space-y-6">
       <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
@@ -123,9 +125,9 @@ import { AdminUserDrawerComponent } from './admin-user-drawer.component';
                         
                         @if (user.isActive) {
                           <button 
-                            (click)="$event.stopPropagation(); deactivateUser(user)"
+                            (click)="$event.stopPropagation(); openDeleteModal(user)"
                             class="text-rose-400 hover:text-rose-600 transition p-2 rounded-lg hover:bg-rose-50"
-                            title="Inativar usuario"
+                            title="Desligar/Excluir usuario"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                           </button>
@@ -202,6 +204,16 @@ import { AdminUserDrawerComponent } from './admin-user-drawer.component';
           (userUpdated)="onUserUpdated()"
         />
       }
+
+      <!-- Modal de Exclusão Customizada -->
+      @if (userToDelete()) {
+        <app-delete-user-modal
+          [user]="userToDelete()!"
+          (close)="closeDeleteModal()"
+          (deleted)="onUserDeleted()"
+        />
+      }
+
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -210,6 +222,7 @@ export class AdminUsersPageComponent implements OnInit {
   private readonly usersService = inject(UsersApiService);
   private readonly toastService = inject(ToastMessagesService);
   private readonly destroyRef = inject(DestroyRef);
+  readonly session = inject(AuthSessionService);
 
   readonly searchControl = new FormControl<string>('');
   readonly roleFilterControl = new FormControl<string | null>(null);
@@ -219,6 +232,11 @@ export class AdminUsersPageComponent implements OnInit {
   readonly showCreateDrawer = signal<boolean>(false);
   readonly userToEdit = signal<UserResponse | null>(null);
   readonly selectedUser = signal<UserResponse | null>(null);
+  
+  // Custom Modal States
+  readonly userToDelete = signal<UserResponse | null>(null);
+  readonly deleteConfirmText = signal<string>('');
+
   readonly usersData = signal<PaginatedUsersResponse | null>(null);
   
   private currentPage = 1;
@@ -298,20 +316,19 @@ export class AdminUsersPageComponent implements OnInit {
     this.fetchUsers();
   }
 
-  deactivateUser(user: UserResponse): void {
-    if (confirm(`Tem certeza que deseja inativar o usuario ${user.firstName} ${user.lastName}? Ele perdera acesso a plataforma.`)) {
-      this.loading.set(true);
-      this.usersService.delete(user.id).subscribe({
-        next: () => {
-          this.toastService.showSuccess('Usuario inativado com sucesso.', 'Sucesso');
-          this.fetchUsers();
-        },
-        error: (err) => {
-          this.toastService.showApiError(err, 'Falha ao inativar');
-          this.loading.set(false);
-        }
-      });
-    }
+  openDeleteModal(user: UserResponse): void {
+    this.userToDelete.set(user);
+    this.deleteConfirmText.set('');
+  }
+
+  closeDeleteModal(): void {
+    this.userToDelete.set(null);
+    this.deleteConfirmText.set('');
+  }
+
+  onUserDeleted(): void {
+    this.closeDeleteModal();
+    this.fetchUsers();
   }
 
   reactivateUser(user: UserResponse): void {
