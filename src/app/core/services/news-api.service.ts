@@ -39,6 +39,10 @@ export class NewsApiService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`, { params });
   }
 
+  getCategories(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/categories`);
+  }
+
   incrementView(slug: string): Observable<void> {
     return this.http.post<void>(`${environment.apiBaseUrl}/public-news/${slug}/view`, {});
   }
@@ -51,5 +55,33 @@ export class NewsApiService {
 
   getPublicBySlug(slug: string): Observable<News> {
     return this.http.get<News>(`${environment.apiBaseUrl}/public-news/${slug}`);
+  }
+
+  getPublicNews(query: { page?: number; limit?: number; category?: string } = {}): Observable<PaginatedNews> {
+    let params = new HttpParams();
+    Object.entries(query).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params = params.set(key, value.toString());
+      }
+    });
+    return this.http.get<PaginatedNews>(`${environment.apiBaseUrl}/public-news`, { params });
+  }
+
+  // --- Engagement Methods ---
+
+  getLikeStatus(slug: string): Observable<{ liked: boolean }> {
+    return this.http.get<{ liked: boolean }>(`${environment.apiBaseUrl}/public-news/${slug}/like-status`);
+  }
+
+  toggleLike(slug: string): Observable<{ liked: boolean; totalLikes: number }> {
+    return this.http.post<{ liked: boolean; totalLikes: number }>(`${environment.apiBaseUrl}/public-news/${slug}/like`, {});
+  }
+
+  getComments(slug: string): Observable<any[]> {
+    return this.http.get<any[]>(`${environment.apiBaseUrl}/public-news/${slug}/comments`);
+  }
+
+  addComment(slug: string, content: string): Observable<any> {
+    return this.http.post<any>(`${environment.apiBaseUrl}/public-news/${slug}/comments`, { content });
   }
 }

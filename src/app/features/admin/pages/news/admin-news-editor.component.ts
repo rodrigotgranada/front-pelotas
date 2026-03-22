@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -85,16 +85,40 @@ import { ImageCropperDialogComponent } from '../../../../shared/ui/image-cropper
           </div>
         }
 
-        <div class="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-6 mb-2">
-            <div>
-              <h3 class="text-sm font-bold text-slate-900">Destaque na Página Inicial</h3>
-              <p class="text-xs text-slate-500">Ao marcar como destaque, essa notícia aparecerá nos quadros principais (Estilo Globo Esporte)</p>
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex-1 flex items-center justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div>
+                <h3 class="text-sm font-bold text-slate-900">Destaque na Home</h3>
+                <p class="text-xs text-slate-500 mt-1">Matéria aparece no carrossel principal</p>
+              </div>
+              <label class="relative inline-flex cursor-pointer items-center">
+                <input type="checkbox" formControlName="isFeatured" class="peer sr-only">
+                <div class="peer h-6 w-11 rounded-full bg-slate-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-amber-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-amber-300"></div>
+              </label>
             </div>
-            <label class="relative inline-flex cursor-pointer items-center">
-              <input type="checkbox" formControlName="isFeatured" class="peer sr-only">
-              <div class="peer h-6 w-11 rounded-full bg-slate-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-amber-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300"></div>
-            </label>
+            
+            <div class="flex-1 flex items-center justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div>
+                <h3 class="text-sm font-bold text-slate-900">Comentários</h3>
+                <p class="text-xs text-slate-500 mt-1">Torcedores logados podem comentar</p>
+              </div>
+              <label class="relative inline-flex cursor-pointer items-center">
+                <input type="checkbox" formControlName="allowComments" class="peer sr-only">
+                <div class="peer h-6 w-11 rounded-full bg-slate-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-emerald-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-300"></div>
+              </label>
+            </div>
+
+            <div class="flex-1 flex items-center justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div>
+                <h3 class="text-sm font-bold text-slate-900">Curtidas</h3>
+                <p class="text-xs text-slate-500 mt-1">Permitir deixar coração na matéria</p>
+              </div>
+              <label class="relative inline-flex cursor-pointer items-center">
+                <input type="checkbox" formControlName="allowLikes" class="peer sr-only">
+                <div class="peer h-6 w-11 rounded-full bg-slate-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-rose-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-rose-300"></div>
+              </label>
+            </div>
           </div>
 
           <div class="flex flex-col md:flex-row gap-6">
@@ -142,14 +166,47 @@ import { ImageCropperDialogComponent } from '../../../../shared/ui/image-cropper
             
             <div>
               <label class="mb-2 block text-sm font-semibold text-slate-700">Categorias da Matéria</label>
-              <div class="flex flex-wrap gap-2">
-                @for (cat of availableCategories; track cat) {
-                  <label class="inline-flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-lg cursor-pointer hover:border-indigo-300 transition">
-                    <input type="checkbox" class="text-indigo-600 rounded focus:ring-indigo-500 w-4 h-4" 
-                           [checked]="hasCategory(cat)"
-                           (change)="toggleCategory(cat)">
-                    <span class="text-sm text-slate-700 font-medium">{{ cat }}</span>
-                  </label>
+              
+              <div class="relative bg-white border border-slate-200 rounded-lg p-2 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all">
+                <!-- Tags já selecionadas -->
+                <div class="flex flex-wrap gap-1.5 mb-1.5">
+                  @for (cat of form.value.categories; track cat) {
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                      {{ cat }}
+                      <button type="button" (click)="removeCategory(cat)" class="hover:bg-indigo-200 hover:text-indigo-900 rounded-full p-0.5 transition flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                      </button>
+                    </span>
+                  }
+                </div>
+
+                <!-- Input Interativo -->
+                <input 
+                  type="text" 
+                  [value]="categoryFilter()"
+                  (input)="onCategoryInput($event)"
+                  (keydown.enter)="$event.preventDefault(); addCategory()"
+                  placeholder="Pesquisar ou Enter para nova..."
+                  class="w-full text-sm outline-none border-none p-1 bg-transparent placeholder-slate-400 text-slate-700"
+                />
+
+                <!-- Dropdown de Sugestões -->
+                @if (categoryFilter() && filteredCategories().length > 0) {
+                  <div class="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden max-h-48 overflow-y-auto">
+                    @for (cat of filteredCategories(); track cat) {
+                      <button type="button" (click)="addCategory(cat)" class="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-900 transition flex items-center gap-2 border-b border-slate-50 last:border-0 font-medium">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-indigo-500"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                        {{ cat }}
+                      </button>
+                    }
+                  </div>
+                }
+                @else if (categoryFilter() && filteredCategories().length === 0) {
+                  <div class="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden px-3 py-2">
+                    <p class="text-xs text-slate-600 flex items-center gap-2">
+                      Criar nova tag: <span class="font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">"{{ categoryFilter() }}"</span>
+                    </p>
+                  </div>
                 }
               </div>
             </div>
@@ -250,15 +307,21 @@ export class AdminNewsEditorComponent implements OnInit, OnDestroy {
   readonly currentStatus = signal<string>('DRAFT');
   readonly imageSelectedEvent = signal<Event | null>(null);
 
-  readonly availableCategories = [
-    'Futebol Profissional',
-    'Futebol Feminino',
-    'Futebol de Base',
-    'Matérias Especiais',
-    'Notas Oficiais',
-    'Ações Sociais',
-    'Loba'
-  ];
+  readonly availableCategories = signal<string[]>([]);
+  readonly categoryFilter = signal<string>('');
+  
+  private normalizeStr(str: string): string {
+    return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  readonly filteredCategories = computed(() => {
+    const query = this.normalizeStr(this.categoryFilter());
+    const all = this.availableCategories();
+    return all.filter(c => 
+      this.normalizeStr(c).includes(query) && 
+      !this.form.value.categories?.includes(c)
+    );
+  });
   
   private newsId: string | null = null;
   private editorJs: EditorJS | null = null;
@@ -270,11 +333,19 @@ export class AdminNewsEditorComponent implements OnInit, OnDestroy {
     contentHtml: [''],
     coverImageUrl: [null as string | null],
     isFeatured: [false],
+    allowComments: [true],
+    allowLikes: [true],
     authorDisplayName: [''],
     categories: [[] as string[]]
   });
 
   ngOnInit() {
+    this.newsApi.getCategories().subscribe(res => {
+      const baseCaps = ['Futebol Profissional', 'Futebol Feminino', 'Futebol de Base', 'Matérias Especiais', 'Notas Oficiais', 'Ações Sociais', 'Loba'];
+      const merged = Array.from(new Set([...baseCaps, ...res])).sort();
+      this.availableCategories.set(merged);
+    });
+
     this.newsId = this.route.snapshot.paramMap.get('id');
     
     if (this.newsId && this.newsId !== 'new') {
@@ -346,6 +417,8 @@ export class AdminNewsEditorComponent implements OnInit, OnDestroy {
           format: news.format,
           coverImageUrl: news.coverImageUrl || null,
           isFeatured: news.isFeatured,
+          allowComments: news.allowComments !== false,
+          allowLikes: news.allowLikes !== false,
           authorDisplayName: news.authorDisplayName || '',
           categories: news.categories || []
         });
@@ -408,6 +481,8 @@ export class AdminNewsEditorComponent implements OnInit, OnDestroy {
       content,
       coverImageUrl: this.form.value.coverImageUrl || undefined,
       isFeatured: this.form.value.isFeatured || false,
+      allowComments: this.form.value.allowComments !== false,
+      allowLikes: this.form.value.allowLikes !== false,
       authorDisplayName: this.form.value.authorDisplayName || undefined,
       categories: this.form.value.categories || [],
       status
@@ -514,17 +589,40 @@ export class AdminNewsEditorComponent implements OnInit, OnDestroy {
     this.form.patchValue({ coverImageUrl: null });
   }
 
-  hasCategory(cat: string): boolean {
-    return this.form.value.categories?.includes(cat) || false;
+  onCategoryInput(event: Event) {
+    const el = event.target as HTMLInputElement;
+    this.categoryFilter.set(el.value);
   }
 
-  toggleCategory(cat: string) {
-    const current = new Set(this.form.value.categories || []);
-    if (current.has(cat)) {
-      current.delete(cat);
+  addCategory(forceCategory?: string) {
+    let cat = (forceCategory || this.categoryFilter()).trim();
+    if (!cat) return;
+
+    const normalizedCat = this.normalizeStr(cat);
+
+    // Auto-fix to existing database format if matches without accents or cases
+    const existingOfficial = this.availableCategories().find(
+      c => this.normalizeStr(c) === normalizedCat
+    );
+
+    if (existingOfficial) {
+      cat = existingOfficial;
     } else {
-      current.add(cat);
+      // Capitalize first letter for beautifully formatted new tags
+      cat = cat.charAt(0).toUpperCase() + cat.slice(1);
     }
-    this.form.patchValue({ categories: Array.from(current) });
+
+    const current = this.form.value.categories || [];
+    const isAlreadyAdded = current.some((c: string) => this.normalizeStr(c) === this.normalizeStr(cat));
+    
+    if (!isAlreadyAdded) {
+      this.form.patchValue({ categories: [...current, cat] });
+    }
+    this.categoryFilter.set('');
+  }
+
+  removeCategory(catToRemove: string) {
+    const current = this.form.value.categories || [];
+    this.form.patchValue({ categories: current.filter((c: string) => c !== catToRemove) });
   }
 }

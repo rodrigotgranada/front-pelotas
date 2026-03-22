@@ -7,6 +7,9 @@ export interface News {
   categories: string[];
   content: any;
   format: 'HTML' | 'BLOCKS';
+  allowComments: boolean;
+  allowLikes: boolean;
+  likesCount: number;
   coverImageUrl?: string | null;
   isFeatured: boolean;
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
