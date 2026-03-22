@@ -1,5 +1,6 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, inject, signal, OnInit } from '@angular/core';
+import { environment } from '../../../../../environments/environment';
 import { RouterLink } from '@angular/router';
 import { PaginatedNews } from '../../../../core/models/news.model';
 import { NewsApiService } from '../../../../core/services/news-api.service';
@@ -175,8 +176,8 @@ import { DeleteNewsModalComponent } from './components/delete-news-modal.compone
                       <div class="mt-2">
                         <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Link Público</p>
                         <div class="flex items-center gap-2">
-                          <input readonly class="text-sm bg-slate-50 text-slate-500 px-3 py-2 rounded-lg flex-1 border border-slate-200 outline-none" [value]="'http://localhost:4200/noticias/' + (selectedNews()?.slug || selectedNews()?.id)" />
-                          <a [href]="'http://localhost:4200/noticias/' + (selectedNews()?.slug || selectedNews()?.id)" target="_blank" class="bg-indigo-100 text-indigo-700 px-3 py-2 rounded-lg hover:bg-indigo-200 font-bold text-sm transition">Testar Acesso</a>
+                          <input readonly class="text-sm bg-slate-50 text-slate-500 px-3 py-2 rounded-lg flex-1 border border-slate-200 outline-none" [value]="publicBaseUrl + '/noticias/' + (selectedNews()?.slug || selectedNews()?.id)" />
+                          <a [href]="publicBaseUrl + '/noticias/' + (selectedNews()?.slug || selectedNews()?.id)" target="_blank" class="bg-indigo-100 text-indigo-700 px-3 py-2 rounded-lg hover:bg-indigo-200 font-bold text-sm transition">Testar Acesso</a>
                         </div>
                       </div>
                     }
@@ -209,6 +210,7 @@ export class AdminNewsPageComponent implements OnInit {
   private readonly newsApi = inject(NewsApiService);
 
   readonly loading = signal(false);
+  readonly publicBaseUrl = environment.publicBaseUrl;
   readonly news = signal<PaginatedNews>({ items: [], total: 0, page: 1, limit: 10, pages: 0 });
   readonly selectedNews = signal<any | null>(null);
   readonly newsToDelete = signal<any | null>(null);
