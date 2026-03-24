@@ -1,5 +1,24 @@
 @use "tailwindcss";
 
+/* =============================================
+   Brand Palette — Tailwind v4 dynamic theme
+   CSS vars are swapped at runtime by AppSettingsService
+   to support campaign themes (Outubro Rosa, Novembro Azul…)
+   ============================================= */
+@theme {
+  --color-brand-50: var(--theme-brand-50, #ecfeff);
+  --color-brand-100: var(--theme-brand-100, #cffafe);
+  --color-brand-200: var(--theme-brand-200, #a5f3fc);
+  --color-brand-300: var(--theme-brand-300, #67e8f9);
+  --color-brand-400: var(--theme-brand-400, #22d3ee);
+  --color-brand-500: var(--theme-brand-500, #06b6d4);
+  --color-brand-600: var(--theme-brand-600, #0891b2);
+  --color-brand-700: var(--theme-brand-700, #0e7490);
+  --color-brand-800: var(--theme-brand-800, #155e75);
+  --color-brand-900: var(--theme-brand-900, #164e63);
+}
+
+
 @import 'quill/dist/quill.core.css';
 @import 'quill/dist/quill.snow.css';
 

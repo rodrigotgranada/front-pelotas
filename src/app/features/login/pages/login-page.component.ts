@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { AuthSessionService } from '../../../core/auth/auth-session.service';
 import { ToastMessagesService, ToastTitle } from '../../../core/notifications/toast-messages.service';
@@ -9,9 +9,12 @@ import { SpinnerComponent } from '../../../shared/ui/spinner/spinner.component';
 import { PasswordInputComponent } from '../../../shared/ui/password-input/password-input.component';
 import { CodeInputComponent } from '../../../shared/ui/code-input/code-input.component';
 
+import { AppSettingsService } from '../../../core/services/app-settings.service';
+import { RouterLink } from '@angular/router';
+
 @Component({
   selector: 'app-login-page',
-  imports: [ReactiveFormsModule, SpinnerComponent, PasswordInputComponent, CodeInputComponent],
+  imports: [ReactiveFormsModule, SpinnerComponent, PasswordInputComponent, CodeInputComponent, RouterLink],
   templateUrl: './login-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -21,6 +24,8 @@ export class LoginPageComponent {
   private readonly session = inject(AuthSessionService);
   private readonly toast = inject(ToastMessagesService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  readonly appSettings = inject(AppSettingsService);
 
   readonly loginForm = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -56,7 +61,7 @@ export class LoginPageComponent {
 
       await this.session.hydrateSession();
       this.toast.showLoginSuccess();
-      await this.router.navigateByUrl('/app/me');
+      await this.navigateAfterLogin();
     } catch (error) {
       this.toast.showApiError(error, ToastTitle.LoginFailure);
     } finally {
@@ -85,7 +90,7 @@ export class LoginPageComponent {
       this.pendingEmailVerification.set(false);
       this.verifyEmailForm.reset();
       this.toast.showSuccess('Email verificado com sucesso.', ToastTitle.Success);
-      await this.router.navigateByUrl('/app/me');
+      await this.navigateAfterLogin();
     } catch (error) {
       this.toast.showApiError(error, 'Falha na verificacao');
     } finally {
@@ -108,6 +113,15 @@ export class LoginPageComponent {
       this.toast.showApiError(error, 'Falha ao reenviar codigo');
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  private async navigateAfterLogin(): Promise<void> {
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    if (returnUrl) {
+      await this.router.navigateByUrl(returnUrl);
+    } else {
+      await this.router.navigateByUrl('/app/me');
     }
   }
 }

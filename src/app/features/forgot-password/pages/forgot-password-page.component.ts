@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { ToastMessagesService, ToastTitle } from '../../../core/notifications/toast-messages.service';
 import { AuthApiService } from '../../../core/services/auth-api.service';
 import { SpinnerComponent } from '../../../shared/ui/spinner/spinner.component';
+import { AppSettingsService } from '../../../core/services/app-settings.service';
 
 @Component({
   selector: 'app-forgot-password-page',
@@ -17,6 +18,7 @@ export class ForgotPasswordPageComponent {
   private readonly authApi = inject(AuthApiService);
   private readonly toast = inject(ToastMessagesService);
   private readonly router = inject(Router);
+  readonly appSettings = inject(AppSettingsService);
 
   readonly forgotForm = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],

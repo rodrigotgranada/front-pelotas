@@ -1,90 +1,126 @@
-<section class="mx-auto max-w-md rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-  <p class="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-700">Autenticacao</p>
-  @if (!pendingEmailVerification()) {
-    <h1 class="mt-2 text-2xl font-black tracking-tight text-slate-900">Entrar no sistema</h1>
-    <p class="mt-2 text-sm text-slate-600">Use suas credenciais do backend para obter o JWT.</p>
+<div class="min-h-screen w-full flex items-center justify-center p-4 relative overflow-hidden bg-slate-950 font-sans text-slate-900">
+  <!-- Decorative background elements -->
+  <div class="absolute inset-0 z-0 text-white/5 pointer-events-none">
+    <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 blur-[120px] rounded-full"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-600/20 blur-[120px] rounded-full"></div>
+  </div>
 
-    <form class="mt-6 space-y-4" [formGroup]="loginForm" (ngSubmit)="onLogin()">
-      <div>
-        <label class="block text-sm font-semibold text-slate-700" for="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 outline-none ring-cyan-200 transition focus:ring"
-          placeholder="rodrigo@pelotas.dev"
-        />
-      </div>
+  <div class="w-full max-w-md relative z-10 animate-[fade-in-up_0.5s_ease-out]">
+    <!-- Return to site link -->
+    <a routerLink="/" class="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm mb-8 group no-underline pointer-events-auto">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:-translate-x-1 transition-transform"><path d="m15 18-6-6 6-6"/></svg>
+      Voltar para o site
+    </a>
 
-      <div>
-        <div class="flex items-center justify-between">
-          <label class="block text-sm font-semibold text-slate-700" for="password">Senha</label>
-          <a routerLink="/forgot-password" class="text-sm font-semibold text-cyan-700 hover:text-cyan-800 hover:underline">
-            Esqueci minha senha
-          </a>
+    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200/50 backdrop-blur-sm pointer-events-auto">
+      <div class="p-8 sm:p-10">
+        <!-- Logo / Header -->
+        <div class="flex flex-col items-center text-center mb-10">
+          <div class="h-20 w-20 flex items-center justify-center mb-6 drop-shadow-2xl">
+            @if (appSettings.badgeUrl(); as badge) {
+              <img [src]="badge" alt="Inter" class="max-h-full max-w-full object-contain">
+            } @else {
+              <div class="h-16 w-16 bg-slate-900 rounded-2xl flex items-center justify-center shadow-xl shadow-slate-900/20">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.35C17.25 23.15 21 18.25 21 13V7L12 2Z"/></svg>
+              </div>
+            }
+          </div>
+          <h1 class="text-3xl font-black tracking-tight text-slate-900">Acesso Restrito</h1>
+          <p class="mt-2 text-slate-500 font-medium">Faça login para gerenciar o portal</p>
         </div>
-        <app-password-input
-          id="password"
-          formControlName="password"
-          class="mt-1 block"
-          placeholder="Senha123"
-        ></app-password-input>
-      </div>
 
-      <button
-        type="submit"
-        class="w-full rounded-xl bg-cyan-700 px-4 py-2 font-semibold text-white transition hover:bg-cyan-800 disabled:cursor-not-allowed disabled:opacity-60"
-        [disabled]="loading()"
-      >
-        @if (loading()) {
-          <app-spinner label="Entrando..." size="sm" [inline]="true" />
+        @if (!pendingEmailVerification()) {
+          <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-6">
+            <div class="space-y-1.5">
+              <label class="text-xs font-black uppercase tracking-widest text-slate-400 ml-1" for="email">E-mail</label>
+              <div class="relative group">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <input
+                  id="email"
+                  type="email"
+                  formControlName="email"
+                  class="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3.5 pl-12 pr-4 text-slate-900 font-medium focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all outline-none"
+                  placeholder="Administrador"
+                />
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between ml-1">
+                <label class="text-xs font-black uppercase tracking-widest text-slate-400" for="password">Senha</label>
+                <a routerLink="/forgot-password" class="text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors no-underline">
+                  Esqueceu a senha?
+                </a>
+              </div>
+              <app-password-input
+                id="password"
+                formControlName="password"
+                placeholder="********"
+                class="block"
+              ></app-password-input>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-2xl shadow-xl shadow-slate-900/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              [disabled]="loading()"
+            >
+              @if (loading()) {
+                <app-spinner label="Autenticando..." size="sm" [inline]="true" color="white" />
+              } @else {
+                Entrar no Painel
+              }
+            </button>
+          </form>
+
+          <div class="mt-8 text-center pt-8 border-t border-slate-100">
+            <p class="text-sm text-slate-500 font-medium">
+              Não tem acesso?
+              <a routerLink="/register" class="text-indigo-600 font-bold hover:text-indigo-700 transition-colors no-underline">Solicitar cadastro</a>
+            </p>
+          </div>
         } @else {
-          Login
+          <!-- Two Factor / Verification Flow -->
+          <div class="animate-[fade-in_0.3s_ease-out]">
+            <p class="text-center text-sm text-slate-600 mb-8 leading-relaxed">
+              Enviamos um código de segurança para<br>
+              <span class="font-bold text-slate-900">{{ verificationEmail() }}</span>
+            </p>
+
+            <form [formGroup]="verifyEmailForm" (ngSubmit)="onVerifyEmail()" class="space-y-8">
+              <div class="flex flex-col items-center">
+                <app-code-input
+                  formControlName="code"
+                  [hasError]="(verifyEmailForm.get('code')?.invalid && verifyEmailForm.get('code')?.touched) || false"
+                ></app-code-input>
+              </div>
+
+              <div class="flex flex-col gap-3">
+                <button
+                  type="submit"
+                  class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-2xl shadow-xl transition-all active:scale-[0.98] disabled:opacity-50"
+                  [disabled]="loading()"
+                >
+                  Validar Código
+                </button>
+                <button
+                  type="button"
+                  (click)="resendCode()"
+                  class="w-full bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold py-3 rounded-2xl transition-all text-sm"
+                  [disabled]="loading()"
+                >
+                  Não recebi o e-mail
+                </button>
+              </div>
+            </form>
+          </div>
         }
-      </button>
-    </form>
-
-    @if (!loading()) {
-      <p class="relative z-10 mt-6 text-center text-sm text-slate-600">
-        Nao tem uma conta?
-        <a routerLink="/register" class="font-semibold text-cyan-700 hover:text-cyan-800 hover:underline">Cadastre-se</a>
-      </p>
-    }
-  } @else {
-    <h1 class="mt-2 text-2xl font-black tracking-tight text-slate-900">Verificar email</h1>
-    <p class="mt-2 text-sm text-slate-600">
-      Enviamos um codigo para <span class="font-semibold">{{ verificationEmail() }}</span>.
+      </div>
+    </div>
+    
+    <!-- Footer info -->
+    <p class="mt-8 text-center text-slate-500 text-xs font-medium tracking-wide">
+      &copy; 2026 Esporte Clube Pelotas - Painel Administrativo v4.0
     </p>
-
-    <form class="mt-6 space-y-8" [formGroup]="verifyEmailForm" (ngSubmit)="onVerifyEmail()">
-      <div class="flex flex-col items-center justify-center">
-        <label class="mb-4 block text-sm font-semibold text-slate-700 text-center" for="verification-code">
-          Digite o codigo de 6 digitos
-        </label>
-        <app-code-input
-          id="verification-code"
-          formControlName="code"
-          [hasError]="(verifyEmailForm.get('code')?.invalid && verifyEmailForm.get('code')?.touched) || false"
-        ></app-code-input>
-      </div>
-
-      <div class="flex gap-2">
-        <button
-          type="submit"
-          class="flex-1 rounded-xl bg-cyan-700 px-4 py-2 font-semibold text-white transition hover:bg-cyan-800 disabled:cursor-not-allowed disabled:opacity-60"
-          [disabled]="loading()"
-        >
-          Confirmar codigo
-        </button>
-        <button
-          type="button"
-          class="rounded-xl border border-slate-300 px-4 py-2 font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
-          (click)="resendCode()"
-          [disabled]="loading()"
-        >
-          Reenviar
-        </button>
-      </div>
-    </form>
-  }
-</section>
+  </div>
+</div>

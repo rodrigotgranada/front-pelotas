@@ -26,8 +26,8 @@ import { ImageCropperDialogComponent } from '../../../../shared/ui/image-cropper
     <div class="flex flex-col gap-6 max-w-5xl mx-auto pb-20">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-4">
-          <a routerLink="/admin/news" class="text-slate-500 hover:text-slate-900">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          <a routerLink="/admin/news" class="text-slate-500 hover:text-slate-900 border border-slate-200 p-2 rounded-xl bg-white shadow-sm transition hover:bg-slate-50">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
           </a>
           <div>
             <h1 class="text-2xl font-black tracking-tight text-slate-900">{{ isNew() ? 'Nova Matéria' : 'Editar Matéria' }}</h1>
@@ -36,119 +36,137 @@ import { ImageCropperDialogComponent } from '../../../../shared/ui/image-cropper
         <div class="flex gap-3">
           <button
             type="button"
-            class="rounded-lg bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-300"
-            (click)="togglePreview()"
+            class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 flex items-center gap-2"
+            (click)="showSeoPreview.set(true)"
           >
-            Ver Prévia (Simulador Mobile)
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            SEO & Redes
           </button>
+          
           <button
             type="button"
-            class="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-green-700 disabled:opacity-50"
+            class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 flex items-center gap-2"
+            (click)="togglePreview()"
+          >
+             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+            Simulador Mobile
+          </button>
+
+          <button
+            type="button"
+            class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2 active:scale-95"
             (click)="save('PUBLISHED')"
             [disabled]="loading()"
           >
-            {{ currentStatus() === 'PUBLISHED' ? 'Atualizar Publicação' : 'Publicar' }}
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4Z"/></svg>
+            {{ currentStatus() === 'PUBLISHED' ? 'Atualizar' : 'Publicar' }}
           </button>
+          
           <button
             type="button"
-            [class]="currentStatus() === 'PUBLISHED' ? 'rounded-lg bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-800 shadow-sm transition-all hover:bg-amber-200 disabled:opacity-50' : 'rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 disabled:opacity-50'"
+            [class]="currentStatus() === 'PUBLISHED' ? 'rounded-xl bg-amber-50 px-4 py-2 text-sm font-bold text-amber-700 border border-amber-100 shadow-sm transition hover:bg-amber-100 disabled:opacity-50 active:scale-95' : 'rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-50 active:scale-95'"
             (click)="save('DRAFT')"
             [disabled]="loading()"
           >
-            {{ currentStatus() === 'PUBLISHED' ? 'Despublicar (Mover p/ Rascunho)' : 'Salvar Rascunho' }}
+            {{ currentStatus() === 'PUBLISHED' ? 'Tirar do ar' : 'Salvar Rascunho' }}
           </button>
         </div>
       </div>
 
       <form [formGroup]="form" class="flex flex-col gap-6">
         @if (isNew()) {
-          <div class="rounded-xl border border-indigo-100 bg-indigo-50 p-4">
-            <p class="text-sm font-semibold text-indigo-900 mb-3">Escolha como deseja escrever esta matéria:</p>
-            <div class="flex flex-col sm:flex-row gap-4">
-              <label class="flex items-center gap-2 cursor-pointer bg-white px-4 py-3 rounded-lg border border-indigo-200 hover:border-indigo-400 transition-all flex-1">
-                <input type="radio" formControlName="format" value="BLOCKS" class="text-indigo-600 focus:ring-indigo-600 h-4 w-4">
-                <div>
-                  <p class="font-bold text-slate-900 text-sm">Modo Moderno (Blocos)</p>
-                  <p class="text-xs text-slate-500">Ideal para matérias dinâmicas, galerias e embelezamento no site público.</p>
-                </div>
-              </label>
-              
-              <label class="flex items-center gap-2 cursor-pointer bg-white px-4 py-3 rounded-lg border border-indigo-200 hover:border-indigo-400 transition-all flex-1">
-                <input type="radio" formControlName="format" value="HTML" class="text-indigo-600 focus:ring-indigo-600 h-4 w-4">
-                <div>
-                  <p class="font-bold text-slate-900 text-sm">Modo Clássico (Word)</p>
-                  <p class="text-xs text-slate-500">Editor tradicional simples com barra de formatação no topo.</p>
-                </div>
-              </label>
+          <div class="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-5 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+               <div class="h-12 w-12 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+               </div>
+               <div>
+                  <p class="font-black text-slate-900 leading-tight">Escolha seu fluxo de escrita</p>
+                  <p class="text-xs text-slate-500 font-medium">Você pode mudar agora, mas depois de salvar o formato será fixado.</p>
+               </div>
             </div>
-            <p class="text-xs text-indigo-600 mt-3 font-medium">Atenção: Não é possível alternar os modos livremente após salvar pela primeira vez.</p>
+            <div class="flex bg-white p-1 rounded-xl shadow-sm border border-slate-200">
+               <button type="button" (click)="form.patchValue({format: 'BLOCKS'})" [class.bg-indigo-600]="form.value.format === 'BLOCKS'" [class.text-white]="form.value.format === 'BLOCKS'" [class.text-slate-500]="form.value.format !== 'BLOCKS'" class="px-4 py-2 rounded-lg text-xs font-black transition-all">MODERNO</button>
+               <button type="button" (click)="form.patchValue({format: 'HTML'})" [class.bg-indigo-600]="form.value.format === 'HTML'" [class.text-white]="form.value.format === 'HTML'" [class.text-slate-500]="form.value.format !== 'HTML'" class="px-4 py-2 rounded-lg text-xs font-black transition-all">CLÁSSICO</button>
+            </div>
           </div>
         }
 
         <div class="flex flex-col gap-4">
-          <div class="flex flex-col md:flex-row gap-4">
-            <div class="flex-1 flex items-center justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div>
-                <h3 class="text-sm font-bold text-slate-900">Destaque na Home</h3>
-                <p class="text-xs text-slate-500 mt-1">Matéria aparece no carrossel principal</p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div class="flex items-center gap-3">
+                <div class="h-8 w-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </div>
+                <div>
+                  <h3 class="text-xs font-black text-slate-900 uppercase tracking-tighter">Destaque</h3>
+                </div>
               </div>
               <label class="relative inline-flex cursor-pointer items-center">
                 <input type="checkbox" formControlName="isFeatured" class="peer sr-only">
-                <div class="peer h-6 w-11 rounded-full bg-slate-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-amber-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-amber-300"></div>
+                <div class="peer h-6 w-11 rounded-full bg-slate-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-amber-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none ring-offset-2 peer-focus:ring-2 peer-focus:ring-amber-300"></div>
               </label>
             </div>
             
-            <div class="flex-1 flex items-center justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div>
-                <h3 class="text-sm font-bold text-slate-900">Comentários</h3>
-                <p class="text-xs text-slate-500 mt-1">Torcedores logados podem comentar</p>
+            <div class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div class="flex items-center gap-3">
+                <div class="h-8 w-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <h3 class="text-xs font-black text-slate-900 uppercase tracking-tighter">Comentários</h3>
               </div>
               <label class="relative inline-flex cursor-pointer items-center">
                 <input type="checkbox" formControlName="allowComments" class="peer sr-only">
-                <div class="peer h-6 w-11 rounded-full bg-slate-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-emerald-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-300"></div>
+                <div class="peer h-6 w-11 rounded-full bg-slate-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-emerald-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none ring-offset-2 peer-focus:ring-2 peer-focus:ring-emerald-300"></div>
               </label>
             </div>
 
-            <div class="flex-1 flex items-center justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div>
-                <h3 class="text-sm font-bold text-slate-900">Curtidas</h3>
-                <p class="text-xs text-slate-500 mt-1">Permitir deixar coração na matéria</p>
+            <div class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div class="flex items-center gap-3">
+                <div class="h-8 w-8 rounded-lg bg-rose-50 flex items-center justify-center text-rose-600">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                </div>
+                <h3 class="text-xs font-black text-slate-900 uppercase tracking-tighter">Curtidas</h3>
               </div>
               <label class="relative inline-flex cursor-pointer items-center">
                 <input type="checkbox" formControlName="allowLikes" class="peer sr-only">
-                <div class="peer h-6 w-11 rounded-full bg-slate-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-rose-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-rose-300"></div>
+                <div class="peer h-6 w-11 rounded-full bg-slate-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-rose-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none ring-offset-2 peer-focus:ring-2 peer-focus:ring-rose-300"></div>
               </label>
             </div>
           </div>
 
           <div class="flex flex-col md:flex-row gap-6">
-            <div class="flex-1">
+            <div class="flex-1 space-y-5">
               <div>
-                <label class="mb-1 block text-sm font-semibold text-slate-700">Título da Matéria</label>
-                <input type="text" formControlName="title" class="w-full rounded-lg border-slate-300 text-slate-900 focus:border-indigo-500 focus:ring-indigo-500 text-xl font-bold py-3" placeholder="Escreva uma chamada forte e atrativa...">
+                <label class="mb-1.5 block text-xs font-black text-slate-400 uppercase tracking-widest px-1">Título do Editorial</label>
+                <input type="text" formControlName="title" class="w-full rounded-2xl border-slate-200 text-slate-900 focus:border-indigo-500 focus:ring-0 text-3xl font-black py-4 px-5 shadow-sm placeholder:text-slate-300 transition-all border-2" placeholder="Digite um título impactante...">
               </div>
-              <div class="mt-4">
-                <label class="mb-1 block text-sm font-semibold text-slate-700">Subtítulo (Opcional)</label>
-                <input type="text" formControlName="subtitle" class="w-full rounded-lg border-slate-300 text-slate-900 focus:border-indigo-500 focus:ring-indigo-500" placeholder="Linha fina, resumo ou apoio">
+              <div>
+                <label class="mb-1.5 block text-xs font-black text-slate-400 uppercase tracking-widest px-1">Chamada / Subtítulo</label>
+                <textarea formControlName="subtitle" rows="2" class="w-full rounded-2xl border-slate-200 text-slate-600 focus:border-indigo-500 focus:ring-0 text-base font-medium py-3 px-5 shadow-sm placeholder:text-slate-300 transition-all border-2 resize-none" placeholder="Resumo curto para atrair o leitor..."></textarea>
               </div>
             </div>
 
             <!-- Capa Upload -->
             <div class="w-full md:w-80 shrink-0">
-              <label class="mb-1 block text-sm font-semibold text-slate-700">Capa da Matéria</label>
+              <label class="mb-1.5 block text-xs font-black text-slate-400 uppercase tracking-widest px-1">Capa da Matéria (16:9)</label>
               @if (form.value.coverImageUrl) {
-                <div class="relative w-full rounded-xl overflow-hidden border border-slate-200 group">
-                  <img [src]="form.value.coverImageUrl" class="w-full h-40 object-cover" />
-                  <button type="button" (click)="removeCover()" class="absolute top-2 right-2 bg-slate-900/50 text-white rounded-full p-2 hover:bg-rose-600 transition opacity-0 group-hover:opacity-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                  </button>
+                <div class="relative w-full rounded-2xl overflow-hidden border-4 border-white shadow-xl group aspect-video">
+                  <img [src]="form.value.coverImageUrl" class="w-full h-full object-cover" />
+                  <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <button type="button" (click)="removeCover()" class="bg-white text-rose-600 rounded-xl p-3 shadow-lg hover:scale-110 active:scale-95 transition-all">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    </button>
+                  </div>
                 </div>
               } @else {
-                <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-slate-300 border-dashed rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition">
+                <label class="flex flex-col items-center justify-center w-full aspect-video border-2 border-slate-200 border-dashed rounded-2xl cursor-pointer bg-slate-50 hover:bg-white hover:border-indigo-400 transition-all hover:shadow-lg group">
                   <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                    <svg class="w-8 h-8 mb-2 text-slate-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/></svg>
-                    <p class="mb-1 text-xs text-slate-500"><span class="font-semibold">Clique para enviar a Capa</span></p>
-                    <p class="text-[10px] text-slate-500">WEBP, PNG, JPG</p>
+                    <div class="h-12 w-12 rounded-full bg-white flex items-center justify-center text-slate-400 shadow-sm border border-slate-100 group-hover:text-indigo-600 transition-colors mb-3">
+                       <svg class="h-6 w-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/></svg>
+                    </div>
+                    <p class="text-xs font-black text-slate-500 uppercase tracking-tighter">Enviar Capa</p>
                   </div>
                   <input type="file" class="hidden" accept="image/png, image/jpeg, image/webp" (change)="onCoverSelected($event)" />
                 </label>
@@ -157,55 +175,41 @@ import { ImageCropperDialogComponent } from '../../../../shared/ui/image-cropper
           </div>
 
           <!-- Metadata Panel -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-slate-50 border border-slate-100 rounded-xl">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-indigo-50/30 border border-indigo-100/50 rounded-2xl mt-4">
             <div>
-              <label class="mb-1 block text-sm font-semibold text-slate-700">Autor / Pseudônimo (Opcional)</label>
-              <input type="text" formControlName="authorDisplayName" class="w-full rounded-lg border-slate-300 text-slate-900 focus:border-indigo-500 focus:ring-indigo-500" placeholder="Ex: Redação Pelotas">
-              <p class="text-xs text-slate-500 mt-1">Se preenchido, oculta seu nome verdadeiro na visualização da página.</p>
+              <label class="mb-1.5 block text-xs font-black text-slate-400 uppercase tracking-widest px-1">Assinatura / Autor</label>
+              <input type="text" formControlName="authorDisplayName" class="w-full rounded-xl border-slate-200 text-slate-700 font-bold focus:border-indigo-500 focus:ring-0 shadow-sm transition-all" placeholder="Ex: Lucas Medeiros ou Redação Lobão">
+              <p class="text-[10px] text-slate-400 mt-2 font-bold uppercase tracking-tight">Oculta seu nome real do sistema para o público.</p>
             </div>
             
             <div>
-              <label class="mb-2 block text-sm font-semibold text-slate-700">Categorias da Matéria</label>
-              
-              <div class="relative bg-white border border-slate-200 rounded-lg p-2 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all">
-                <!-- Tags já selecionadas -->
-                <div class="flex flex-wrap gap-1.5 mb-1.5">
-                  @for (cat of form.value.categories; track cat) {
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
-                      {{ cat }}
-                      <button type="button" (click)="removeCategory(cat)" class="hover:bg-indigo-200 hover:text-indigo-900 rounded-full p-0.5 transition flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                      </button>
-                    </span>
-                  }
-                </div>
-
-                <!-- Input Interativo -->
+              <label class="mb-1.5 block text-xs font-black text-slate-400 uppercase tracking-widest px-1">Categorias</label>
+              <div class="relative bg-white border border-slate-200 rounded-xl px-3 py-1.5 shadow-sm min-h-[46px] flex flex-wrap gap-1.5 transition-all focus-within:ring-2 focus-within:ring-indigo-100 focus-within:border-indigo-400">
+                @for (cat of form.value.categories; track cat) {
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-black bg-indigo-600 text-white shadow-sm shadow-indigo-200 group">
+                    {{ cat }}
+                    <button type="button" (click)="removeCategory(cat)" class="hover:bg-indigo-700/50 rounded p-0.5 transition">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                  </span>
+                }
                 <input 
                   type="text" 
                   [value]="categoryFilter()"
                   (input)="onCategoryInput($event)"
                   (keydown.enter)="$event.preventDefault(); addCategory()"
-                  placeholder="Pesquisar ou Enter para nova..."
-                  class="w-full text-sm outline-none border-none p-1 bg-transparent placeholder-slate-400 text-slate-700"
+                  placeholder="Pesquisar..."
+                  class="flex-1 min-w-[120px] text-sm outline-none border-none p-1 bg-transparent placeholder-slate-300 text-slate-700 font-bold"
                 />
 
-                <!-- Dropdown de Sugestões -->
                 @if (categoryFilter() && filteredCategories().length > 0) {
-                  <div class="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden max-h-48 overflow-y-auto">
+                  <div class="absolute z-50 left-0 right-0 top-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden max-h-56 p-1 border-t-0 animate-in fade-in slide-in-from-top-2 duration-200">
                     @for (cat of filteredCategories(); track cat) {
-                      <button type="button" (click)="addCategory(cat)" class="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-900 transition flex items-center gap-2 border-b border-slate-50 last:border-0 font-medium">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-indigo-500"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                      <button type="button" (click)="addCategory(cat)" class="w-full text-left px-4 py-2.5 text-xs font-black text-slate-500 hover:bg-slate-50 hover:text-indigo-600 transition flex items-center justify-between group rounded-xl">
                         {{ cat }}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="opacity-0 group-hover:opacity-100"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                       </button>
                     }
-                  </div>
-                }
-                @else if (categoryFilter() && filteredCategories().length === 0) {
-                  <div class="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden px-3 py-2">
-                    <p class="text-xs text-slate-600 flex items-center gap-2">
-                      Criar nova tag: <span class="font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">"{{ categoryFilter() }}"</span>
-                    </p>
                   </div>
                 }
               </div>
@@ -213,54 +217,157 @@ import { ImageCropperDialogComponent } from '../../../../shared/ui/image-cropper
           </div>
         </div>
 
-        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm min-h-[500px]">
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm min-h-[500px] mt-2">
           @if (form.value.format === 'HTML') {
-            <!-- Quill Editor (Word Like) -->
-            <quill-editor formControlName="contentHtml" [styles]="{height: '400px'}"></quill-editor>
+            <quill-editor formControlName="contentHtml" [styles]="{height: '500px', 'border-radius': '1rem'}" class="block overflow-hidden"></quill-editor>
           } @else {
-            <!-- Editor.js (Block Like) -->
-            <div id="editorjs" class="prose max-w-none"></div>
+            <div id="editorjs" class="prose max-w-none pt-4"></div>
           }
         </div>
       </form>
     </div>
 
-    <!-- Drawer de Preview -->
-    @if (showPreview()) {
-      <div class="fixed inset-0 z-50 overflow-hidden" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+    <!-- SEO & Redes Preview Modal -->
+    @if (showSeoPreview()) {
+      <div class="fixed inset-0 z-[60] overflow-hidden" aria-labelledby="seo-title" role="dialog" aria-modal="true">
         <div class="absolute inset-0 overflow-hidden">
-          <div class="absolute inset-0 bg-slate-900/60 transition-opacity" aria-hidden="true" (click)="togglePreview()"></div>
-
-          <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
+          <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" (click)="showSeoPreview.set(false)"></div>
+          <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
             <div class="pointer-events-auto w-screen max-w-2xl transform transition-transform shadow-2xl">
-              <div class="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
-                <div class="px-4 sm:px-6">
-                  <div class="flex items-start justify-between">
-                    <h2 class="text-base font-semibold leading-6 text-slate-900" id="slide-over-title">Prévia da Matéria (Mobile Simulator)</h2>
-                    <div class="ml-3 flex h-7 items-center">
-                      <button type="button" class="relative rounded-md bg-white text-slate-400 hover:text-slate-500" (click)="togglePreview()">
-                        <span class="absolute -inset-2.5"></span><span class="sr-only">Fechar painel</span>
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                      </button>
+              <div class="flex h-full flex-col overflow-y-auto bg-slate-50 shadow-xl">
+                <div class="px-6 py-6 bg-white border-b border-slate-200 sticky top-0 z-10 flex items-center justify-between">
+                  <div>
+                    <h2 class="text-xl font-black text-slate-900" id="seo-title">Prévia de SEO e Redes Sociais</h2>
+                    <p class="text-xs text-slate-500 font-bold uppercase mt-1 tracking-widest text-indigo-600">Otimização para busca e compartilhamento</p>
+                  </div>
+                  <button type="button" class="rounded-full p-2 bg-slate-100 text-slate-500 hover:text-rose-600 transition" (click)="showSeoPreview.set(false)">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                </div>
+                
+                <div class="p-8 space-y-12">
+                  <!-- Google Preview -->
+                  <div class="space-y-4">
+                    <div class="flex items-center gap-2 mb-1">
+                      <div class="h-6 w-6 rounded-lg bg-white border border-slate-200 flex items-center justify-center">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-slate-400"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                      </div>
+                      <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Google Search</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-2">
+                       <p class="text-xs text-slate-600 mb-0.5">ecpelotas.com.br > notícias > {{ form.value.title | lowercase }}</p>
+                       <p class="text-xl text-[#1a0dab] font-medium hover:underline cursor-pointer">{{ form.value.title || 'Título da sua matéria...' }}</p>
+                       <p class="text-sm text-[#4d5156] leading-relaxed line-clamp-2">
+                         {{ (form.value.subtitle || 'Em um passo importante para o futuro do Lobo, o Esporte Clube Pelotas apresenta novidades que prometem empolgar a torcida no Estádio Boca do Lobo.') }}
+                       </p>
+                    </div>
+                  </div>
+
+                  <!-- Facebook/WhatsApp Preview -->
+                  <div class="space-y-4">
+                    <div class="flex items-center gap-2 mb-1">
+                      <div class="h-6 w-6 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="text-blue-600"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                      </div>
+                      <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Facebook / WhatsApp</h3>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden max-w-md mx-auto">
+                        <div class="aspect-video bg-slate-100 flex items-center justify-center">
+                          @if (form.value.coverImageUrl) {
+                            <img [src]="form.value.coverImageUrl" class="w-full h-full object-cover">
+                          } @else {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="text-slate-300"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                          }
+                        </div>
+                        <div class="p-4 bg-[#f2f3f5] border-t border-slate-200">
+                          <p class="text-[10px] text-slate-500 uppercase font-medium">ECPELOTAS.COM.BR</p>
+                          <p class="text-base font-bold text-[#1c1e21] mt-1">{{ form.value.title || 'Título da notícia' }}</p>
+                          <p class="text-sm text-[#65676b] mt-1 line-clamp-1">{{ form.value.subtitle || 'Breve introdução da matéria para atrair cliques.' }}</p>
+                        </div>
+                    </div>
+                  </div>
+
+                  <!-- Twitter/X Preview -->
+                  <div class="space-y-4 pb-12">
+                     <div class="flex items-center gap-2 mb-1">
+                      <div class="h-6 w-6 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" class="text-white"><path d="M4 4l11.733 16h4.267l-11.733-16zM4 20l6.768-6.768m2.464-2.464l6.768-6.768"/></svg>
+                      </div>
+                      <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Twitter / X (Summary Card)</h3>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden max-w-md mx-auto flex items-stretch h-32">
+                        <div class="w-32 bg-slate-100 flex-shrink-0 border-r border-slate-200">
+                           @if (form.value.coverImageUrl) {
+                             <img [src]="form.value.coverImageUrl" class="w-full h-full object-cover">
+                           } @else {
+                             <div class="w-full h-full flex items-center justify-center text-slate-200"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><circle cx="9" cy="9" r="2" /><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></svg></div>
+                           }
+                        </div>
+                        <div class="p-3 flex flex-col justify-center">
+                           <p class="text-xs text-slate-500">ecpelotas.com.br</p>
+                           <p class="text-sm font-bold text-slate-900 mt-0.5 line-clamp-2">{{ form.value.title || 'Título da matéria no Twitter' }}</p>
+                           <p class="text-[11px] text-slate-500 mt-0.5 line-clamp-2">{{ form.value.subtitle }}</p>
+                        </div>
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Drawer de Preview (Mobile) -->
+    @if (showPreview()) {
+      <div class="fixed inset-0 z-50 overflow-hidden" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+        <div class="absolute inset-0 overflow-hidden">
+          <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" aria-hidden="true" (click)="togglePreview()"></div>
+
+          <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
+            <div class="pointer-events-auto w-screen max-w-2xl transform transition-transform shadow-2xl">
+              <div class="flex h-full flex-col overflow-y-auto bg-slate-50 py-6 shadow-xl">
+                <div class="px-6 pb-6 flex items-start justify-between">
+                    <div>
+                      <h2 class="text-xl font-black text-slate-900" id="slide-over-title">Simulador Mobile</h2>
+                      <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Como o torcedor verá no celular</p>
+                    </div>
+                    <button type="button" class="relative rounded-full p-2 bg-slate-100 text-slate-500 hover:text-rose-500 transition-colors" (click)="togglePreview()">
+                      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
                 
-                <div class="relative mt-6 flex-1 px-4 sm:px-6 bg-slate-100 flex justify-center py-8">
-                  <div class="bg-white w-[375px] min-h-[667px] shadow-sm rounded-3xl border-8 border-slate-900 overflow-hidden flex flex-col items-stretch relative">
-                    <div class="h-6 w-full bg-slate-900 rounded-t-lg"></div>
-                    <div class="p-5 flex-1 overflow-y-auto">
+                <div class="relative flex-1 px-4 flex justify-center py-8">
+                  <div class="bg-white w-[375px] min-h-[667px] shadow-2xl rounded-[40px] border-[12px] border-slate-900 overflow-hidden flex flex-col items-stretch relative">
+                    <div class="h-7 w-full bg-slate-900 flex justify-center items-start">
+                       <div class="h-1.5 w-16 bg-slate-800 rounded-full mt-2"></div>
+                    </div>
+                    <div class="p-6 flex-1 overflow-y-auto scrollbar-hide">
+                        @if (form.value.coverImageUrl) {
+                           <img [src]="form.value.coverImageUrl" class="w-full aspect-video rounded-2xl object-cover mb-6 shadow-lg">
+                        }
                         <h1 class="text-2xl font-black text-slate-900 leading-tight">{{ form.value.title || 'Título da Matéria' }}</h1>
                         @if (form.value.subtitle) {
-                          <p class="mt-2 text-sm text-slate-500 font-medium">{{ form.value.subtitle }}</p>
+                          <p class="mt-3 text-sm text-slate-500 font-bold leading-relaxed">{{ form.value.subtitle }}</p>
                         }
-                        <div class="mt-5 mb-5 border-t border-slate-200"></div>
+                        
+                        <div class="flex items-center gap-3 my-6">
+                           <div class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-400 border border-slate-200">R</div>
+                           <div class="flex flex-col">
+                              <span class="text-xs font-black text-slate-900 uppercase">Redação Pelotas</span>
+                              <span class="text-[10px] font-bold text-slate-400 uppercase">Há 5 min • 3 min leitura</span>
+                           </div>
+                        </div>
 
-                        <div class="prose prose-sm max-w-none break-words">
+                        <div class="prose prose-sm max-w-none break-words text-slate-700 leading-relaxed font-medium">
                           @if (previewLoading()) {
-                            <p class="text-center text-slate-400 text-xs py-10">Gerando prévia...</p>
+                            <div class="flex flex-col gap-4 py-8">
+                               <div class="h-4 bg-slate-100 rounded-full w-full animate-pulse"></div>
+                               <div class="h-4 bg-slate-100 rounded-full w-3/4 animate-pulse"></div>
+                               <div class="h-4 bg-slate-100 rounded-full w-5/6 animate-pulse"></div>
+                            </div>
                           } @else {
-                            <div [innerHTML]="previewBlocksHtml()"></div>
+                            <div [innerHTML]="previewBlocksHtml()" class="block-preview"></div>
                           }
                         </div>
                     </div>
@@ -279,7 +386,7 @@ import { ImageCropperDialogComponent } from '../../../../shared/ui/image-cropper
         [imageChangedEvent]="imageSelectedEvent()!"
         [aspectRatio]="1.777"
         [maintainAspectRatio]="true"
-        [resizeToWidth]="800"
+        [resizeToWidth]="1280"
         [roundCropper]="false"
         (imageCroppedEvent)="onImageCropped($event)"
         (cancel)="onCropCancel()"
@@ -288,7 +395,12 @@ import { ImageCropperDialogComponent } from '../../../../shared/ui/image-cropper
   `,
   styles: [`
     :host { display: block; }
-    .ce-block__content { max-width: 100%; } /* Overrides native Editor.js constraint */
+    .ce-block__content { max-width: 100%; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .block-preview ::ng-deep h2 { font-size: 1.25rem !important; font-weight: 800 !important; color: #0f172a !important; margin-top: 1.5rem !important; margin-bottom: 0.75rem !important; }
+    .block-preview ::ng-deep p { margin-bottom: 1rem !important; }
+    .block-preview ::ng-deep figure { margin: 1.5rem 0 !important; }
   `]
 })
 export class AdminNewsEditorComponent implements OnInit, OnDestroy {
@@ -302,6 +414,7 @@ export class AdminNewsEditorComponent implements OnInit, OnDestroy {
   readonly isNew = signal(true);
   readonly loading = signal(false);
   readonly showPreview = signal(false);
+  readonly showSeoPreview = signal(false);
   readonly previewLoading = signal(false);
   readonly previewBlocksHtml = signal('');
   readonly currentStatus = signal<string>('DRAFT');
@@ -316,6 +429,7 @@ export class AdminNewsEditorComponent implements OnInit, OnDestroy {
 
   readonly filteredCategories = computed(() => {
     const query = this.normalizeStr(this.categoryFilter());
+    if (!query) return [];
     const all = this.availableCategories();
     return all.filter(c => 
       this.normalizeStr(c).includes(query) && 
@@ -489,16 +603,16 @@ export class AdminNewsEditorComponent implements OnInit, OnDestroy {
     };
 
     const request = this.isNew() 
-      ? this.newsApi.create(payload)
-      : this.newsApi.update(this.newsId!, payload);
+      ? this.newsApi.create(payload as any)
+      : this.newsApi.update(this.newsId!, payload as any);
 
     request.subscribe({
       next: () => {
         this.toast.showSuccess(status === 'PUBLISHED' ? 'Matéria publicada!' : 'Rascunho salvo!');
         this.router.navigate(['/admin/news']);
       },
-      error: () => {
-        this.toast.showError('Erro ao salvar a matéria.');
+      error: (err) => {
+        this.toast.showApiError(err, 'Erro ao salvar a matéria.');
         this.loading.set(false);
       }
     });

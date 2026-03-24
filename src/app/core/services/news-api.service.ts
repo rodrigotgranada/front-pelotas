@@ -57,7 +57,7 @@ export class NewsApiService {
     return this.http.get<News>(`${environment.apiBaseUrl}/public-news/${slug}`);
   }
 
-  getPublicNews(query: { page?: number; limit?: number; category?: string } = {}): Observable<PaginatedNews> {
+  getPublicNews(query: { page?: number; limit?: number; category?: string; search?: string } = {}): Observable<PaginatedNews> {
     let params = new HttpParams();
     Object.entries(query).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
@@ -83,5 +83,25 @@ export class NewsApiService {
 
   addComment(slug: string, content: string): Observable<any> {
     return this.http.post<any>(`${environment.apiBaseUrl}/public-news/${slug}/comments`, { content });
+  }
+
+  getRelated(slug: string, limit: number = 3): Observable<News[]> {
+    return this.http.get<News[]>(`${environment.apiBaseUrl}/public-news/${slug}/related`, {
+      params: new HttpParams().set('limit', limit.toString())
+    });
+  }
+
+  subscribeNewsletter(email: string): Observable<any> {
+    return this.http.post<any>(`${environment.apiBaseUrl}/newsletter/subscribe`, { email });
+  }
+
+  getSubscribers(query: { page?: number; limit?: number; status?: string; search?: string } = {}): Observable<any> {
+    let params = new HttpParams();
+    Object.entries(query).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params = params.set(key, value.toString());
+      }
+    });
+    return this.http.get<any>(`${environment.apiBaseUrl}/newsletter`, { params });
   }
 }

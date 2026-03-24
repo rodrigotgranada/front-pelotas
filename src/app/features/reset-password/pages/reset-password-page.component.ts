@@ -7,6 +7,7 @@ import { AuthApiService } from '../../../core/services/auth-api.service';
 import { SpinnerComponent } from '../../../shared/ui/spinner/spinner.component';
 import { PasswordInputComponent } from '../../../shared/ui/password-input/password-input.component';
 import { CodeInputComponent } from '../../../shared/ui/code-input/code-input.component';
+import { AppSettingsService } from '../../../core/services/app-settings.service';
 
 @Component({
   selector: 'app-reset-password-page',
@@ -20,6 +21,7 @@ export class ResetPasswordPageComponent implements OnInit {
   private readonly toast = inject(ToastMessagesService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  readonly appSettings = inject(AppSettingsService);
 
   readonly resetForm = this.formBuilder.nonNullable.group(
     {

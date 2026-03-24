@@ -17,6 +17,7 @@ import { PhoneInputComponent } from '../../../shared/ui/phone-input/phone-input.
 import { CepInputComponent } from '../../../shared/ui/cep-input/cep-input.component';
 import { CodeInputComponent } from '../../../shared/ui/code-input/code-input.component';
 import { PhotoUploadComponent } from '../../../shared/ui/photo-upload/photo-upload.component';
+import { AppSettingsService } from '../../../core/services/app-settings.service';
 
 interface ViaCepResponse {
   cep: string;
@@ -54,6 +55,7 @@ export class RegisterPageComponent {
   private readonly toast = inject(ToastMessagesService);
   private readonly router = inject(Router);
   private readonly http = inject(HttpClient);
+  readonly appSettings = inject(AppSettingsService);
 
   readonly registerForm = this.formBuilder.group({
     firstName: ['', [Validators.required, Validators.minLength(2)]],

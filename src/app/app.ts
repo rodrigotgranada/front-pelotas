@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthTokenService } from './core/auth/auth-token.service';
 import { AuthApiService } from './core/services/auth-api.service';
@@ -7,11 +7,13 @@ import { LoadingService } from './core/http/loading.service';
 import { getRoleDebugInfo, resolveRoleWithStoredCode } from './core/auth/roles.util';
 import { ToastMessagesService } from './core/notifications/toast-messages.service';
 import { SpinnerOverlayComponent } from './shared/ui/spinner-overlay/spinner-overlay.component';
+import { FormsModule } from '@angular/forms';
+import { AppSettingsService } from './core/services/app-settings.service';
 import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, SpinnerOverlayComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, SpinnerOverlayComponent, FormsModule],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,10 +24,17 @@ export class App implements OnInit {
   private readonly session = inject(AuthSessionService);
   private readonly loadingService = inject(LoadingService);
   private readonly toast = inject(ToastMessagesService);
-  private readonly router = inject(Router);
+  readonly router = inject(Router);
+  readonly appSettings = inject(AppSettingsService);
+  readonly searchQuery = signal('');
+  private readonly currentUrl = signal(this.router.url);
 
   readonly hasToken = computed(() => !!this.tokenService.token());
   readonly me = this.session.me;
+  readonly badgeUrl = this.appSettings.badgeUrl;
+
+  readonly dropdownOpen = signal(false);
+
   readonly canAccessAdminData = computed(() => {
     if (!this.hasToken()) {
       return false;
@@ -51,9 +60,24 @@ export class App implements OnInit {
 
     return role === 'owner' || role === 'admin';
   });
+
+  readonly showHeader = computed(() => {
+    const url = this.currentUrl();
+    const authRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
+    return !authRoutes.some(route => url.startsWith(route));
+  });
+
   readonly globalLoading = this.loadingService.isLoading;
 
   async ngOnInit(): Promise<void> {
+    // Sync URL signal with router events
+    this.router.events.subscribe(() => {
+      this.currentUrl.set(this.router.url);
+    });
+
+    // Load settings (badge image + theme) before anything else
+    await this.appSettings.loadPublicSettings();
+
     const result = await this.session.hydrateSession();
 
     if (result === 'invalid-session') {
@@ -61,10 +85,36 @@ export class App implements OnInit {
     }
   }
 
+  toggleDropdown(): void {
+    this.dropdownOpen.update((v) => !v);
+  }
+
+  closeDropdown(): void {
+    this.dropdownOpen.set(false);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('#user-menu-button') && !target.closest('#user-dropdown')) {
+      this.dropdownOpen.set(false);
+    }
+  }
+
   onLogout(): void {
+    this.dropdownOpen.set(false);
     this.authApi.logout();
     this.session.clear();
     this.toast.showLogoutInfo();
     void this.router.navigateByUrl('/');
+  }
+
+  onSearch(): void {
+    const query = this.searchQuery().trim();
+    if (query) {
+      this.router.navigate(['/'], { queryParams: { search: query } });
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 }

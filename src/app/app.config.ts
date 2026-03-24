@@ -1,5 +1,6 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, APP_INITIALIZER } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { AppSettingsService } from './core/services/app-settings.service';
 import { provideRouter } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideToastr } from 'ngx-toastr';
@@ -20,5 +21,11 @@ export const appConfig: ApplicationConfig = {
     }),
     provideRouter(routes),
     provideHttpClient(withInterceptors([loadingInterceptor, authInterceptor])),
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (settings: AppSettingsService) => () => settings.loadPublicSettings(),
+      deps: [AppSettingsService],
+      multi: true
+    }
   ]
 };

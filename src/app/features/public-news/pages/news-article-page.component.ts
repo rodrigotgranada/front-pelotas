@@ -7,29 +7,17 @@ import { NewsApiService } from '../../../core/services/news-api.service';
 import { ToastMessagesService } from '../../../core/notifications/toast-messages.service';
 import { News } from '../../../core/models/news.model';
 import { SpinnerComponent } from '../../../shared/ui/spinner/spinner.component';
-import { Title, Meta } from '@angular/platform-browser';
+import { SeoService } from '../../../core/services/seo.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NewsletterWidgetComponent } from '../../../shared/ui/newsletter-widget/newsletter-widget.component';
+import { AppSettingsService } from '../../../core/services/app-settings.service';
 
 @Component({
   selector: 'app-news-article-page',
   standalone: true,
-  imports: [CommonModule, DatePipe, RouterLink, SpinnerComponent, FormsModule],
+  imports: [CommonModule, DatePipe, RouterLink, SpinnerComponent, FormsModule, NewsletterWidgetComponent],
   template: `
-    <div class="min-h-screen bg-slate-50 font-sans flex flex-col">
-      <!-- Minimal Header -->
-      <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
-        <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <a routerLink="/" class="text-xl font-black tracking-tighter text-slate-900 hover:text-cyan-700 transition flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-cyan-600"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 15h10"/><path d="m9 18 3-3-3-3"/></svg>
-            PELOTAS
-          </a>
-          <nav>
-            <a routerLink="/login" class="text-sm font-semibold text-slate-600 hover:text-slate-900 transition mr-4">Entrar</a>
-            <a routerLink="/register" class="text-sm font-bold text-white bg-cyan-600 hover:bg-cyan-700 px-4 py-2 rounded-full transition">Assinar</a>
-          </nav>
-        </div>
-      </header>
-
-      <main class="flex-1 w-full max-w-4xl mx-auto bg-white shadow-xl min-h-[80vh] my-0 sm:my-8 sm:rounded-3xl overflow-hidden flex flex-col relative pb-20">
+      <main class="flex-1 w-full max-w-7xl mx-auto px-4 py-8 flex flex-col relative pb-20">
         @if (loading()) {
           <div class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white">
             <app-spinner size="lg"></app-spinner>
@@ -39,9 +27,9 @@ import { Title, Meta } from '@angular/platform-browser';
 
         @if (article()) {
           <!-- Capa Hero -->
-          @if (article()?.coverImageUrl) {
+          @if (article()?.coverImageUrl || appSettings.defaultNewsImageUrl()) {
             <div class="w-full h-64 sm:h-96 relative overflow-hidden bg-slate-900 flex items-center justify-center">
-              <img [src]="article()!.coverImageUrl" class="w-full h-full object-cover opacity-90 transition-transform duration-700 hover:scale-105" alt="Capa da Matéria">
+              <img [src]="article()!.coverImageUrl || appSettings.defaultNewsImageUrl()" class="w-full h-full object-cover opacity-90 transition-transform duration-700 hover:scale-105" alt="Capa da Matéria">
             </div>
           }
 
@@ -115,7 +103,7 @@ import { Title, Meta } from '@angular/platform-browser';
                 }
 
                 <button (click)="copyLink()" class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:text-indigo-800 font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 shadow-sm">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
                   Copiar Link
                 </button>
               </div>
@@ -186,32 +174,55 @@ import { Title, Meta } from '@angular/platform-browser';
                 </div>
               </div>
             }
+            <!-- Related News Section -->
+            @if (relatedNews().length > 0) {
+              <div class="mt-20 border-t border-slate-100 pt-16">
+                <h2 class="text-3xl font-black text-slate-900 mb-8 flex items-center gap-3 tracking-tight">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-cyan-600"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  Leia também
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  @for (news of relatedNews(); track news.id) {
+                    <a [routerLink]="['/noticias', news.slug]" class="group block bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-300">
+                      <div class="h-40 overflow-hidden relative">
+                        <img [src]="news.coverImageUrl || appSettings.defaultNewsImageUrl() || 'assets/placeholder-cover.jpg'" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
+                      </div>
+                      <div class="p-4">
+                        <span class="text-[10px] font-bold uppercase text-cyan-700 mb-1 block">{{ news.categories[0] }}</span>
+                        <h3 class="text-base font-black text-slate-900 leading-tight group-hover:text-cyan-600 transition line-clamp-2">
+                          {{ news.title }}
+                        </h3>
+                      </div>
+                    </a>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Newsletter Widget on Article -->
+            <div class="mt-20">
+              <app-newsletter-widget></app-newsletter-widget>
+            </div>
           </article>
         }
       </main>
-      
-      <!-- Minimal Footer -->
-      <footer class="bg-slate-900 text-slate-400 py-8 text-center text-sm">
-        <div class="max-w-5xl mx-auto px-4">
-          <p>© 2026 Portal Pelotas. Todos os direitos reservados.</p>
-        </div>
-      </footer>
-    </div>
   `
 })
 export class NewsArticlePageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
+  readonly router = inject(Router);
   private readonly newsApi = inject(NewsApiService);
-  private readonly titleService = inject(Title);
-  private readonly metaService = inject(Meta);
+  private readonly seo = inject(SeoService);
   private readonly toast = inject(ToastMessagesService);
   private readonly tokenService = inject(AuthTokenService);
+  readonly appSettings = inject(AppSettingsService);
 
   readonly isAuthenticated = () => !!this.tokenService.getToken();
 
   readonly loading = signal<boolean>(true);
   readonly article = signal<News | null>(null);
+  readonly relatedNews = signal<News[]>([]);
 
   readonly userHasLiked = signal<boolean>(false);
   readonly likesCount = signal<number>(0);
@@ -281,7 +292,8 @@ export class NewsArticlePageComponent implements OnInit {
         }
 
         this.loading.set(false);
-        this.updateSeoTags(news);
+        this.seo.updateArticleSeo(news);
+        this.loadRelated(news.slug);
         // Dispara contagem de visuzalização de forma isolada
         this.newsApi.incrementView(news.slug || news.id).subscribe();
       },
@@ -294,10 +306,17 @@ export class NewsArticlePageComponent implements OnInit {
     });
   }
 
+  private loadRelated(slug: string) {
+    this.newsApi.getRelated(slug).subscribe({
+      next: (res) => this.relatedNews.set(res),
+      error: () => this.relatedNews.set([])
+    });
+  }
+
   toggleLike() {
     if (!this.isAuthenticated()) {
       this.toast.showWarning('Faça login ou cadastre-se para curtir.');
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
       return;
     }
     const data = this.article();
@@ -325,7 +344,7 @@ export class NewsArticlePageComponent implements OnInit {
   submitComment() {
     if (!this.isAuthenticated()) {
       this.toast.showWarning('Faça login ou cadastre-se para comentar.');
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
       return;
     }
     
@@ -349,26 +368,6 @@ export class NewsArticlePageComponent implements OnInit {
         this.toast.showError('Erro ao publicar comentário.');
       }
     });
-  }
-
-  private updateSeoTags(news: News) {
-    this.titleService.setTitle(`${news.title} | Portal Pelotas`);
-
-    this.metaService.updateTag({ property: 'og:title', content: news.title });
-    this.metaService.updateTag({ property: 'og:type', content: 'article' });
-    this.metaService.updateTag({ property: 'og:url', content: window.location.href });
-    this.metaService.updateTag({ property: 'og:site_name', content: 'Portal Pelotas' });
-
-    if (news.subtitle) {
-      this.metaService.updateTag({ name: 'description', content: news.subtitle });
-      this.metaService.updateTag({ property: 'og:description', content: news.subtitle });
-    }
-    
-    if (news.coverImageUrl) {
-      this.metaService.updateTag({ property: 'og:image', content: news.coverImageUrl });
-      this.metaService.updateTag({ property: 'og:image:width', content: '800' });
-      this.metaService.updateTag({ property: 'og:image:height', content: '450' });
-    }
   }
 
   getWhatsAppLink(): string {

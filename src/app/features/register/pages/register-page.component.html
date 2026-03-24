@@ -1,309 +1,348 @@
-<section class="mx-auto rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-  <p class="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-700">Bem-vindo(a) ao Lobao</p>
-  @if (!pendingEmailVerification()) {
-  <h1 class="mt-2 text-2xl font-black tracking-tight text-slate-900">Crie sua conta</h1>
-  <p class="mt-2 text-sm text-slate-600">Preencha seus dados para se cadastrar na plataforma.</p>
+<div class="min-h-screen w-full flex items-center justify-center p-4 sm:p-8 relative overflow-hidden bg-slate-950 font-sans text-slate-900">
+  <!-- Decorative background elements -->
+  <div class="absolute inset-0 z-0 text-white/5 pointer-events-none">
+    <div class="absolute top-[-5%] left-[-5%] w-[50%] h-[50%] bg-indigo-600/15 blur-[120px] rounded-full"></div>
+    <div class="absolute bottom-[-5%] right-[-5%] w-[50%] h-[50%] bg-cyan-600/15 blur-[120px] rounded-full"></div>
+  </div>
 
-  <form class="mt-6 space-y-6" [formGroup]="registerForm" (ngSubmit)="onRegister()">
-
-    <!-- Dados Principais -->
-    <div class="space-y-4">
-      <h2 class="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2">Dados Basicos</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-semibold text-slate-700" for="firstName">Nome <span
-              class="text-red-500">*</span></label>
-          <input id="firstName" type="text" formControlName="firstName"
-            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 outline-none ring-cyan-200 transition focus:ring"
-            placeholder="Seu Nome" />
-        </div>
-        <div>
-          <label class="block text-sm font-semibold text-slate-700" for="lastName">Sobrenome <span
-              class="text-red-500">*</span></label>
-          <input id="lastName" type="text" formControlName="lastName"
-            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 outline-none ring-cyan-200 transition focus:ring"
-            placeholder="Seu Sobrenome" />
-        </div>
-      </div>
-
-      <div>
-        <label class="block text-sm font-semibold text-slate-700" for="email">E-mail <span
-            class="text-red-500">*</span></label>
-        <app-email-input id="email" formControlName="email"></app-email-input>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-semibold text-slate-700" for="password">Senha <span
-              class="text-red-500">*</span></label>
-          <app-password-input id="password" formControlName="password" class="mt-1 block"></app-password-input>
-        </div>
-        <div>
-          <label class="block text-sm font-semibold text-slate-700" for="confirmPassword">Confirmar senha <span
-              class="text-red-500">*</span></label>
-          <app-password-input id="confirmPassword" formControlName="confirmPassword" class="mt-1 block"
-            placeholder="Confirme a senha"></app-password-input>
-          @if (registerForm.get('confirmPassword')?.touched &&
-          registerForm.get('confirmPassword')?.hasError('passwordMismatch')) {
-          <p class="mt-1 text-xs text-rose-500">As senhas nao coincidem.</p>
-          }
-        </div>
-      </div>
-
-      <div>
-        <label class="block text-sm font-semibold text-slate-700" for="document">CPF <span
-            class="text-red-500">*</span></label>
-        <div class="mt-1 w-full md:w-1/2">
-          <app-cpf-input id="document" formControlName="document"></app-cpf-input>
-        </div>
-      </div>
+  <div class="w-full max-w-3xl relative z-10 animate-[fade-in_up_0.5s_ease-out] py-12">
+    <!-- Return to site link -->
+    <div class="flex justify-between items-center mb-8 pointer-events-auto">
+      <a routerLink="/login" class="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm group no-underline">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:-translate-x-1 transition-transform"><path d="m15 18-6-6 6-6"/></svg>
+        Fazer login
+      </a>
+      <a routerLink="/" class="text-slate-500 hover:text-white transition-colors text-sm no-underline font-medium">Voltar ao site</a>
     </div>
 
-    <!-- Contatos -->
-    <div class="space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-        <h2 class="text-lg font-bold text-slate-800">Contatos</h2>
-        <button type="button"
-          class="rounded-lg border border-cyan-300 px-3 py-1 text-xs font-semibold text-cyan-700 transition hover:bg-cyan-50"
-          (click)="addContact()">
-          + Adicionar contato
-        </button>
-      </div>
-
-      <div class="space-y-3" formArrayName="contacts">
-        @if (!contactsFormArray.length) {
-        <p class="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-3 text-xs text-slate-600 text-center">
-          Nenhum contato adicionado.
-        </p>
-        }
-
-        @for (contactGroup of contactsFormArray.controls; track $index) {
-        <div class="grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-12"
-          [formGroupName]="$index">
-          <label class="text-sm md:col-span-3">
-            <span class="mb-1 block font-semibold text-slate-700">Tipo <span class="text-red-500">*</span></span>
-            <select formControlName="type"
-              class="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-cyan-300 transition focus:ring bg-white">
-              <option value="celular">Celular</option>
-              <option value="telefone">Telefone Fixo</option>
-            </select>
-          </label>
-
-          <label class="text-sm md:col-span-4">
-            <span class="mb-1 block font-semibold text-slate-700">Numero/Valor <span
-                class="text-red-500">*</span></span>
-            @if (contactGroup.get('type')?.value === 'celular' || contactGroup.get('type')?.value === 'telefone') {
-            <app-phone-input id="contact-value" formControlName="value"
-              (input)="onContactValueInput($index)"></app-phone-input>
-            } @else {
-            <input type="text" formControlName="value" (input)="onContactValueInput($index)"
-              class="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-cyan-300 transition focus:ring"
-              placeholder="(53) 99999-9999" />
-            }
-          </label>
-
-          <div class="flex items-center gap-4 text-sm justify-center md:col-span-3 pt-6">
-            @if (contactGroup.get('type')?.value === 'celular') {
-            <label class="flex items-center gap-1 cursor-pointer">
-              <input type="checkbox" formControlName="isWhatsapp"
-                class="h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-600" />
-              <span class="font-semibold text-slate-700">WhatsApp</span>
-            </label>
-            }
-
-            <label class="flex items-center gap-1 cursor-pointer">
-              <input type="checkbox" formControlName="isPrimary" (change)="onContactPrimaryChange($index)"
-                class="h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-600" />
-              <span class="font-semibold text-slate-700">Principal</span>
-            </label>
-          </div>
-
-          <div class="flex items-center justify-end md:col-span-2 pt-6">
-            <button type="button"
-              class="w-full md:w-auto rounded-lg border border-rose-300 px-3 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-50"
-              (click)="removeContact($index)">
-              Remover
-            </button>
+    <div class="bg-white rounded-[32px] shadow-2xl overflow-hidden border border-slate-200/50 backdrop-blur-sm pointer-events-auto">
+      <div class="p-8 sm:p-12">
+        <!-- Header -->
+        <div class="mb-12">
+          <div class="flex items-center gap-6 mb-4">
+            <div class="h-16 w-16 flex items-center justify-center drop-shadow-xl">
+              @if (appSettings.badgeUrl(); as badge) {
+                <img [src]="badge" alt="Inter" class="max-h-full max-w-full object-contain">
+              } @else {
+                <div class="h-12 w-12 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+              }
+            </div>
+            <div>
+              <h1 class="text-3xl font-black tracking-tight text-slate-900">Novo Cadastro</h1>
+              <p class="text-slate-500 font-medium">Junte-se à tribo do Lobão hoje mesmo.</p>
+            </div>
           </div>
         </div>
-        }
-      </div>
-    </div>
 
-    <!-- Endereços -->
-    <div class="space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-        <h2 class="text-lg font-bold text-slate-800">Enderecos</h2>
-        <button type="button"
-          class="rounded-lg border border-cyan-300 px-3 py-1 text-xs font-semibold text-cyan-700 transition hover:bg-cyan-50"
-          (click)="addAddress()">
-          + Adicionar endereco
-        </button>
-      </div>
+        @if (!pendingEmailVerification()) {
+          <form class="space-y-12" [formGroup]="registerForm" (ngSubmit)="onRegister()">
+            
+            <!-- Dados Basicos -->
+            <section class="space-y-6">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="flex items-center justify-center h-6 w-6 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">1</span>
+                <h2 class="text-sm font-black uppercase tracking-widest text-slate-400">Dados Básicos</h2>
+              </div>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="space-y-1.5">
+                  <label class="text-xs font-bold text-slate-500 ml-1" for="firstName">Nome <span class="text-rose-500">*</span></label>
+                  <input id="firstName" type="text" formControlName="firstName"
+                    class="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-slate-900 font-medium focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all outline-none"
+                    placeholder="Ex: Rodrigo" />
+                </div>
+                <div class="space-y-1.5">
+                  <label class="text-xs font-bold text-slate-500 ml-1" for="lastName">Sobrenome <span class="text-rose-500">*</span></label>
+                  <input id="lastName" type="text" formControlName="lastName"
+                    class="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-slate-900 font-medium focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all outline-none"
+                    placeholder="Ex: Silva" />
+                </div>
+              </div>
 
-      <div class="space-y-3" formArrayName="addresses">
-        @if (!addressesFormArray.length) {
-        <p class="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-3 text-xs text-slate-600 text-center">
-          Nenhum endereco adicionado.
-        </p>
-        }
+              <div class="space-y-1.5">
+                <label class="text-xs font-bold text-slate-500 ml-1" for="email">E-mail <span class="text-rose-500">*</span></label>
+                <app-email-input id="email" formControlName="email"></app-email-input>
+              </div>
 
-        @for (addressGroup of addressesFormArray.controls; track $index) {
-        <div class="grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-12 relative"
-          [formGroupName]="$index">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="space-y-1.5">
+                  <label class="text-xs font-bold text-slate-500 ml-1" for="password">Senha <span class="text-rose-500">*</span></label>
+                  <app-password-input id="password" formControlName="password" class="block"></app-password-input>
+                </div>
+                <div class="space-y-1.5">
+                  <label class="text-xs font-bold text-slate-500 ml-1" for="confirmPassword">Confirmar senha <span class="text-rose-500">*</span></label>
+                  <app-password-input id="confirmPassword" formControlName="confirmPassword" class="block" placeholder="Repita a senha"></app-password-input>
+                  @if (registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.hasError('passwordMismatch')) {
+                    <p class="mt-1 text-xs text-rose-500 font-medium ml-1 flex items-center gap-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                      As senhas não coincidem.
+                    </p>
+                  }
+                </div>
+              </div>
 
-          @if (addressGroup.get('loadingCep')?.value) {
-          <div class="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 flex items-center justify-center rounded-xl">
-            <app-spinner label="Buscando CEP..." size="sm" />
-          </div>
-          }
+              <div class="space-y-1.5">
+                <label class="text-xs font-bold text-slate-500 ml-1" for="document">CPF <span class="text-rose-500">*</span></label>
+                <div class="max-w-xs">
+                  <app-cpf-input id="document" formControlName="document"></app-cpf-input>
+                </div>
+              </div>
+            </section>
 
-          <label class="text-sm md:col-span-3">
-            <span class="mb-1 block font-semibold text-slate-700">Tipo <span class="text-red-500">*</span></span>
-            <select formControlName="type"
-              class="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-cyan-300 transition focus:ring bg-white">
-              <option value="home">Casa</option>
-              <option value="work">Trabalho</option>
-              <option value="other">Outro</option>
-            </select>
-          </label>
+            <!-- Contatos -->
+            <section class="space-y-6">
+              <div class="flex items-center justify-between gap-3 mb-2">
+                <div class="flex items-center gap-3">
+                  <span class="flex items-center justify-center h-6 w-6 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">2</span>
+                  <h2 class="text-sm font-black uppercase tracking-widest text-slate-400">Contatos</h2>
+                </div>
+                <button type="button"
+                  class="inline-flex items-center gap-2 rounded-xl bg-slate-50 border border-slate-200 px-4 py-2 text-xs font-bold text-slate-600 transition hover:bg-white hover:text-indigo-600 hover:border-indigo-200"
+                  (click)="addContact()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                  Adicionar
+                </button>
+              </div>
 
-          <label class="text-sm md:col-span-3">
-            <span class="mb-1 block font-semibold text-slate-700">CEP <span class="text-red-500">*</span></span>
-            <app-cep-input id="address-zipCode" formControlName="zipCode"
-              (input)="onZipCodeInput($index)"></app-cep-input>
-          </label>
+              <div class="space-y-4" formArrayName="contacts">
+                @if (!contactsFormArray.length) {
+                  <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 p-8 text-center">
+                    <p class="text-sm text-slate-400 font-medium">Nenhum contato adicionado.</p>
+                  </div>
+                }
 
-          <label class="flex items-center gap-2 text-sm md:col-span-2 pt-6 cursor-pointer">
-            <input type="checkbox" formControlName="isPrimary" (change)="onAddressPrimaryChange($index)"
-              class="h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-600" />
-            <span class="font-semibold text-slate-700">Principal</span>
-          </label>
+                @for (contactGroup of contactsFormArray.controls; track $index) {
+                  <div class="p-5 rounded-2xl border border-slate-100 bg-slate-50/80 grid gap-4 sm:grid-cols-12 relative group/item" [formGroupName]="$index">
+                    <div class="sm:col-span-3 space-y-1.5">
+                      <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Tipo</label>
+                      <select formControlName="type"
+                        class="w-full rounded-xl border border-slate-200 px-3 py-2.5 outline-none bg-white text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+                        <option value="celular">Celular</option>
+                        <option value="telefone">Fixo</option>
+                      </select>
+                    </div>
 
-          <div class="flex items-center justify-end md:col-span-4 pt-6">
-            <button type="button"
-              class="w-full md:w-auto rounded-lg border border-rose-300 px-3 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-50"
-              (click)="removeAddress($index)">
-              Remover
-            </button>
-          </div>
+                    <div class="sm:col-span-5 space-y-1.5">
+                      <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Número</label>
+                      <app-phone-input formControlName="value" (input)="onContactValueInput($index)"></app-phone-input>
+                    </div>
 
-          <label class="text-sm md:col-span-8">
-            <span class="mb-1 block font-semibold text-slate-700">Rua <span class="text-red-500">*</span></span>
-            <input type="text" formControlName="street"
-              class="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-cyan-300 transition focus:ring bg-white" />
-          </label>
+                    <div class="sm:col-span-3 flex items-center gap-4 pt-5">
+                      @if (contactGroup.get('type')?.value === 'celular') {
+                        <label class="flex items-center gap-2 cursor-pointer select-none group/check">
+                          <input type="checkbox" formControlName="isWhatsapp"
+                            class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                          <span class="text-xs font-bold text-slate-600 group-hover/check:text-indigo-600 transition-colors">WhatsApp</span>
+                        </label>
+                      }
+                      <label class="flex items-center gap-2 cursor-pointer select-none group/check">
+                        <input type="checkbox" formControlName="isPrimary" (change)="onContactPrimaryChange($index)"
+                          class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                        <span class="text-xs font-bold text-slate-600 group-hover/check:text-indigo-600 transition-colors">Principal</span>
+                      </label>
+                    </div>
 
-          <label class="text-sm md:col-span-4">
-            <span class="mb-1 block font-semibold text-slate-700">Numero <span class="text-red-500">*</span></span>
-            <input type="text" formControlName="number"
-              class="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-cyan-300 transition focus:ring bg-white" />
-          </label>
+                    <div class="sm:col-span-1 flex items-center justify-end sm:pt-4">
+                      <button type="button"
+                        class="p-2 rounded-lg text-slate-300 hover:text-rose-500 transition-colors"
+                        title="Remover Contato"
+                        (click)="removeContact($index)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            </section>
 
-          <label class="text-sm md:col-span-4">
-            <span class="mb-1 block font-semibold text-slate-700">Complemento</span>
-            <input type="text" formControlName="complement"
-              class="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-cyan-300 transition focus:ring bg-white" />
-          </label>
+            <!-- Endereços -->
+            <section class="space-y-6">
+              <div class="flex items-center justify-between gap-3 mb-2">
+                <div class="flex items-center gap-3">
+                  <span class="flex items-center justify-center h-6 w-6 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">3</span>
+                  <h2 class="text-sm font-black uppercase tracking-widest text-slate-400">Endereços</h2>
+                </div>
+                <button type="button"
+                  class="inline-flex items-center gap-2 rounded-xl bg-slate-50 border border-slate-200 px-4 py-2 text-xs font-bold text-slate-600 transition hover:bg-white hover:text-indigo-600 hover:border-indigo-200"
+                  (click)="addAddress()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                  Adicionar
+                </button>
+              </div>
 
-          <label class="text-sm md:col-span-4">
-            <span class="mb-1 block font-semibold text-slate-700">Bairro <span class="text-red-500">*</span></span>
-            <input type="text" formControlName="neighborhood"
-              class="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-cyan-300 transition focus:ring bg-white" />
-          </label>
+              <div class="space-y-4" formArrayName="addresses">
+                @if (!addressesFormArray.length) {
+                  <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 p-8 text-center">
+                    <p class="text-sm text-slate-400 font-medium">Nenhum endereço adicionado.</p>
+                  </div>
+                }
 
-          <label class="text-sm md:col-span-3">
-            <span class="mb-1 block font-semibold text-slate-700">Cidade <span class="text-red-500">*</span></span>
-            <input type="text" formControlName="city"
-              class="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-cyan-300 transition focus:ring bg-white" />
-          </label>
+                @for (addressGroup of addressesFormArray.controls; track $index) {
+                  <div class="p-6 rounded-3xl border border-slate-100 bg-slate-50/80 relative" [formGroupName]="$index">
+                    @if (addressGroup.get('loadingCep')?.value) {
+                      <div class="absolute inset-0 bg-white/60 backdrop-blur-sm z-20 flex items-center justify-center rounded-3xl animate-[fade-in_0.2s]">
+                        <app-spinner label="CEP..." size="sm" />
+                      </div>
+                    }
 
-          <label class="text-sm md:col-span-1">
-            <span class="mb-1 block font-semibold text-slate-700">UF <span class="text-red-500">*</span></span>
-            <input type="text" formControlName="state" maxlength="2"
-              class="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-cyan-300 transition focus:ring bg-white uppercase text-center" />
-          </label>
-        </div>
-        }
-      </div>
-    </div>
+                    <div class="grid gap-6 sm:grid-cols-12">
+                      <div class="sm:col-span-4 space-y-1.5">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Tipo</label>
+                        <select formControlName="type"
+                          class="w-full rounded-xl border border-slate-200 px-3 py-2.5 outline-none bg-white text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+                          <option value="home">Casa</option>
+                          <option value="work">Trabalho</option>
+                          <option value="other">Outro</option>
+                        </select>
+                      </div>
 
-    <!-- Avatar -->
-    <div class="space-y-4">
-      <h2 class="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2">Foto de Perfil</h2>
-      <div class="mt-3 flex flex-wrap items-center gap-4">
-        
-        <app-photo-upload
-          [photoUrl]="photoPreviewUrl() || null"
-          [disabled]="loading()"
-          (fileSelected)="onFileSelected($event)"
-          (photoRemoved)="removePhoto()"
-        ></app-photo-upload>
+                      <div class="sm:col-span-4 space-y-1.5">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">CEP</label>
+                        <app-cep-input formControlName="zipCode" (input)="onZipCodeInput($index)"></app-cep-input>
+                      </div>
 
-        <div class="flex flex-col gap-1">
-          <p class="text-xs text-slate-500 max-w-[200px]">JPG/PNG com recorte.</p>
-        </div>
-        
-      </div>
-    </div>
+                      <div class="sm:col-span-2 flex items-center pt-5">
+                         <label class="flex items-center gap-2 cursor-pointer select-none group/check">
+                          <input type="checkbox" formControlName="isPrimary" (change)="onAddressPrimaryChange($index)"
+                            class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                          <span class="text-xs font-bold text-slate-600 group-hover/check:text-indigo-600 transition-colors">Principal</span>
+                        </label>
+                      </div>
 
-    <div class="pt-4 border-t border-slate-200">
-      <button type="submit"
-        class="w-full rounded-xl bg-sky-600 px-4 py-3 text-lg font-bold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
-        [disabled]="loading() || registerForm.invalid">
-        @if (loading()) {
-        <app-spinner label="Cadastrando..." size="sm" [inline]="true" />
+                      <div class="sm:col-span-2 flex items-center justify-end pt-5">
+                         <button type="button"
+                          class="p-2 rounded-lg text-slate-300 hover:text-rose-500 transition-colors"
+                          (click)="removeAddress($index)">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                        </button>
+                      </div>
+
+                      <!-- Subgrid for street details -->
+                      <div class="sm:col-span-8 space-y-1.5">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Rua / Logradouro</label>
+                        <input type="text" formControlName="street"
+                          class="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none" />
+                      </div>
+
+                      <div class="sm:col-span-4 space-y-1.5">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Número</label>
+                        <input type="text" formControlName="number"
+                          class="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none" />
+                      </div>
+
+                      <div class="sm:col-span-4 space-y-1.5">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Bairro</label>
+                        <input type="text" formControlName="neighborhood"
+                          class="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none" />
+                      </div>
+
+                      <div class="sm:col-span-5 space-y-1.5">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Cidade</label>
+                        <input type="text" formControlName="city"
+                          class="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none" />
+                      </div>
+
+                      <div class="sm:col-span-3 space-y-1.5">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Estado (UF)</label>
+                        <input type="text" formControlName="state" maxlength="2"
+                          class="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-sm font-black uppercase text-center focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none" />
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </section>
+
+            <!-- Foto -->
+            <section class="space-y-6">
+              <div class="flex items-center gap-3">
+                <span class="flex items-center justify-center h-6 w-6 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">4</span>
+                <h2 class="text-sm font-black uppercase tracking-widest text-slate-400">Foto de Perfil</h2>
+              </div>
+              
+              <div class="bg-slate-50/50 rounded-3xl p-8 border border-slate-100 flex flex-col sm:flex-row items-center gap-8">
+                <app-photo-upload
+                  [photoUrl]="photoPreviewUrl() || null"
+                  [disabled]="loading()"
+                  (fileSelected)="onFileSelected($event)"
+                  (photoRemoved)="removePhoto()"
+                ></app-photo-upload>
+                
+                <div class="text-center sm:text-left">
+                  <h4 class="text-slate-900 font-bold mb-1">Sua melhor foto</h4>
+                  <p class="text-xs text-slate-500 leading-relaxed max-w-[240px]">
+                    Use uma imagem JPG ou PNG. Recomendamos que seu rosto esteja centralizado.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <div class="pt-10">
+              <button type="submit"
+                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-indigo-600/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed text-base tracking-wide"
+                [disabled]="loading() || registerForm.invalid">
+                @if (loading()) {
+                  <app-spinner label="Cadastrando..." size="sm" [inline]="true" color="white" />
+                } @else {
+                  Finalizar Cadastro
+                }
+              </button>
+              <p class="text-center text-[10px] text-slate-400 mt-4 font-medium uppercase tracking-widest">
+                Ao clicar em finalizar, você concorda com nossos termos de uso.
+              </p>
+            </div>
+          </form>
         } @else {
-        Finalizar Cadastro
+          <!-- Two Factor / Verification Flow -->
+          <div class="py-12 text-center animate-[fade-in_0.3s_ease-out]">
+             <div class="h-20 w-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-8">
+               <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            
+            <h2 class="text-2xl font-black text-slate-900 mb-2">Quase lá!</h2>
+            <p class="text-slate-500 font-medium mb-12 max-w-sm mx-auto">
+              Sua conta foi criada, mas precisamos validar seu e-mail.<br>
+              Enviamos um código para <span class="text-indigo-600 font-bold">{{ verificationEmail() }}</span>
+            </p>
+
+            <form class="max-w-xs mx-auto space-y-10" [formGroup]="verifyEmailForm" (ngSubmit)="onVerifyEmail()">
+              <app-code-input
+                formControlName="code"
+                [hasError]="(verifyEmailForm.get('code')?.invalid && verifyEmailForm.get('code')?.touched) || false"
+              ></app-code-input>
+
+              <div class="flex flex-col gap-3">
+                <button type="submit"
+                  class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-indigo-600/20 transition-all active:scale-[0.98] disabled:opacity-50"
+                  [disabled]="loading() || verifyEmailForm.invalid">
+                  Confirmar e Entrar
+                </button>
+                <button type="button"
+                  class="w-full bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold py-3 rounded-2xl transition-all text-sm"
+                  (click)="resendCode()" [disabled]="loading()">
+                   Não recebi o código
+                </button>
+              </div>
+            </form>
+          </div>
         }
-      </button>
+      </div>
     </div>
-  </form>
+    
+    <!-- Footer -->
+    <p class="mt-12 text-center text-slate-500 text-xs font-medium tracking-wide">
+      &copy; 2026 Esporte Clube Pelotas • Sistema de Gestão Interna
+    </p>
+  </div>
+</div>
 
-  <p class="mt-6 text-center text-sm text-slate-600">
-    Ja possui uma conta?
-    <a routerLink="/login" class="font-semibold text-cyan-700 hover:text-cyan-800 hover:underline">Fazer login</a>
-  </p>
-
-  } @else {
-  <h1 class="mt-2 text-2xl font-black tracking-tight text-slate-900">Verificar e-mail</h1>
-  <p class="mt-2 text-sm text-slate-600">
-    Cadastro aprovado! Enviamos um codigo para <span class="font-semibold">{{ verificationEmail() }}</span>.
-  </p>
-
-  <form class="mt-6 space-y-8" [formGroup]="verifyEmailForm" (ngSubmit)="onVerifyEmail()">
-    <div class="flex flex-col items-center justify-center">
-      <label class="mb-4 block text-sm font-semibold text-slate-700 text-center" for="verification-code">
-        Digite o codigo de 6 digitos
-      </label>
-      <app-code-input
-        id="verification-code"
-        formControlName="code"
-        [hasError]="(verifyEmailForm.get('code')?.invalid && verifyEmailForm.get('code')?.touched) || false"
-      ></app-code-input>
-    </div>
-
-    <div class="flex gap-2">
-      <button type="submit"
-        class="flex-1 rounded-xl bg-cyan-700 px-4 py-2 font-semibold text-white transition hover:bg-cyan-800 disabled:cursor-not-allowed disabled:opacity-60"
-        [disabled]="loading() || verifyEmailForm.invalid">
-        @if (loading()) {
-        <app-spinner label="Verificando..." size="sm" [inline]="true" />
-        } @else {
-        Confirmar e Entrar
-        }
-      </button>
-      <button type="button"
-        class="rounded-xl border border-slate-300 px-4 py-2 font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
-        (click)="resendCode()" [disabled]="loading()">
-        Reenviar
-      </button>
-    </div>
-  </form>
-  }
-
-  @if (imageChangedEvent) {
-  <app-image-cropper-dialog [imageChangedEvent]="imageChangedEvent" (imageCroppedEvent)="onImageCropped($any($event))"
-    (cancel)="onCropCancel()" />
-  }
-</section>
+@if (imageChangedEvent) {
+  <app-image-cropper-dialog 
+    [imageChangedEvent]="imageChangedEvent" 
+    (imageCroppedEvent)="onImageCropped($any($event))"
+    (cancel)="onCropCancel()" 
+  />
+}
+>

@@ -13,5 +13,5 @@ export const authGuard: CanActivateFn = () => {
   }
 
   toast.showAuthRequired();
-  return router.createUrlTree(['/']);
+  return router.createUrlTree(['/login'], { queryParams: { returnUrl: router.routerState.snapshot.url } });
 };

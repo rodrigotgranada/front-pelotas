@@ -15,7 +15,6 @@ export default [
       {
         path: 'dashboard',
         loadComponent: () => import('./pages/dashboard/dashboard-page.component').then((c) => c.DashboardPageComponent),
-        // Todos que chegam no AdminLayout tem acesso ao dashboard
         canActivate: [rolesGuard(['owner', 'socio', 'admin', 'editor'])],
       },
       {
@@ -29,6 +28,11 @@ export default [
         canActivate: [rolesGuard(['owner', 'socio', 'admin', 'editor'])],
       },
       {
+        path: 'newsletter',
+        loadComponent: () => import('./pages/newsletter-admin/newsletter-admin-page.component').then((c) => c.AdminNewsletterPageComponent),
+        canActivate: [rolesGuard(['owner', 'admin'])],
+      },
+      {
         path: 'news/editor/:id',
         loadComponent: () => import('./pages/news/admin-news-editor.component').then((c) => c.AdminNewsEditorComponent),
         canActivate: [rolesGuard(['owner', 'socio', 'admin', 'editor'])],
@@ -38,11 +42,11 @@ export default [
         loadComponent: () => import('../../features/logs/pages/logs-page.component').then((c) => c.LogsPageComponent),
         canActivate: [rolesGuard(['owner', 'admin'])],
       },
-      // {
-      //   path: 'finance',
-      //   loadComponent: () => import('./pages/finance/admin-finance-page.component').then((c) => c.AdminFinancePageComponent),
-      //   canActivate: [rolesGuard(['owner', 'socio'])],
-      // },
+      {
+        path: 'settings',
+        loadComponent: () => import('./pages/settings/admin-settings-page.component').then((c) => c.AdminSettingsPageComponent),
+        canActivate: [rolesGuard(['owner', 'admin'])],
+      },
     ],
   },
 ] satisfies Routes;
