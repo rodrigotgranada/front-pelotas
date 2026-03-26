@@ -32,6 +32,7 @@ export class App implements OnInit {
   readonly hasToken = computed(() => !!this.tokenService.token());
   readonly me = this.session.me;
   readonly badgeUrl = this.appSettings.badgeUrl;
+  readonly isMembershipEnabled = this.appSettings.isMembershipEnabled;
 
   readonly dropdownOpen = signal(false);
 

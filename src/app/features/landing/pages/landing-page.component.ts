@@ -23,6 +23,7 @@ export class LandingPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   readonly appSettings = inject(AppSettingsService);
   private readonly destroyRef = inject(DestroyRef);
+  readonly isMembershipEnabled = this.appSettings.isMembershipEnabled;
 
   readonly isAuthenticated = () => !!this.authTokenService.getToken();
   

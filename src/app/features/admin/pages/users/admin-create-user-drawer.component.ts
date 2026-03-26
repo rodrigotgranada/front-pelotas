@@ -17,6 +17,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ToastMessagesService, ToastTitle } from '../../../../core/notifications/toast-messages.service';
 import { UsersApiService } from '../../../../core/services/users-api.service';
 import { RolesApiService } from '../../../../core/services/roles-api.service';
+import { MembershipService, MembershipPlan } from '../../../../shared/master-bypass-v2';
 import { SpinnerComponent } from '../../../../shared/ui/spinner/spinner.component';
 import { EmailInputComponent } from '../../../../shared/ui/email-input/email-input.component';
 import { CpfInputComponent } from '../../../../shared/ui/cpf-input/cpf-input.component';
@@ -59,6 +60,7 @@ export class AdminCreateUserDrawerComponent implements OnInit {
   private readonly rolesApi = inject(RolesApiService);
   private readonly toast = inject(ToastMessagesService);
   private readonly http = inject(HttpClient);
+  private readonly membershipApi = inject(MembershipService);
 
   @Input() editUser?: UserResponse | null = null;
 
@@ -84,6 +86,11 @@ export class AdminCreateUserDrawerComponent implements OnInit {
     { initialValue: [] }
   );
 
+  readonly membershipPlans = toSignal(
+    this.membershipApi.getPlans().pipe(map((plans: MembershipPlan[]) => plans.filter(p => p.isActive))),
+    { initialValue: [] as MembershipPlan[] }
+  );
+
   readonly form = this.fb.group({
     firstName: ['', [Validators.required, Validators.minLength(2)]],
     lastName: ['', [Validators.required, Validators.minLength(2)]],
@@ -93,9 +100,17 @@ export class AdminCreateUserDrawerComponent implements OnInit {
     documentType: ['cpf'],
     roleId: ['', [Validators.required]],
     isActive: [true],
+    membershipPlanId: [''],
+    isMembershipPayed: [true],
     contacts: this.fb.array([]),
     addresses: this.fb.array([]),
   });
+
+  isSocioSelected(): boolean {
+    const roleId = this.form.get('roleId')?.value;
+    const role = this.activeRoles().find(r => r.id === roleId);
+    return role?.code === 'socio';
+  }
 
   ngOnInit(): void {
     if (this.editUser) {
@@ -326,6 +341,8 @@ export class AdminCreateUserDrawerComponent implements OnInit {
       documentType: 'cpf',
       roleId: raw.roleId,
       isActive: raw.isActive,
+      membershipPlanId: this.isSocioSelected() ? raw.membershipPlanId : undefined,
+      isMembershipPayed: this.isSocioSelected() ? raw.isMembershipPayed : undefined,
       contacts,
       addresses,
     };

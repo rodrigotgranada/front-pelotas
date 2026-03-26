@@ -7,6 +7,7 @@ export interface PublicSettings {
   badgeUrl: string | null;
   themePreset: string;
   defaultNewsImageUrl: string | null;
+  isMembershipEnabled: boolean;
 }
 
 export interface ThemePreset {
@@ -90,6 +91,7 @@ export class AppSettingsService {
   readonly badgeUrl = signal<string | null>(null);
   readonly themePreset = signal<string>('default');
   readonly defaultNewsImageUrl = signal<string | null>(null);
+  readonly isMembershipEnabled = signal<boolean>(true);
 
   async loadPublicSettings(): Promise<void> {
     try {
@@ -99,6 +101,7 @@ export class AppSettingsService {
       this.badgeUrl.set(settings.badgeUrl ?? null);
       this.themePreset.set(settings.themePreset ?? 'default');
       this.defaultNewsImageUrl.set(settings.defaultNewsImageUrl ?? null);
+      this.isMembershipEnabled.set(settings.isMembershipEnabled ?? true);
       this.applyTheme(settings.themePreset ?? 'default');
     } catch {
       // Silently fail — use defaults

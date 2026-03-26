@@ -47,6 +47,36 @@ export default [
         loadComponent: () => import('./pages/settings/admin-settings-page.component').then((c) => c.AdminSettingsPageComponent),
         canActivate: [rolesGuard(['owner', 'admin'])],
       },
+      {
+        path: 'historia',
+        loadComponent: () => import('./pages/history/admin-history-page.component').then((c) => c.AdminHistoryPageComponent),
+        canActivate: [rolesGuard(['owner', 'admin'])],
+      },
+      {
+        path: 'historia/novo',
+        loadComponent: () => import('./pages/history/admin-history-editor.component').then((c) => c.AdminHistoryEditorComponent),
+        canActivate: [rolesGuard(['owner', 'admin'])],
+      },
+      {
+        path: 'historia/editar/:id',
+        loadComponent: () => import('./pages/history/admin-history-editor.component').then((c) => c.AdminHistoryEditorComponent),
+        canActivate: [rolesGuard(['owner', 'admin'])],
+      },
+      {
+        path: 'socio/planos',
+        loadComponent: () => import('./pages/membership/admin-plans-page.component').then((c) => c.AdminPlansPageComponent),
+        canActivate: [rolesGuard(['owner', 'admin'])],
+      },
+      {
+        path: 'socio/planos/novo',
+        loadComponent: () => import('./pages/membership/admin-plan-editor.component').then((c) => c.AdminPlanEditorComponent),
+        canActivate: [rolesGuard(['owner', 'admin'])],
+      },
+      {
+        path: 'socio/planos/editar/:id',
+        loadComponent: () => import('./pages/membership/admin-plan-editor.component').then((c) => c.AdminPlanEditorComponent),
+        canActivate: [rolesGuard(['owner', 'admin'])],
+      },
     ],
   },
 ] satisfies Routes;

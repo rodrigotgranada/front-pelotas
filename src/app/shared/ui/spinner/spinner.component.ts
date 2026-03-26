@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 
 @Component({
   selector: 'app-spinner',
+  standalone: true,
   templateUrl: './spinner.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {

@@ -52,6 +52,16 @@
         <!-- Navigation & Actions -->
         <div class="flex items-center gap-3 ml-auto">
           <nav class="flex items-center gap-1.5">
+            @if (isMembershipEnabled()) {
+              <a routerLink="/seja-socio" routerLinkActive="text-brand-600 bg-brand-50"
+                 class="px-3 py-1.5 rounded-lg text-brand-600 text-xs font-black hover:bg-brand-50 transition border border-brand-100">
+                Seja Sócio
+              </a>
+            }
+            <a routerLink="/historia" routerLinkActive="text-brand-600 bg-brand-50"
+               class="px-3 py-1.5 rounded-lg text-slate-600 text-xs font-bold hover:text-brand-600 hover:bg-slate-50 transition">
+              História
+            </a>
             @if (canAccessAdminData()) {
               <a routerLink="/admin" routerLinkActive="bg-slate-800 text-white"
                  class="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-bold hover:bg-slate-700 transition shadow-sm">

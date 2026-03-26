@@ -41,6 +41,14 @@ import { ToastMessagesService } from '../../../../core/notifications/toast-messa
         >
           Personalização
         </button>
+        <button 
+          (click)="activeTab.set('modulos')"
+          [class]="activeTab() === 'modulos' 
+            ? 'px-6 py-2 bg-white rounded-xl text-sm font-bold text-slate-900 shadow-sm' 
+            : 'px-6 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-50 transition'"
+        >
+          Módulos
+        </button>
       </div>
 
       <!-- Tab: Identidade Visual -->
@@ -219,6 +227,55 @@ import { ToastMessagesService } from '../../../../core/notifications/toast-messa
           </div>
         </section>
       }
+
+      <!-- Tab: Módulos -->
+      @if (activeTab() === 'modulos') {
+        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Gestão de Módulos</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Habilite ou desabilite funcionalidades inteiras do portal</p>
+          </div>
+          <div class="p-6 space-y-6">
+            <div class="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-cyan-100 text-cyan-600 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">Módulo de Sócios</h3>
+                  <p class="text-xs text-slate-500 mt-0.5">Se desativado, remove botões de adesão e bloqueia rotas de inscrição.</p>
+                </div>
+              </div>
+
+              <!-- Toggle -->
+              <button
+                type="button"
+                (click)="toggleMembership()"
+                [disabled]="membershipSaving()"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2"
+                [class.bg-brand-600]="isMembershipEnabled()"
+                [class.bg-slate-200]="!isMembershipEnabled()"
+              >
+                <span
+                  class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                  [class.translate-x-5]="isMembershipEnabled()"
+                  [class.translate-x-0]="!isMembershipEnabled()"
+                ></span>
+              </button>
+            </div>
+
+            @if (membershipSaving()) {
+              <div class="flex items-center gap-2 text-xs text-slate-500">
+                <svg class="animate-spin h-3.5 w-3.5 text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Salvando alteração...
+              </div>
+            }
+          </div>
+        </section>
+      }
     </div>
   `,
 })
@@ -232,10 +289,12 @@ export class AdminSettingsPageComponent implements OnInit {
   readonly defaultNewsUrl = this.appSettings.defaultNewsImageUrl;
   readonly selectedTheme = signal(this.appSettings.themePreset());
 
-  readonly activeTab = signal<'identidade' | 'tema'>('identidade');
+  readonly activeTab = signal<'identidade' | 'tema' | 'modulos'>('identidade');
   readonly badgeSaving = signal(false);
   readonly defaultNewsSaving = signal(false);
   readonly themeSaving = signal(false);
+  readonly membershipSaving = signal(false);
+  readonly isMembershipEnabled = this.appSettings.isMembershipEnabled;
 
   ngOnInit() {
     this.selectedTheme.set(this.appSettings.themePreset());
@@ -393,6 +452,20 @@ export class AdminSettingsPageComponent implements OnInit {
       this.toast.showError('Erro ao remover imagem padrão.');
     } finally {
       this.defaultNewsSaving.set(false);
+    }
+  }
+
+  async toggleMembership() {
+    this.membershipSaving.set(true);
+    const newValue = !this.isMembershipEnabled();
+    try {
+      await this.appSettings.saveSetting('isMembershipEnabled', String(newValue));
+      this.appSettings.isMembershipEnabled.set(newValue);
+      this.toast.showSuccess(newValue ? 'Módulo de Sócios ativado!' : 'Módulo de Sócios desativado!');
+    } catch {
+      this.toast.showError('Erro ao alterar status do módulo.');
+    } finally {
+      this.membershipSaving.set(false);
     }
   }
 }

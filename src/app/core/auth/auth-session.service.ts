@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, from, map, Observable } from 'rxjs';
 import { UserMeResponse } from '../models/user.model';
 import { UsersApiService } from '../services/users-api.service';
 import { AuthTokenService } from './auth-token.service';
@@ -40,6 +40,10 @@ export class AuthSessionService {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  refreshMe(): Observable<UserMeResponse | null> {
+    return from(this.hydrateSession()).pipe(map(() => this.me()));
   }
 
   clear(): void {
