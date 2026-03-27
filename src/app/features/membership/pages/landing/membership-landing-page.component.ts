@@ -1,6 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { MembershipService, MembershipPlan } from '../../../../shared/master-bypass-v2';
 import { SpinnerComponent } from '../../../../shared/ui/spinner/spinner.component';
 import { finalize } from 'rxjs';
@@ -12,7 +11,7 @@ import { ToastMessagesService } from '../../../../core/notifications/toast-messa
 @Component({
   selector: 'app-membership-landing-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, SpinnerComponent, FormsModule],
+  imports: [CommonModule, SpinnerComponent, FormsModule],
   template: `
     <div class="min-h-screen bg-white">
       <header class="relative py-24 bg-slate-900 overflow-hidden">

@@ -95,9 +95,6 @@ import { MembershipInterestApiService } from '../../../core/services/membership-
           @if (hasAnyRole(['owner', 'socio', 'admin'])) {
             <div class="pt-4 pb-2">
               <p class="px-3 text-xs font-bold uppercase tracking-wider text-slate-400">Gerencial</p>
-            </div>
-            
-            </a>
             
             <a
               routerLink="/admin/intencoes"
