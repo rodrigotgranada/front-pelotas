@@ -28,6 +28,10 @@ export default [
         canActivate: [rolesGuard(['owner', 'socio', 'admin', 'editor'])],
       },
       {
+        path: 'intencoes',
+        loadComponent: () => import('./pages/membership/admin-interests-page.component').then(m => m.AdminInterestsPageComponent)
+      },
+      {
         path: 'newsletter',
         loadComponent: () => import('./pages/newsletter-admin/newsletter-admin-page.component').then((c) => c.AdminNewsletterPageComponent),
         canActivate: [rolesGuard(['owner', 'admin'])],

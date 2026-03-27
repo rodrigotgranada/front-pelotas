@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthSessionService } from '../../../core/auth/auth-session.service';
+import { MembershipInterestApiService } from '../../../core/services/membership-interest-api.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -96,14 +97,24 @@ import { AuthSessionService } from '../../../core/auth/auth-session.service';
               <p class="px-3 text-xs font-bold uppercase tracking-wider text-slate-400">Gerencial</p>
             </div>
             
+            </a>
+            
             <a
-              routerLink="/admin/users"
-              routerLinkActive="bg-cyan-50 text-cyan-700 font-semibold"
+              routerLink="/admin/intencoes"
+              routerLinkActive="bg-indigo-50 text-indigo-700 font-semibold"
               (click)="isSidebarOpen.set(false)"
-              class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
+              class="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900 group"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              Usuarios e Time
+              <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg>
+                Intenções de Sócio
+              </div>
+              <span 
+                *ngIf="unreadInterestsCount() > 0"
+                class="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-black text-white shadow-sm shadow-red-200"
+              >
+                {{ unreadInterestsCount() }}
+              </span>
             </a>
 
             <a
@@ -203,11 +214,31 @@ import { AuthSessionService } from '../../../core/auth/auth-session.service';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AdminLayoutComponent {
+export class AdminLayoutComponent implements OnInit, OnDestroy {
   private readonly session = inject(AuthSessionService);
+  private readonly interestApi = inject(MembershipInterestApiService);
   
   readonly me = this.session.me;
   readonly isSidebarOpen = signal(false);
+  readonly unreadInterestsCount = signal(0);
+  
+  private pollInterval?: any;
+
+  ngOnInit() {
+    this.refreshUnreadCount();
+    // Poll every 1 minute
+    this.pollInterval = setInterval(() => this.refreshUnreadCount(), 60000);
+  }
+
+  ngOnDestroy() {
+    if (this.pollInterval) clearInterval(this.pollInterval);
+  }
+
+  refreshUnreadCount() {
+    if (this.hasAnyRole(['owner', 'admin'])) {
+      this.interestApi.getUnreadCount().subscribe(res => this.unreadInterestsCount.set(res.count));
+    }
+  }
 
   get roleCode(): string {
     return (this.me() as any)?.roleCode || 'guest';
