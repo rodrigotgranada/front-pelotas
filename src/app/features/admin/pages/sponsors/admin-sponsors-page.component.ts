@@ -4,13 +4,12 @@ import { Sponsor } from '../../../../core/models/sponsor.model';
 import { SponsorsService } from '../../../../core/services/sponsors.service';
 import { SpinnerComponent } from '../../../../shared/ui/spinner/spinner.component';
 import { finalize } from 'rxjs';
-import { RouterLink } from '@angular/router';
 import { AdminCreateSponsorDrawerComponent } from './components/admin-create-sponsor-drawer.component';
 
 @Component({
   selector: 'app-admin-sponsors-page',
   standalone: true,
-  imports: [CommonModule, SpinnerComponent, RouterLink, AdminCreateSponsorDrawerComponent],
+  imports: [CommonModule, SpinnerComponent, AdminCreateSponsorDrawerComponent],
   template: `
     <div class="flex flex-col gap-6">
       <div class="flex items-center justify-between">
