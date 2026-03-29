@@ -124,6 +124,7 @@ export class AdminHistoryEditorComponent implements OnInit, OnDestroy {
   private editor?: EditorJS;
   
   readonly imageSelectedEvent = signal<Event | null>(null);
+  private fileInputElement: HTMLInputElement | null = null;
 
   readonly form = this.fb.group({
     title: ['', [Validators.required]],
@@ -201,10 +202,16 @@ export class AdminHistoryEditorComponent implements OnInit, OnDestroy {
 
   onFileSelected(event: any) {
     this.imageSelectedEvent.set(event);
+    this.fileInputElement = event.target;
   }
 
   onImageCropped(file: Blob) {
     this.imageSelectedEvent.set(null);
+    if (this.fileInputElement) {
+      this.fileInputElement.value = '';
+      this.fileInputElement = null;
+    }
+
     const reader = new FileReader();
     reader.onload = (e: any) => {
       this.form.patchValue({ coverImageUrl: e.target.result });
@@ -216,6 +223,10 @@ export class AdminHistoryEditorComponent implements OnInit, OnDestroy {
 
   onCropCancel() {
     this.imageSelectedEvent.set(null);
+    if (this.fileInputElement) {
+      this.fileInputElement.value = '';
+      this.fileInputElement = null;
+    }
   }
 
   removeCover() {
