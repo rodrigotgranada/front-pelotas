@@ -9,11 +9,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { NewsletterWidgetComponent } from '../../../shared/ui/newsletter-widget/newsletter-widget.component';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
+import { SponsorsCarouselComponent } from '../components/sponsors-carousel.component';
 
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [RouterLink, CommonModule, SpinnerComponent, NewsletterWidgetComponent],
+  imports: [RouterLink, CommonModule, SpinnerComponent, NewsletterWidgetComponent, SponsorsCarouselComponent],
   templateUrl: './landing-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

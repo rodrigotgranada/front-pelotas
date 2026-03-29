@@ -23,6 +23,11 @@ export default [
         canActivate: [rolesGuard(['owner', 'socio', 'admin'])],
       },
       {
+        path: 'sponsors',
+        loadComponent: () => import('./pages/sponsors/admin-sponsors-page.component').then((c) => c.AdminSponsorsPageComponent),
+        canActivate: [rolesGuard(['owner', 'socio', 'admin'])],
+      },
+      {
         path: 'news',
         loadComponent: () => import('./pages/news/admin-news-page.component').then((c) => c.AdminNewsPageComponent),
         canActivate: [rolesGuard(['owner', 'socio', 'admin', 'editor'])],

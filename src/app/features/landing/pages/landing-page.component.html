@@ -1,18 +1,7 @@
 <main class="flex-1 w-full max-w-7xl mx-auto px-4 py-8">
-  <!-- Sponsor Carousel (Placeholder) - Only on main view -->
+  <!-- Sponsor Carousel (Only on main view) -->
   @if (!currentSearch()) {
-    <div class="mb-10 w-full overflow-hidden border-y border-slate-200 bg-white shadow-sm rounded-2xl relative group">
-      <div class="px-6 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Patrocinadores Oficiais</span>
-      </div>
-      <div class="flex items-center gap-12 overflow-x-auto py-5 px-6 whitespace-nowrap hide-scrollbar flex-nowrap shrink-0 snap-x">
-        <div class="h-10 w-32 bg-slate-100 rounded animate-pulse opacity-50 shrink-0 snap-center"></div>
-        <div class="h-10 w-24 bg-slate-100 rounded animate-pulse opacity-50 shrink-0 snap-center"></div>
-        <div class="h-10 w-40 bg-slate-100 rounded animate-pulse opacity-50 shrink-0 snap-center"></div>
-        <div class="h-10 w-28 bg-slate-100 rounded animate-pulse opacity-50 shrink-0 snap-center"></div>
-        <div class="h-10 w-32 bg-slate-100 rounded animate-pulse opacity-50 shrink-0 snap-center"></div>
-      </div>
-    </div>
+    <app-sponsors-carousel></app-sponsors-carousel>
   }
 
   <!-- Page Title / Search Breadcrumb -->
