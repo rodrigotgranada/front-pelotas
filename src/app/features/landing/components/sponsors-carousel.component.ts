@@ -10,9 +10,8 @@ import { SponsorsService } from '../../../core/services/sponsors.service';
   imports: [CommonModule, FallbackImgDirective],
   template: `
     @if (sponsors().length > 0) {
-      <div class="mb-10 w-full overflow-hidden border-y border-slate-200 bg-white shadow-sm rounded-2xl relative select-none">
-        
-        <div class="px-6 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between z-20 relative">
+      <div class="w-full overflow-hidden border-b border-slate-200 bg-white relative select-none">
+        <div class="max-w-7xl mx-auto px-6 py-2 border-b border-slate-100 flex items-center justify-between z-20 relative">
           <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Patrocinadores Oficiais</span>
           <div class="flex items-center gap-2">
             <button (click)="prev()" class="p-1 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition">
@@ -25,19 +24,19 @@ import { SponsorsService } from '../../../core/services/sponsors.service';
         </div>
 
         <!-- Carousel Track Container -->
-        <!-- O calc(50% - X) garante que o item sempre preencha o centro da div independentemente do tamanho da tela. Cada item tem 160px de largura final (128px + 32px de gap) -->
         <div 
-          class="h-28 w-full bg-white cursor-pointer relative flex items-center overflow-hidden" 
+          class="h-28 w-full cursor-pointer relative flex items-center overflow-hidden" 
           (click)="next()"
           (mouseenter)="pause()"
           (mouseleave)="resume()"
         >
-          <!-- Fading Edges to hide entering/leaving logos gracefully -->
-          <div class="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
-          <div class="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
+          <!-- Fading Edges -->
+          <div class="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+          <div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
 
-          <div class="flex items-center transition-transform duration-500 ease-out will-change-transform absolute left-0"
-               [style.transform]="'translate3d(calc(50% - ' + ((currentIndex() * 160) + 80) + 'px), 0, 0)'">
+          <div class="flex items-center transition-transform duration-500 ease-out will-change-transform absolute h-full"
+               [style.left]="'50%'"
+               [style.transform]="'translate3d(-' + ((currentIndex() * 160) + 80) + 'px, 0, 0)'">
             
             @for (sponsor of sponsors(); track sponsor._id; let i = $index) {
               <div 

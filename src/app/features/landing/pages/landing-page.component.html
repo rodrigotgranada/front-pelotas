@@ -1,8 +1,13 @@
-<main class="flex-1 w-full max-w-7xl mx-auto px-4 py-8">
-  <!-- Sponsor Carousel (Only on main view) -->
+<div class="flex-1 w-full">
+  <!-- Sponsor Carousel (Bleeding full width below header) -->
   @if (!currentSearch() && appSettings.isSponsorsEnabled()) {
-    <app-sponsors-carousel></app-sponsors-carousel>
+    <div class="w-full bg-white shadow-sm">
+      <app-sponsors-carousel></app-sponsors-carousel>
+    </div>
   }
+
+  <!-- Page Content Container -->
+  <div class="w-full max-w-7xl mx-auto px-4 py-8">
 
   <!-- Page Title / Search Breadcrumb -->
   @if (currentSearch()) {
@@ -132,5 +137,5 @@
       }
     </section>
 
-  }
-</main>
+  </div>
+</div>
