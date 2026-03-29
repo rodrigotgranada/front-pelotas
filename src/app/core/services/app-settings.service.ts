@@ -8,6 +8,7 @@ export interface PublicSettings {
   themePreset: string;
   defaultNewsImageUrl: string | null;
   isMembershipEnabled: boolean;
+  isSponsorsEnabled: boolean;
 }
 
 export interface ThemePreset {
@@ -92,6 +93,7 @@ export class AppSettingsService {
   readonly themePreset = signal<string>('default');
   readonly defaultNewsImageUrl = signal<string | null>(null);
   readonly isMembershipEnabled = signal<boolean>(true);
+  readonly isSponsorsEnabled = signal<boolean>(true);
 
   async loadPublicSettings(): Promise<void> {
     try {
@@ -102,6 +104,7 @@ export class AppSettingsService {
       this.themePreset.set(settings.themePreset ?? 'default');
       this.defaultNewsImageUrl.set(settings.defaultNewsImageUrl ?? null);
       this.isMembershipEnabled.set(settings.isMembershipEnabled ?? true);
+      this.isSponsorsEnabled.set(settings.isSponsorsEnabled ?? true);
       this.applyTheme(settings.themePreset ?? 'default');
     } catch {
       // Silently fail — use defaults

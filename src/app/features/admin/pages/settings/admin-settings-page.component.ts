@@ -273,6 +273,45 @@ import { ToastMessagesService } from '../../../../core/notifications/toast-messa
                 Salvando alteração...
               </div>
             }
+
+            <!-- Sponsors Toggle -->
+            <div class="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50 mt-6">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"/></svg>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">Módulo de Patrocinadores</h3>
+                  <p class="text-xs text-slate-500 mt-0.5">Se desativado, o carrossel de patrocinadores não será renderizado na tela inicial (Home).</p>
+                </div>
+              </div>
+
+              <!-- Toggle -->
+              <button
+                type="button"
+                (click)="toggleSponsors()"
+                [disabled]="sponsorsSaving()"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2"
+                [class.bg-brand-600]="isSponsorsEnabled()"
+                [class.bg-slate-200]="!isSponsorsEnabled()"
+              >
+                <span
+                  class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                  [class.translate-x-5]="isSponsorsEnabled()"
+                  [class.translate-x-0]="!isSponsorsEnabled()"
+                ></span>
+              </button>
+            </div>
+
+            @if (sponsorsSaving()) {
+              <div class="flex items-center gap-2 text-xs text-slate-500">
+                <svg class="animate-spin h-3.5 w-3.5 text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Salvando alteração...
+              </div>
+            }
           </div>
         </section>
       }
@@ -292,9 +331,11 @@ export class AdminSettingsPageComponent implements OnInit {
   readonly activeTab = signal<'identidade' | 'tema' | 'modulos'>('identidade');
   readonly badgeSaving = signal(false);
   readonly defaultNewsSaving = signal(false);
-  readonly themeSaving = signal(false);
   readonly membershipSaving = signal(false);
+  readonly sponsorsSaving = signal(false);
+  readonly themeSaving = signal(false);
   readonly isMembershipEnabled = this.appSettings.isMembershipEnabled;
+  readonly isSponsorsEnabled = this.appSettings.isSponsorsEnabled;
 
   ngOnInit() {
     this.selectedTheme.set(this.appSettings.themePreset());
@@ -466,6 +507,20 @@ export class AdminSettingsPageComponent implements OnInit {
       this.toast.showError('Erro ao alterar status do módulo.');
     } finally {
       this.membershipSaving.set(false);
+    }
+  }
+
+  async toggleSponsors() {
+    this.sponsorsSaving.set(true);
+    const newValue = !this.isSponsorsEnabled();
+    try {
+      await this.appSettings.saveSetting('isSponsorsEnabled', String(newValue));
+      this.appSettings.isSponsorsEnabled.set(newValue);
+      this.toast.showSuccess(newValue ? 'Módulo de Patrocinadores ativado!' : 'Módulo de Patrocinadores desativado!');
+    } catch {
+      this.toast.showError('Erro ao alterar status do módulo.');
+    } finally {
+      this.sponsorsSaving.set(false);
     }
   }
 }
