@@ -88,11 +88,19 @@ import { ToastMessagesService } from '../../../../core/notifications/toast-messa
 
                   <div class="space-y-1.5">
                     <label class="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">WhatsApp / Telefone</label>
-                    <input 
-                      type="tel" name="phone" [(ngModel)]="formData.phone" required
-                      placeholder="(00) 00000-0000"
-                      class="w-full bg-slate-100 border-none rounded-2xl py-4 px-6 font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500 transition-all"
-                    />
+                    <div class="relative group">
+                      <input 
+                        type="tel" name="phone" [(ngModel)]="formData.phone" (input)="onPhoneInput($event)" required
+                        placeholder="(00) 00000-0000" maxlength="15"
+                        class="w-full bg-slate-100 border-none rounded-2xl py-4 px-6 font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500 transition-all pr-32"
+                      />
+                      <div class="absolute right-3 top-1/2 -translate-y-1/2">
+                        <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-xl shadow-sm border border-slate-100 hover:border-emerald-200 transition-all">
+                          <input type="checkbox" name="isWhatsApp" [(ngModel)]="formData.isWhatsApp" class="w-4 h-4 text-emerald-500 border-slate-200 rounded focus:ring-emerald-500" />
+                          <span class="text-[10px] font-black text-slate-500 uppercase tracking-tighter">É Whats?</span>
+                        </label>
+                      </div>
+                    </div>
                   </div>
 
                   <button 
@@ -131,6 +139,7 @@ export class MembershipLandingPageComponent implements OnInit {
     name: '',
     email: '',
     phone: '',
+    isWhatsApp: true,
   };
 
   ngOnInit() { 
@@ -169,7 +178,7 @@ export class MembershipLandingPageComponent implements OnInit {
       next: () => {
         this.toast.showSuccess('Solicitação enviada! Entraremos em contato em breve.');
         this.selectedPlan.set(null);
-        this.formData = { name: '', email: '', phone: '' };
+        this.formData = { name: '', email: '', phone: '', isWhatsApp: true };
         this.submitting.set(false);
       },
       error: () => {
@@ -177,5 +186,18 @@ export class MembershipLandingPageComponent implements OnInit {
         this.submitting.set(false);
       }
     });
+  }
+
+  onPhoneInput(e: Event) {
+    const input = e.target as HTMLInputElement;
+    this.formData.phone = this.maskPhone(input.value);
+  }
+
+  private maskPhone(value: string): string {
+    const d = value.replace(/\D/g, '').slice(0, 11);
+    if (d.length <= 2) return d;
+    if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+    if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+    return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
   }
 }

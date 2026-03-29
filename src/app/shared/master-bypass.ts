@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Routes } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 // --- SERVICE ---
 export interface MembershipPlan {
@@ -18,7 +19,7 @@ export interface MembershipPlan {
 })
 export class MembershipService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:3000/api/membership';
+  private readonly apiUrl = `${environment.apiBaseUrl}/membership`;
 
   getPlans(): Observable<MembershipPlan[]> { return this.http.get<MembershipPlan[]>(`${this.apiUrl}/plans/public`); }
   getPlan(id: string): Observable<MembershipPlan> { return this.http.get<MembershipPlan>(`${this.apiUrl}/plans/${id}`); }

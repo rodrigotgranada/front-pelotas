@@ -220,34 +220,47 @@
                       </div>
 
                       <!-- Subgrid for street details -->
-                      <div class="sm:col-span-8 space-y-1.5">
-                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Rua / Logradouro</label>
+                      <div class="sm:col-span-9 space-y-1.5">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Rua / Logradouro <span class="text-rose-500">*</span></label>
                         <input type="text" formControlName="street"
                           class="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none" />
                       </div>
 
-                      <div class="sm:col-span-4 space-y-1.5">
-                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Número</label>
+                      <div class="sm:col-span-3 space-y-1.5">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Número <span class="text-rose-500">*</span></label>
                         <input type="text" formControlName="number"
                           class="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none" />
                       </div>
 
                       <div class="sm:col-span-4 space-y-1.5">
-                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Bairro</label>
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Complemento</label>
+                        <input type="text" formControlName="complement"
+                          class="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none" 
+                          placeholder="Apto, Bloco, etc" />
+                      </div>
+
+                      <div class="sm:col-span-4 space-y-1.5">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Bairro <span class="text-rose-500">*</span></label>
                         <input type="text" formControlName="neighborhood"
                           class="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none" />
                       </div>
 
-                      <div class="sm:col-span-5 space-y-1.5">
-                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Cidade</label>
+                      <div class="sm:col-span-4 space-y-1.5">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Cidade <span class="text-rose-500">*</span></label>
                         <input type="text" formControlName="city"
                           class="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none" />
                       </div>
 
                       <div class="sm:col-span-3 space-y-1.5">
-                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Estado (UF)</label>
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Estado (UF) <span class="text-rose-500">*</span></label>
                         <input type="text" formControlName="state" maxlength="2"
                           class="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-sm font-black uppercase text-center focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none" />
+                      </div>
+
+                      <div class="sm:col-span-9 space-y-1.5">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">País</label>
+                        <input type="text" formControlName="country"
+                          class="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none" />
                       </div>
                     </div>
                   </div>

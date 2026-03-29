@@ -111,37 +111,35 @@
                   </div>
                 }
 
-                <!-- Toggle: Ativo imediatamente (Somente na criacao) -->
-                @if (!editUser) {
-                  <div class="rounded-xl border border-slate-200 p-4">
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <h4 class="text-sm font-semibold text-slate-900">Ativar imediatamente?</h4>
-                        <p class="text-xs text-slate-500 mt-0.5">
-                          {{ form.get('isActive')?.value
-                            ? 'Conta será criada como ativa. Sem necessidade de verificação de e-mail.'
-                            : 'Usuário precisará verificar o e-mail para ativar a conta.' }}
-                        </p>
-                      </div>
-                      <!-- Toggle Switch -->
-                      <button
-                        type="button"
-                        (click)="form.get('isActive')?.setValue(!form.get('isActive')?.value)"
-                        class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
-                        [class.bg-cyan-600]="form.get('isActive')?.value"
-                        [class.bg-slate-200]="!form.get('isActive')?.value"
-                        [attr.aria-checked]="form.get('isActive')?.value"
-                        role="switch"
-                      >
-                        <span
-                          class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                          [class.translate-x-5]="form.get('isActive')?.value"
-                          [class.translate-x-0]="!form.get('isActive')?.value"
-                        ></span>
-                      </button>
+                <!-- Toggle: Ativo (Disponivel na criacao e edicao) -->
+                <div class="rounded-xl border border-slate-200 p-4">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <h4 class="text-sm font-semibold text-slate-900">Ativar usuário?</h4>
+                      <p class="text-xs text-slate-500 mt-0.5">
+                        {{ form.get('isActive')?.value
+                          ? 'Usuário poderá fazer login na plataforma.'
+                          : 'Usuário não conseguirá fazer login (Bloqueado/Pendente).' }}
+                      </p>
                     </div>
+                    <!-- Toggle Switch -->
+                    <button
+                      type="button"
+                      (click)="form.get('isActive')?.setValue(!form.get('isActive')?.value)"
+                      class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+                      [class.bg-cyan-600]="form.get('isActive')?.value"
+                      [class.bg-slate-200]="!form.get('isActive')?.value"
+                      [attr.aria-checked]="form.get('isActive')?.value"
+                      role="switch"
+                    >
+                      <span
+                        class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                        [class.translate-x-5]="form.get('isActive')?.value"
+                        [class.translate-x-0]="!form.get('isActive')?.value"
+                      ></span>
+                    </button>
                   </div>
-                }
+                </div>
 
                 <!-- Opção de Senha Fixa -->
                 <div class="space-y-1.5">
@@ -345,22 +343,43 @@
         </form>
 
         <!-- Footer Fixo -->
-        <div class="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-6 py-4 shrink-0">
-          <button type="button" (click)="close.emit()"
-            class="rounded-xl px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-200"
-            [disabled]="loading()">
-            Cancelar
-          </button>
-          <button type="submit" (click)="onSubmit()"
-            class="inline-flex items-center gap-2 rounded-xl bg-cyan-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-500 disabled:opacity-70 disabled:cursor-not-allowed"
-            [disabled]="loading() || form.invalid">
-            @if (loading()) {
-              <app-spinner size="sm" />
-              <span>Salvando...</span>
-            } @else {
+        <div class="flex flex-col border-t border-slate-200 bg-slate-50 px-6 py-4 shrink-0 rounded-b-3xl">
+          <!-- Validation Feedback Section -->
+          @if (form.invalid && (form.dirty || form.touched)) {
+            <div class="bg-rose-50 border border-rose-100 rounded-xl p-3 mb-4 animate-in fade-in slide-in-from-top-2">
+              <div class="flex items-center gap-2 mb-2">
+                <i class="ph ph-warning-circle text-rose-500 text-lg"></i>
+                <span class="text-xs font-bold text-rose-700 uppercase tracking-tight">Campos Obrigatórios ou Inválidos</span>
+              </div>
+              <ul class="space-y-1 ml-6 list-disc">
+                @for (error of getValidationErrors(); track error) {
+                  <li class="text-[11px] font-medium text-rose-600 leading-tight">{{ error }}</li>
+                }
+              </ul>
+            </div>
+          }
+
+          <div class="flex gap-3">
+            <button
+              type="button"
+              (click)="close.emit()"
+              class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+              [disabled]="loading()"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              (click)="onSubmit()"
+              [disabled]="form.invalid || loading()"
+              class="flex-[2] px-4 py-2.5 rounded-xl bg-cyan-600 text-sm font-semibold text-white hover:bg-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-cyan-600/20 flex items-center justify-center gap-2"
+            >
+              @if (loading()) {
+                <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              }
               {{ editUser ? 'Salvar Alterações' : 'Criar Usuário' }}
-            }
-          </button>
+            </button>
+          </div>
         </div>
       </div>
     </div>

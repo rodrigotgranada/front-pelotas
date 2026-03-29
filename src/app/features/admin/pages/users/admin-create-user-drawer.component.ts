@@ -121,7 +121,7 @@ export class AdminCreateUserDrawerComponent implements OnInit {
         document: this.editUser.document || '',
         documentType: this.editUser.documentType || 'cpf',
         roleId: this.editUser.roleId || '',
-        isActive: this.editUser.isActive,
+        isActive: this.editUser.status === 'active',
       });
 
       // Clear password requirement for edit mode
@@ -303,6 +303,21 @@ export class AdminCreateUserDrawerComponent implements OnInit {
     }
   }
 
+  getValidationErrors(): string[] {
+    const errors: string[] = [];
+    if (this.form.get('firstName')?.invalid) errors.push('Nome inválido (mín. 2 letras)');
+    if (this.form.get('lastName')?.invalid) errors.push('Sobrenome inválido (mín. 2 letras)');
+    if (this.form.get('email')?.invalid) errors.push('E-mail inválido');
+    if (this.form.get('roleId')?.invalid) errors.push('Selecione um Cargo');
+    if (this.isSocioSelected() && this.form.get('membershipPlanId')?.invalid) errors.push('Selecione um Plano de Sócio');
+    
+    // Check form arrays
+    if (this.form.get('contacts')?.invalid) errors.push('Existem contatos com dados incompletos ou inválidos');
+    if (this.form.get('addresses')?.invalid) errors.push('Existem endereços com dados incompletos (CEP, Rua, etc)');
+
+    return errors;
+  }
+
   async onSubmit(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -341,6 +356,7 @@ export class AdminCreateUserDrawerComponent implements OnInit {
       documentType: 'cpf',
       roleId: raw.roleId,
       isActive: raw.isActive,
+      emailVerified: !!raw.isActive, // If admin set Active=true, we force emailVerified=true
       membershipPlanId: this.isSocioSelected() ? raw.membershipPlanId : undefined,
       isMembershipPayed: this.isSocioSelected() ? raw.isMembershipPayed : undefined,
       contacts,

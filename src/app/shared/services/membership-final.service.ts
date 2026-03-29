@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface MembershipPlan {
   id: string;
@@ -16,8 +17,7 @@ export interface MembershipPlan {
 })
 export class MembershipService {
   private readonly http = inject(HttpClient);
-  // Hardcoding to bypass persistent environment import issues in this corrupted environment
-  private readonly apiUrl = 'http://localhost:3000/api/membership';
+  private readonly apiUrl = `${environment.apiBaseUrl}/membership`;
 
   // Public methods
   getPlans(): Observable<MembershipPlan[]> {

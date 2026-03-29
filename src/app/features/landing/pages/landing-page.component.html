@@ -42,7 +42,7 @@
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 h-auto md:h-[420px]">
           @for (news of featuredNews(); track news.id; let i = $index) {
             <a [routerLink]="['/noticias', news.slug]" 
-               class="group relative rounded-3xl overflow-hidden shadow border border-slate-900/10 block w-full h-full"
+               class="group relative rounded-3xl overflow-hidden shadow border border-slate-900/10 block w-full h-full min-h-[300px] md:min-h-0"
                [class.md:col-span-8]="i === 0"
                [class.md:row-span-2]="i === 0"
                [class.md:col-span-4]="i > 0">

@@ -11,7 +11,9 @@ export interface MembershipInterest {
   phone: string;
   planId: any;
   isRead: boolean;
-  status: string;
+  status: 'PENDING' | 'CONTACTED' | 'COMPLETED' | 'REJECTED';
+  isWhatsApp: boolean;
+  resolutionNotes?: string;
   createdAt: string;
 }
 
@@ -21,6 +23,7 @@ export interface CreateInterestDto {
   email: string;
   phone: string;
   planId: string;
+  isWhatsApp: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -44,7 +47,7 @@ export class MembershipInterestApiService {
     return this.http.patch<MembershipInterest>(`${this.apiUrl}/admin/${id}/read`, {});
   }
 
-  updateStatus(id: string, status: string): Observable<MembershipInterest> {
-    return this.http.patch<MembershipInterest>(`${this.apiUrl}/admin/${id}/status`, { status });
+  updateStatus(id: string, status: string, resolutionNotes?: string): Observable<MembershipInterest> {
+    return this.http.patch<MembershipInterest>(`${this.apiUrl}/admin/${id}/status`, { status, resolutionNotes });
   }
 }

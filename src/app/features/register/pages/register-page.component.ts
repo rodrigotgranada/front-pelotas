@@ -304,13 +304,18 @@ export class RegisterPageComponent {
 
       const response = await firstValueFrom(this.authApi.register(payload));
 
+      // Tenta fazer o upload da foto imediatamente apos o registro (o novo backend retorna token)
+      if (this.selectedPhoto) {
+        this.handlePhotoUpload();
+      }
+
       if (response.requiresEmailVerification) {
         this.pendingEmailVerification.set(true);
         this.verificationEmail.set(payload.email);
         this.toast.showInfo('Digite o codigo enviado para o seu email para concluir o cadastro.', ToastTitle.Info);
       } else {
         await this.session.hydrateSession();
-        await this.handlePhotoUpload();
+        // Nao precisa chamar handlePhotoUpload aqui de novo, ja chamamos acima
         this.toast.showSuccess('Cadastro realizado com sucesso!', ToastTitle.Success);
         await this.router.navigateByUrl('/app/me');
       }

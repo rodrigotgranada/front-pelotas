@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Routes } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 // --- SHARED MODELS ---
 export interface MembershipPlan {
@@ -30,7 +31,7 @@ export interface History {
 })
 export class MembershipService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:3000/api/membership';
+  private readonly apiUrl = `${environment.apiBaseUrl}/membership`;
 
   // Public
   getPlans(): Observable<MembershipPlan[]> { return this.http.get<MembershipPlan[]>(`${this.apiUrl}/plans`); }
@@ -50,7 +51,7 @@ export class MembershipService {
 })
 export class HistoryApiService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:3000/api/history';
+  private readonly apiUrl = `${environment.apiBaseUrl}/history`;
 
   listPublic(): Observable<History[]> { return this.http.get<History[]>(this.apiUrl); }
   listAdmin(): Observable<History[]> { return this.http.get<History[]>(`${this.apiUrl}/admin`); }
