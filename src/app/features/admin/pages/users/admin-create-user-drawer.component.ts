@@ -352,7 +352,7 @@ export class AdminCreateUserDrawerComponent implements OnInit {
       lastName: raw.lastName,
       email: raw.email,
       password: raw.password || undefined,
-      document: raw.document || undefined,
+      document: raw.document ? raw.document.replace(/\D/g, '') : undefined,
       documentType: 'cpf',
       roleId: raw.roleId,
       isActive: raw.isActive,

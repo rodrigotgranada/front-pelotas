@@ -281,7 +281,7 @@ export class RegisterPageComponent {
         lastName: rawForm.lastName?.trim() ?? '',
         email: rawForm.email?.trim() ?? '',
         password: rawForm.password?.trim() ?? '',
-        document: rawForm.document?.trim() ?? '',
+        document: (rawForm.document ?? '').replace(/\D/g, ''),
         documentType: 'cpf',
         contacts: (rawForm.contacts as any[]).map((c, i, arr) => ({
           type: c.isWhatsapp && c.type === 'celular' ? 'whatsapp' : c.type.trim(),
