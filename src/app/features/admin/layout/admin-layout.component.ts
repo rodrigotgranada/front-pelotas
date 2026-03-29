@@ -166,22 +166,6 @@ import { MembershipInterestApiService } from '../../../core/services/membership-
             </a>
           }
 
-          <!-- Modulos Restritos (Owner, Socio) -->
-          @if (hasAnyRole(['owner', 'socio'])) {
-            <div class="pt-4 pb-2">
-              <p class="px-3 text-xs font-bold uppercase tracking-wider text-slate-400">Restrito</p>
-            </div>
-            
-            <a
-              routerLink="/admin/finance"
-              routerLinkActive="bg-cyan-50 text-cyan-700 font-semibold"
-              (click)="isSidebarOpen.set(false)"
-              class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              Financeiro
-            </a>
-          }
         </nav>
 
         <!-- User bottom panel -->
