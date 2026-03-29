@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" fill="none">
+  <rect width="1280" height="720" fill="#f1f5f9"/>
+  <rect width="1280" height="720" fill="url(#pattern)"/>
+  <defs>
+    <pattern id="pattern" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M0 40L40 0H20L0 20M40 40V20L20 40" fill="#e2e8f0" fill-opacity="0.4"/>
+    </pattern>
+  </defs>
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="64" font-weight="900" fill="#cbd5e1">IMAGEM INDISPONÍVEL</text>
+  <text x="50%" y="60%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="24" font-weight="600" fill="#94a3b8">Esporte Clube Pelotas</text>
+</svg>

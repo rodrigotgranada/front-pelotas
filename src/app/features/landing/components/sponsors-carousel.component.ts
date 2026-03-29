@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { FallbackImgDirective } from '../../../shared/directives/fallback-img.directive';
 import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { Sponsor } from '../../../core/models/sponsor.model';
 import { SponsorsService } from '../../../core/services/sponsors.service';
@@ -6,7 +7,7 @@ import { SponsorsService } from '../../../core/services/sponsors.service';
 @Component({
   selector: 'app-sponsors-carousel',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FallbackImgDirective],
   template: `
     @if (sponsors().length > 0) {
       <div class="mb-10 w-full overflow-hidden border-y border-slate-200 bg-white shadow-sm rounded-2xl relative select-none">
@@ -47,7 +48,7 @@ import { SponsorsService } from '../../../core/services/sponsors.service';
                   'grayscale opacity-30 scale-90 z-0 hover:opacity-60': i !== currentIndex()
                 }"
               >
-                <img [src]="sponsor.logoUrl" class="max-h-full max-w-full object-contain pointer-events-none" />
+                <img [src]="sponsor.logoUrl" appFallbackImg="sponsor" class="max-h-full max-w-full object-contain pointer-events-none" />
               </div>
             }
           </div>

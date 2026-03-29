@@ -10,11 +10,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NewsletterWidgetComponent } from '../../../shared/ui/newsletter-widget/newsletter-widget.component';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { SponsorsCarouselComponent } from '../components/sponsors-carousel.component';
+import { FallbackImgDirective } from '../../../shared/directives/fallback-img.directive';
 
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [RouterLink, CommonModule, SpinnerComponent, NewsletterWidgetComponent, SponsorsCarouselComponent],
+  imports: [RouterLink, CommonModule, SpinnerComponent, NewsletterWidgetComponent, SponsorsCarouselComponent, FallbackImgDirective],
   templateUrl: './landing-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
