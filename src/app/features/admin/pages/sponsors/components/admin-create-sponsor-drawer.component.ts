@@ -193,11 +193,18 @@ export class AdminCreateSponsorDrawerComponent implements OnInit {
         logoStorageKey = uploadResult.id || '';
       }
 
-      const payload = {
-        ...this.form.value,
+      const formVal = this.form.value;
+      const payload: any = {
+        name: formVal.name,
+        order: formVal.order,
+        isActive: formVal.isActive,
         logoUrl,
         logoStorageKey,
       };
+      
+      if (formVal.websiteUrl && formVal.websiteUrl.trim() !== '') {
+        payload.websiteUrl = formVal.websiteUrl.trim();
+      }
 
       if (this.sponsorToEdit) {
         this.sponsorsService.update(this.sponsorToEdit._id, payload).subscribe({
