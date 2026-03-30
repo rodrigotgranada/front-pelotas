@@ -10,19 +10,7 @@ import { SponsorsService } from '../../../core/services/sponsors.service';
   imports: [CommonModule, FallbackImgDirective],
   template: `
     @if (sponsors().length > 0) {
-      <div class="w-full overflow-hidden border-b border-slate-200 bg-white relative select-none">
-        <div class="max-w-7xl mx-auto px-6 py-2 border-b border-slate-100 flex items-center justify-between z-20 relative">
-          <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Patrocinadores Oficiais</span>
-          <div class="flex items-center gap-2">
-            <button (click)="prev()" class="p-1 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-            </button>
-            <button (click)="next()" class="p-1 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-            </button>
-          </div>
-        </div>
-
+      <div class="w-full overflow-hidden border-b border-slate-200 bg-white relative select-none group">
         <!-- Carousel Track Container -->
         <div 
           class="h-28 w-full cursor-pointer relative flex items-center overflow-hidden" 
@@ -52,6 +40,17 @@ import { SponsorsService } from '../../../core/services/sponsors.service';
             }
           </div>
         </div>
+
+        <!-- Navigation Arrows Overlay -->
+        <button (click)="$event.stopPropagation(); prev()" 
+                class="absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 hover:bg-white text-slate-400 hover:text-slate-800 shadow border border-slate-200 z-30 transition hover:scale-110">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+
+        <button (click)="$event.stopPropagation(); next()" 
+                class="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 hover:bg-white text-slate-400 hover:text-slate-800 shadow border border-slate-200 z-30 transition hover:scale-110">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
       </div>
     }
   `,
