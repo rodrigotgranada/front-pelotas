@@ -8,23 +8,30 @@
     <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm w-full">
       <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
 
-        <!-- Badge / Logo — link to home -->
-        <a routerLink="/" class="flex items-center gap-3 shrink-0 group" aria-label="Ir para a home">
-          @if (badgeUrl()) {
-            <img
-              [src]="badgeUrl()"
-              alt="Distintivo do clube"
-              class="h-10 w-10 object-contain rounded-lg group-hover:scale-105 transition duration-200"
-            />
-          } @else {
-            <!-- Fallback SVG Shield -->
-            <div class="h-10 w-10 flex items-center justify-center rounded-lg bg-brand-600 text-white group-hover:bg-brand-700 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.35C17.25 23.15 21 18.25 21 13V7L12 2Z"/>
-              </svg>
-            </div>
-          }
-        </a>
+        <!-- Hamburger Menu Toggle & Logo -->
+        <div class="flex items-center gap-4 shrink-0">
+          <button (click)="toggleGlobalMenu()" class="p-2 -ml-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+            <span class="sr-only">Abrir menu principal</span>
+          </button>
+          
+          <a routerLink="/" class="flex items-center gap-3 shrink-0 group" aria-label="Ir para a home">
+            @if (badgeUrl()) {
+              <img
+                [src]="badgeUrl()"
+                alt="Distintivo do clube"
+                class="h-10 w-10 object-contain rounded-lg group-hover:scale-105 transition duration-200"
+              />
+            } @else {
+              <!-- Fallback SVG Shield -->
+              <div class="h-10 w-10 flex items-center justify-center rounded-lg bg-brand-600 text-white group-hover:bg-brand-700 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.35C17.25 23.15 21 18.25 21 13V7L12 2Z"/>
+                </svg>
+              </div>
+            }
+          </a>
+        </div>
 
         <!-- Search Bar -->
         <div class="hidden md:flex flex-1 max-w-md mx-8">
@@ -52,16 +59,6 @@
         <!-- Navigation & Actions -->
         <div class="flex items-center gap-3 ml-auto">
           <nav class="flex items-center gap-1.5">
-            @if (isMembershipEnabled()) {
-              <a routerLink="/seja-socio" routerLinkActive="text-brand-600 bg-brand-50"
-                 class="px-3 py-1.5 rounded-lg text-brand-600 text-xs font-black hover:bg-brand-50 transition border border-brand-100">
-                Seja Sócio
-              </a>
-            }
-            <a routerLink="/historia" routerLinkActive="text-brand-600 bg-brand-50"
-               class="px-3 py-1.5 rounded-lg text-slate-600 text-xs font-bold hover:text-brand-600 hover:bg-slate-50 transition">
-              História
-            </a>
             @if (canAccessAdminData()) {
               <a routerLink="/admin" routerLinkActive="bg-slate-800 text-white"
                  class="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-bold hover:bg-slate-700 transition shadow-sm">
@@ -142,8 +139,66 @@
     </header>
   }
 
+  <!-- Global Sidebar Overlay (GloboEsporte Style) -->
+  @if (isGlobalMenuOpen()) {
+    <div class="fixed inset-0 z-[100] flex">
+      <!-- Backdrop -->
+      <div class="fixed inset-0 bg-slate-900/60 transition-opacity backdrop-blur-sm" (click)="closeGlobalMenu()"></div>
+      
+      <!-- Drawer Panel -->
+      <div class="relative flex w-full max-w-xs md:max-w-sm flex-col overflow-y-auto bg-slate-900 shadow-2xl animate-in slide-in-from-left duration-300">
+        <!-- Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+          <span class="text-lg font-black text-white tracking-tight flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" class="text-brand-500">
+              <path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.35C17.25 23.15 21 18.25 21 13V7L12 2Z"/>
+            </svg>
+            E.C. Pelotas
+          </span>
+          <button type="button" (click)="closeGlobalMenu()" class="rounded-lg p-2 text-slate-400 hover:text-white hover:bg-slate-800 transition">
+            <span class="sr-only">Fechar Menu</span>
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+        
+        <!-- Navigation Links -->
+        <nav class="flex-1 px-4 py-6 space-y-2">
+          <a routerLink="/" class="flex items-center gap-3 rounded-xl px-4 py-3 text-base font-bold text-slate-300 hover:bg-slate-800 hover:text-brand-400 transition" (click)="closeGlobalMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Início / O Lobo
+          </a>
+
+          <a routerLink="/historia" class="flex items-center gap-3 rounded-xl px-4 py-3 text-base font-bold text-slate-300 hover:bg-slate-800 hover:text-brand-400 transition" (click)="closeGlobalMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M8 7h6"/><path d="M8 11h8"/></svg>
+            Nossa História
+          </a>
+
+          <a routerLink="/idolos" class="flex items-center gap-3 rounded-xl px-4 py-3 text-base font-bold text-slate-300 hover:bg-slate-800 hover:text-brand-400 transition" (click)="closeGlobalMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Mural de Ídolos
+          </a>
+
+          @if (isMembershipEnabled()) {
+            <div class="pt-4 mt-6 border-t border-slate-800">
+              <a routerLink="/seja-socio" class="flex items-center justify-between rounded-xl px-4 py-4 text-base font-black text-slate-900 bg-gradient-to-r from-amber-400 to-amber-500 shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-[0.98] transition-transform" (click)="closeGlobalMenu()">
+                <div class="flex items-center gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  Seja Sócio do Lobo
+                </div>
+              </a>
+            </div>
+          }
+        </nav>
+      </div>
+    </div>
+  }
+
   <!-- App Content Area -->
   <main class="flex-1 w-full relative">
     <router-outlet />
   </main>
+
+  @if (showFooter()) {
+    <app-public-footer />
+  }
 </div>

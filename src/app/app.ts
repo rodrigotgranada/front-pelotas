@@ -10,10 +10,11 @@ import { SpinnerOverlayComponent } from './shared/ui/spinner-overlay/spinner-ove
 import { FormsModule } from '@angular/forms';
 import { AppSettingsService } from './core/services/app-settings.service';
 import { environment } from '../environments/environment';
+import { PublicFooterComponent } from './shared/ui/public-footer/public-footer.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, SpinnerOverlayComponent, FormsModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, SpinnerOverlayComponent, FormsModule, PublicFooterComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,6 +36,7 @@ export class App implements OnInit {
   readonly isMembershipEnabled = this.appSettings.isMembershipEnabled;
 
   readonly dropdownOpen = signal(false);
+  readonly isGlobalMenuOpen = signal(false);
 
   readonly canAccessAdminData = computed(() => {
     if (!this.hasToken()) {
@@ -68,12 +70,19 @@ export class App implements OnInit {
     return !authRoutes.some(route => url.startsWith(route));
   });
 
+  readonly showFooter = computed(() => {
+    const url = this.currentUrl();
+    const excludedRoutes = ['/admin', '/login', '/register', '/forgot-password', '/reset-password'];
+    return !excludedRoutes.some(route => url.startsWith(route));
+  });
+
   readonly globalLoading = this.loadingService.isLoading;
 
   async ngOnInit(): Promise<void> {
     // Sync URL signal with router events
     this.router.events.subscribe(() => {
       this.currentUrl.set(this.router.url);
+      this.isGlobalMenuOpen.set(false); // Close global menu on link click magically
     });
 
     // Load settings (badge image + theme) before anything else
@@ -92,6 +101,14 @@ export class App implements OnInit {
 
   closeDropdown(): void {
     this.dropdownOpen.set(false);
+  }
+
+  toggleGlobalMenu(): void {
+    this.isGlobalMenuOpen.update((v) => !v);
+  }
+
+  closeGlobalMenu(): void {
+    this.isGlobalMenuOpen.set(false);
   }
 
   @HostListener('document:click', ['$event'])

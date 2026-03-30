@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { compressImage } from '../../utils/image-compress.util';
 
 @Component({
   selector: 'app-photo-upload',
@@ -58,12 +59,25 @@ export class PhotoUploadComponent {
   @Input() photoUrl: string | null = null;
   @Input() disabled = false;
   
-  @Output() fileSelected = new EventEmitter<Event>();
+  @Output() fileSelected = new EventEmitter<File>();
   @Output() photoRemoved = new EventEmitter<void>();
 
-  onFileChange(event: Event): void {
+  async onFileChange(event: Event): Promise<void> {
     if (this.disabled) return;
-    this.fileSelected.emit(event);
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    // Reset so same file can be selected again
+    input.value = '';
+    // Compress before emitting (max 512px for avatars, JPEG 85%)
+    try {
+      const compressed = await compressImage(file, 512, 512, 0.85);
+      const compressedFile = new File([compressed], 'avatar.jpg', { type: 'image/jpeg' });
+      this.fileSelected.emit(compressedFile);
+    } catch {
+      // Fallback: emit original file if compression fails
+      this.fileSelected.emit(file);
+    }
   }
 
   onRemove(): void {

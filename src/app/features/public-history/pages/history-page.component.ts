@@ -1,15 +1,17 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { HistoryApiService, History } from '../../../shared/master-bypass-v2';
 import { SpinnerComponent } from '../../../shared/ui/spinner/spinner.component';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 
+
 @Component({
   selector: 'app-history-page',
   standalone: true,
-  imports: [CommonModule, SpinnerComponent],
+  imports: [CommonModule, SpinnerComponent, RouterLink],
   template: `
-    <div class="bg-white min-h-screen">
+    <div class="bg-white">
       <!-- Header / Banner -->
       <section class="relative h-[400px] flex items-center justify-center overflow-hidden bg-slate-900">
         <div class="absolute inset-0 opacity-40">
@@ -94,12 +96,13 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
           </p>
           <div class="flex flex-wrap justify-center gap-4">
              @if (isMembershipEnabled()) {
-               <button class="px-8 py-4 bg-cyan-600 text-white font-black rounded-full hover:bg-cyan-500 transition-all shadow-xl shadow-cyan-900/20 active:scale-95">Seja Sócio do Lobo</button>
+               <a routerLink="/seja-socio" class="px-8 py-4 bg-cyan-600 text-white font-black rounded-full hover:bg-cyan-500 transition-all shadow-xl shadow-cyan-900/20 active:scale-95">Seja Sócio do Lobo</a>
              }
-             <button class="px-8 py-4 bg-white/5 text-white border border-white/10 font-black rounded-full hover:bg-white/10 transition-all active:scale-95">Ver Galeria de Ídolos</button>
           </div>
         </div>
       </section>
+      
+
     </div>
   `,
   styles: [`

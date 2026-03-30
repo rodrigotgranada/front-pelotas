@@ -12,6 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NewsletterWidgetComponent } from '../../../shared/ui/newsletter-widget/newsletter-widget.component';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 
+
 @Component({
   selector: 'app-news-article-page',
   standalone: true,
@@ -199,7 +200,6 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
                 </div>
               </div>
             }
-
             <!-- Newsletter Widget on Article -->
             <div class="mt-20">
               <app-newsletter-widget></app-newsletter-widget>

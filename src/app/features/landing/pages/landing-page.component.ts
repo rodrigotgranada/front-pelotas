@@ -12,6 +12,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
 import { SponsorsCarouselComponent } from '../components/sponsors-carousel.component';
 import { FallbackImgDirective } from '../../../shared/directives/fallback-img.directive';
 
+
 @Component({
   selector: 'app-landing-page',
   standalone: true,

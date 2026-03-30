@@ -8,12 +8,13 @@ import { MembershipInterestApiService } from '../../../../core/services/membersh
 import { FormsModule } from '@angular/forms';
 import { ToastMessagesService } from '../../../../core/notifications/toast-messages.service';
 
+
 @Component({
   selector: 'app-membership-landing-page',
   standalone: true,
   imports: [CommonModule, SpinnerComponent, FormsModule],
   template: `
-    <div class="min-h-screen bg-white">
+    <div class="bg-white">
       <header class="relative py-24 bg-slate-900 overflow-hidden">
         <div class="absolute inset-0 bg-slate-800 opacity-20"></div>
         <div class="relative max-w-7xl mx-auto px-4 text-center">
@@ -121,6 +122,7 @@ import { ToastMessagesService } from '../../../../core/notifications/toast-messa
           </div>
         }
       </div>
+
     </div>
   `,
 })

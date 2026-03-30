@@ -9,6 +9,23 @@ export interface PublicSettings {
   defaultNewsImageUrl: string | null;
   isMembershipEnabled: boolean;
   isSponsorsEnabled: boolean;
+
+  // Footer
+  footerPhone?: string;
+  footerIsWhatsapp?: boolean;
+  footerEmail?: string;
+  footerAddress?: string;
+  footerMapsEmbedUrl?: string;
+  footerSocialLinks?: string;
+  footerLinks?: string;
+  footerDevName?: string;
+  footerDevUrl?: string;
+}
+
+export interface PublicSocialLink {
+  type: 'instagram' | 'facebook' | 'twitter' | 'youtube' | 'tiktok' | 'whatsapp' | 'other';
+  url: string;
+  label?: string;
 }
 
 export interface ThemePreset {
@@ -95,6 +112,17 @@ export class AppSettingsService {
   readonly isMembershipEnabled = signal<boolean>(true);
   readonly isSponsorsEnabled = signal<boolean>(true);
 
+  // Footer signals
+  readonly footerPhone = signal<string>('');
+  readonly footerIsWhatsapp = signal<boolean>(false);
+  readonly footerEmail = signal<string>('');
+  readonly footerAddress = signal<string>('');
+  readonly footerMapsEmbedUrl = signal<string>('');
+  readonly footerSocialLinks = signal<PublicSocialLink[]>([]);
+  readonly footerLinks = signal<any[]>([]);
+  readonly footerDevName = signal<string>('Rodrigo Granada');
+  readonly footerDevUrl = signal<string>('https://www.linkedin.com/in/rtgranada-desenvolvedor/');
+
   async loadPublicSettings(): Promise<void> {
     try {
       const settings = await firstValueFrom(
@@ -105,6 +133,27 @@ export class AppSettingsService {
       this.defaultNewsImageUrl.set(settings.defaultNewsImageUrl ?? null);
       this.isMembershipEnabled.set(settings.isMembershipEnabled ?? true);
       this.isSponsorsEnabled.set(settings.isSponsorsEnabled ?? true);
+      
+      this.footerPhone.set(settings.footerPhone ?? '');
+      this.footerIsWhatsapp.set(settings.footerIsWhatsapp ?? false);
+      this.footerEmail.set(settings.footerEmail ?? '');
+      this.footerAddress.set(settings.footerAddress ?? '');
+      this.footerMapsEmbedUrl.set(settings.footerMapsEmbedUrl ?? '');
+      try {
+        this.footerSocialLinks.set(JSON.parse(settings.footerSocialLinks || '[]'));
+      } catch {
+        this.footerSocialLinks.set([]);
+      }
+
+      try {
+        this.footerLinks.set(JSON.parse(settings.footerLinks || '[]'));
+      } catch {
+        this.footerLinks.set([]);
+      }
+
+      this.footerDevName.set(settings.footerDevName ?? 'Rodrigo Granada');
+      this.footerDevUrl.set(settings.footerDevUrl ?? 'https://www.linkedin.com/in/rtgranada-desenvolvedor/');
+
       this.applyTheme(settings.themePreset ?? 'default');
     } catch {
       // Silently fail — use defaults

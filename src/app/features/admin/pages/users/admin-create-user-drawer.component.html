@@ -388,7 +388,7 @@
 
 @if (imageChangedEvent) {
   <app-image-cropper-dialog
-    [imageChangedEvent]="imageChangedEvent"
+    [imageFile]="$any(imageChangedEvent)"
     (imageCroppedEvent)="onImageCropped($any($event))"
     (cancel)="onCropCancel()"
   />

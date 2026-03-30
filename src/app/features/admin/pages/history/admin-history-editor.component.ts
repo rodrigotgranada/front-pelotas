@@ -11,10 +11,13 @@ import ImageTool from '@editorjs/image';
 import List from '@editorjs/list';
 
 import { HistoryApiService } from '../../../../core/services/history-api.service';
+import { NewsApiService } from '../../../../core/services/news-api.service';
 import { ToastMessagesService } from '../../../../core/notifications/toast-messages.service';
 import { environment } from '../../../../../environments/environment';
 import { History } from '../../../../core/models/history.model';
 import { ImageCropperDialogComponent } from '../../../../shared/ui/image-cropper/image-cropper-dialog.component';
+import { compressImage } from '../../../../shared/utils/image-compress.util';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-admin-history-editor',
@@ -117,6 +120,7 @@ export class AdminHistoryEditorComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly historyApi = inject(HistoryApiService);
+  private readonly newsApi = inject(NewsApiService);
   private readonly toast = inject(ToastMessagesService);
 
   readonly isNew = signal<boolean>(true);
@@ -125,6 +129,7 @@ export class AdminHistoryEditorComponent implements OnInit, OnDestroy {
   
   readonly imageSelectedEvent = signal<Event | null>(null);
   private fileInputElement: HTMLInputElement | null = null;
+  private pendingCoverBlob: Blob | null = null;
 
   readonly form = this.fb.group({
     title: ['', [Validators.required]],
@@ -152,7 +157,14 @@ export class AdminHistoryEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  private initEditor(data?: any) {
+  private async initEditor(data?: any) {
+    // Always destroy previous instance before creating a new one
+    if (this.editor) {
+      await this.editor.destroy();
+      this.editor = undefined;
+    }
+    // Small delay to ensure the DOM is ready after destroy
+    await new Promise(resolve => setTimeout(resolve, 50));
     this.editor = new EditorJS({
       holder: 'editorjs',
       placeholder: 'Conte a história deste período aqui...',
@@ -163,7 +175,7 @@ export class AdminHistoryEditorComponent implements OnInit, OnDestroy {
           class: ImageTool as any,
           config: {
             endpoints: {
-              byFile: `${environment.apiBaseUrl}/uploads/news`, // Reuse news upload endpoint
+              byFile: `${environment.apiBaseUrl}/uploads/news`,
             },
             additionalRequestHeaders: {
                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
@@ -190,6 +202,8 @@ export class AdminHistoryEditorComponent implements OnInit, OnDestroy {
         
         if (data.format === 'BLOCKS') {
           this.initEditor(data.content);
+        } else {
+          this.initEditor();
         }
         this.loading.set(false);
       },
@@ -203,6 +217,8 @@ export class AdminHistoryEditorComponent implements OnInit, OnDestroy {
   onFileSelected(event: any) {
     this.imageSelectedEvent.set(event);
     this.fileInputElement = event.target;
+    // NOTE: do NOT reset input.value here — the cropper reads files from the event.
+    // The reset happens in onImageCropped / onCropCancel after the crop is done.
   }
 
   onImageCropped(file: Blob) {
@@ -211,14 +227,12 @@ export class AdminHistoryEditorComponent implements OnInit, OnDestroy {
       this.fileInputElement.value = '';
       this.fileInputElement = null;
     }
-
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.form.patchValue({ coverImageUrl: e.target.result });
-      // In a real scenario, we might upload here or on save.
-      // For now, consistent with news editor, let's keep it in base64 if it's new.
-    };
-    reader.readAsDataURL(file);
+    // Use createObjectURL (synchronous, inside Angular zone) so the template
+    // updates immediately without needing a FileReader async callback
+    const objectUrl = URL.createObjectURL(file);
+    this.form.patchValue({ coverImageUrl: objectUrl });
+    // Store the blob for actual uploading on save
+    this.pendingCoverBlob = file;
   }
 
   onCropCancel() {
@@ -239,14 +253,33 @@ export class AdminHistoryEditorComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.loading.set(true);
+    const id = this.route.snapshot.paramMap.get('id');
+
+    // If a new cover image was cropped, upload it first
+    if (this.pendingCoverBlob) {
+      try {
+        const compressed = await compressImage(this.pendingCoverBlob, 1280, 720, 0.85);
+        const file = new File([compressed], 'cover.jpg', { type: 'image/jpeg' });
+        const res: any = await firstValueFrom(this.newsApi.uploadImage(file));
+        if (res.success && res.file?.url) {
+          this.form.patchValue({ coverImageUrl: res.file.url });
+          // Release the old blob URL
+          URL.revokeObjectURL(this.form.value.coverImageUrl || '');
+        }
+      } catch {
+        this.toast.showError('Erro ao fazer upload da capa.');
+        this.loading.set(false);
+        return;
+      }
+      this.pendingCoverBlob = null;
+    }
+
     const editorData = await this.editor?.save();
     const payload = {
       ...this.form.value,
       content: editorData
     };
-
-    this.loading.set(true);
-    const id = this.route.snapshot.paramMap.get('id');
 
     const obs = id 
       ? this.historyApi.update(id, payload as any)

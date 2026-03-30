@@ -1,14 +1,16 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormArray, FormGroup } from '@angular/forms';
 import { AppSettingsService, THEME_PRESETS } from '../../../../core/services/app-settings.service';
 import { NewsApiService } from '../../../../core/services/news-api.service';
 import { ToastMessagesService } from '../../../../core/notifications/toast-messages.service';
+import { compressImage } from '../../../../shared/utils/image-compress.util';
 
 @Component({
   selector: 'app-admin-settings-page',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule],
   template: `
     <div class="max-w-3xl mx-auto pb-20 flex flex-col gap-8">
 
@@ -24,7 +26,7 @@ import { ToastMessagesService } from '../../../../core/notifications/toast-messa
       </div>
 
       <!-- Tab Navigation -->
-      <div class="flex items-center gap-1 bg-slate-100 p-1.5 rounded-2xl w-fit">
+      <div class="flex items-center gap-1 bg-slate-100 p-1.5 rounded-2xl w-fit flex-wrap">
         <button 
           (click)="activeTab.set('identidade')"
           [class]="activeTab() === 'identidade' 
@@ -48,6 +50,14 @@ import { ToastMessagesService } from '../../../../core/notifications/toast-messa
             : 'px-6 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-50 transition'"
         >
           Módulos
+        </button>
+        <button 
+          (click)="activeTab.set('rodape')"
+          [class]="activeTab() === 'rodape' 
+            ? 'px-6 py-2 bg-white rounded-xl text-sm font-bold text-slate-900 shadow-sm' 
+            : 'px-6 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-50 transition'"
+        >
+          Rodapé & Contato
         </button>
       </div>
 
@@ -315,6 +325,157 @@ import { ToastMessagesService } from '../../../../core/notifications/toast-messa
           </div>
         </section>
       }
+
+      <!-- Tab: Rodapé & Contato -->
+      @if (activeTab() === 'rodape') {
+        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Rodapé Público</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Informações de contato institucionais, mapa e links</p>
+          </div>
+          <form [formGroup]="footerForm" (ngSubmit)="saveFooter()" class="p-6 space-y-6">
+            
+            <div class="space-y-4">
+              <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest border-b border-slate-100 pb-2">Informações de Contato</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <label class="text-xs font-bold text-slate-700">Telefone Principal</label>
+                  <div class="flex items-center gap-3">
+                    <input type="text" formControlName="footerPhone" class="flex-1 px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 text-sm">
+                    <button
+                      type="button"
+                      (click)="footerForm.get('footerIsWhatsapp')?.setValue(!footerForm.get('footerIsWhatsapp')?.value)"
+                      class="flex items-center gap-2 px-3 py-2 rounded-xl border transition-all shrink-0"
+                      [class]="footerForm.get('footerIsWhatsapp')?.value 
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
+                        : 'bg-white border-slate-200 text-slate-400 hover:bg-slate-50'"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="space-y-1">
+                  <label class="text-xs font-bold text-slate-700">E-mail Oficial</label>
+                  <input type="email" formControlName="footerEmail" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 text-sm">
+                </div>
+              </div>
+              <div class="space-y-1">
+                <label class="text-xs font-bold text-slate-700">Endereço Completo</label>
+                <input type="text" formControlName="footerAddress" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 text-sm">
+              </div>
+              <div class="space-y-1">
+                <label class="text-xs font-bold text-slate-700">Google Maps Embed URL / Iframe</label>
+                <textarea formControlName="footerMapsEmbedUrl" rows="3" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 text-sm font-mono text-slate-600 placeholder:text-slate-300" placeholder="Cole o código do iframe do mapa aqui..."></textarea>
+                <p class="text-[10px] text-slate-400">Entre no Google Maps, clique em "Compartilhar", "Incorporar um mapa" e copie o código HTML (&lt;iframe ...&gt;).</p>
+              </div>
+            </div>
+
+            <div class="space-y-4 pt-4" formArrayName="footerSocialLinks">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest">Redes Sociais</h3>
+                <button type="button" (click)="addSocialLink()" class="text-xs bg-brand-50 text-brand-700 font-bold px-3 py-1.5 rounded-lg hover:bg-brand-100 border border-brand-200 transition">
+                  + Add Rede Social
+                </button>
+              </div>
+
+              @if (footerSocialLinksFormArray.controls.length === 0) {
+                <div class="py-8 text-center border-2 border-dashed border-slate-100 rounded-2xl">
+                  <p class="text-xs text-slate-400">Nenhuma rede social cadastrada.</p>
+                </div>
+              }
+              
+              <div class="grid grid-cols-1 gap-3">
+                @for (social of footerSocialLinksFormArray.controls; track $index) {
+                  <div [formGroupName]="$index" class="flex flex-col sm:flex-row gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100 items-end sm:items-center">
+                    <div class="flex-none w-full sm:w-40 space-y-1">
+                      <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Plataforma</label>
+                      <select formControlName="type" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white">
+                        <option value="instagram">Instagram</option>
+                        <option value="facebook">Facebook</option>
+                        <option value="twitter">X (Twitter)</option>
+                        <option value="youtube">YouTube</option>
+                        <option value="tiktok">TikTok</option>
+                        <option value="whatsapp">WhatsApp</option>
+                        <option value="other">Outro</option>
+                      </select>
+                    </div>
+                    <div class="flex-1 w-full space-y-1">
+                      <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Rótulo (Opcional - Ex: Loja)</label>
+                      <input type="text" formControlName="label" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm" placeholder="Ex: Oficial">
+                    </div>
+                    <div class="flex-1 w-full space-y-1">
+                      <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Link (URL Completa)</label>
+                      <input type="url" formControlName="url" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm" placeholder="https://...">
+                    </div>
+                    <button type="button" (click)="removeSocialLink($index)" class="p-2 text-rose-500 hover:bg-rose-50 border border-transparent hover:border-rose-200 rounded-xl transition" title="Remover rede social">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="space-y-4 pt-4" formArrayName="footerLinks">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest">Links Úteis</h3>
+                <button type="button" (click)="addFooterLink()" class="text-xs bg-slate-100 text-slate-600 font-bold px-3 py-1.5 rounded-lg hover:bg-slate-200 transition">
+                  + Add Link
+                </button>
+              </div>
+              
+              @for (link of footerLinksFormArray.controls; track i; let i = $index) {
+                <div [formGroupName]="i" class="flex gap-4 items-start bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  <div class="flex-1 space-y-1">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Título do Link</label>
+                    <input type="text" formControlName="label" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" placeholder="Ex: Portal da Transparência">
+                  </div>
+                  <div class="flex-1 space-y-1">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">URL do Link</label>
+                    <input type="text" formControlName="url" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" placeholder="https://...">
+                  </div>
+                  <div class="pt-5 mt-1">
+                    <button type="button" (click)="removeFooterLink(i)" class="p-2 text-rose-500 hover:bg-rose-50 border border-transparent hover:border-rose-200 rounded-lg transition" title="Remover link">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div class="space-y-4 pt-4 border-t border-slate-100">
+              <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest border-b border-slate-100 pb-2">Créditos de Desenvolvimento</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <label class="text-xs font-bold text-slate-700">Nome do Desenvolvedor</label>
+                  <input type="text" formControlName="footerDevName" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 text-sm" placeholder="Ex: Rodrigo Granada">
+                </div>
+                <div class="space-y-1">
+                  <label class="text-xs font-bold text-slate-700">Link do Portfólio / LinkedIn</label>
+                  <input type="url" formControlName="footerDevUrl" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 text-sm" placeholder="https://linkedin.com/in/...">
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-6 flex justify-end">
+              <button
+                type="submit"
+                [disabled]="footerSaving()"
+                class="px-8 py-3 rounded-xl bg-brand-600 text-white text-sm font-bold shadow-lg shadow-brand-500/20 hover:bg-brand-700 transition disabled:opacity-50 flex items-center gap-2"
+              >
+                @if (footerSaving()) {
+                  <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Salvando Dados...
+                } @else {
+                  Salvar Rodapé
+                }
+              </button>
+            </div>
+          </form>
+        </section>
+      }
     </div>
   `,
 })
@@ -322,23 +483,131 @@ export class AdminSettingsPageComponent implements OnInit {
   private readonly appSettings = inject(AppSettingsService);
   private readonly newsApi = inject(NewsApiService);
   private readonly toast = inject(ToastMessagesService);
+  private readonly fb = inject(FormBuilder);
 
   readonly themePresets = THEME_PRESETS;
   readonly badgeUrl = this.appSettings.badgeUrl;
   readonly defaultNewsUrl = this.appSettings.defaultNewsImageUrl;
   readonly selectedTheme = signal(this.appSettings.themePreset());
 
-  readonly activeTab = signal<'identidade' | 'tema' | 'modulos'>('identidade');
+  readonly activeTab = signal<'identidade' | 'tema' | 'modulos' | 'rodape'>('identidade');
   readonly badgeSaving = signal(false);
   readonly defaultNewsSaving = signal(false);
   readonly membershipSaving = signal(false);
   readonly sponsorsSaving = signal(false);
   readonly themeSaving = signal(false);
+  readonly footerSaving = signal(false);
   readonly isMembershipEnabled = this.appSettings.isMembershipEnabled;
   readonly isSponsorsEnabled = this.appSettings.isSponsorsEnabled;
 
+  readonly footerForm: FormGroup = this.fb.group({
+    footerPhone: [''],
+    footerIsWhatsapp: [false],
+    footerEmail: [''],
+    footerAddress: [''],
+    footerMapsEmbedUrl: [''],
+    footerDevName: [''],
+    footerDevUrl: [''],
+    footerSocialLinks: this.fb.array([]),
+    footerLinks: this.fb.array([])
+  });
+
+  get footerSocialLinksFormArray(): FormArray {
+    return this.footerForm.get('footerSocialLinks') as FormArray;
+  }
+
+  get footerLinksFormArray(): FormArray {
+    return this.footerForm.get('footerLinks') as FormArray;
+  }
+
+  constructor() {
+    // Reactively update form when settings signals change
+    effect(() => {
+      const socials = this.appSettings.footerSocialLinks();
+      const links = this.appSettings.footerLinks();
+      
+      // Update basic fields
+      this.footerForm.patchValue({
+        footerPhone: this.appSettings.footerPhone() || '',
+        footerIsWhatsapp: this.appSettings.footerIsWhatsapp() || false,
+        footerEmail: this.appSettings.footerEmail() || '',
+        footerAddress: this.appSettings.footerAddress() || '',
+        footerMapsEmbedUrl: this.appSettings.footerMapsEmbedUrl() || '',
+        footerDevName: this.appSettings.footerDevName() || '',
+        footerDevUrl: this.appSettings.footerDevUrl() || '',
+      }, { emitEvent: false });
+
+      // Update Social Array
+      this.footerSocialLinksFormArray.clear({ emitEvent: false });
+      for (const s of socials) {
+        this.footerSocialLinksFormArray.push(this.fb.group({
+          type: [s.type || 'instagram'],
+          label: [s.label || ''],
+          url: [s.url || '']
+        }), { emitEvent: false });
+      }
+
+      // Update Links Array
+      this.footerLinksFormArray.clear({ emitEvent: false });
+      for (const link of links) {
+        this.footerLinksFormArray.push(this.fb.group({
+          label: [link.label || ''],
+          url: [link.url || '']
+        }), { emitEvent: false });
+      }
+    });
+  }
+
   ngOnInit() {
     this.selectedTheme.set(this.appSettings.themePreset());
+  }
+
+  addSocialLink() {
+    this.footerSocialLinksFormArray.push(this.fb.group({ type: ['instagram'], label: [''], url: [''] }));
+  }
+
+  removeSocialLink(index: number) {
+    this.footerSocialLinksFormArray.removeAt(index);
+  }
+
+  addFooterLink() {
+    this.footerLinksFormArray.push(this.fb.group({ label: [''], url: [''] }));
+  }
+
+  removeFooterLink(index: number) {
+    this.footerLinksFormArray.removeAt(index);
+  }
+
+  async saveFooter() {
+    this.footerSaving.set(true);
+    try {
+      const raw = this.footerForm.getRawValue();
+      const keys = Object.keys(raw);
+      
+      // Save basic settings
+      const basicKeys = ['footerPhone', 'footerIsWhatsapp', 'footerEmail', 'footerAddress', 'footerMapsEmbedUrl', 'footerDevName', 'footerDevUrl'];
+      for (const k of basicKeys) {
+        const val = String(raw[k]);
+        await this.appSettings.saveSetting(k, val);
+        (this.appSettings as any)[k].set(raw[k]);
+      }
+
+      // Save footerSocialLinks as JSON string
+      const socialsJson = JSON.stringify(raw.footerSocialLinks);
+      await this.appSettings.saveSetting('footerSocialLinks', socialsJson);
+      this.appSettings.footerSocialLinks.set(raw.footerSocialLinks);
+
+      // Save footerLinks as JSON string
+      const linksJson = JSON.stringify(raw.footerLinks);
+      await this.appSettings.saveSetting('footerLinks', linksJson);
+      this.appSettings.footerLinks.set(raw.footerLinks);
+
+      this.toast.showSuccess('Configurações de rodapé salvas!');
+    } catch {
+      this.toast.showError('Erro ao salvar as configurações.');
+    } finally {
+      this.footerSaving.set(false);
+    }
   }
 
   getSwatches(preset: (typeof THEME_PRESETS)[0]): string[] {
@@ -456,14 +725,17 @@ export class AdminSettingsPageComponent implements OnInit {
     }
   }
 
-  onDefaultNewsImageSelected(event: Event) {
+  async onDefaultNewsImageSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
     input.value = '';
     
     this.defaultNewsSaving.set(true);
-    this.newsApi.uploadImage(file).subscribe({
+    // Compress before upload (max 1280px, JPEG 82%)
+    const compressed = await compressImage(file).catch(() => file) as File;
+    const fileToUpload = compressed instanceof File ? compressed : new File([compressed], 'news-default.jpg', { type: 'image/jpeg' });
+    this.newsApi.uploadImage(fileToUpload).subscribe({
       next: async (res) => {
         if (res.success && res.file?.url) {
           try {

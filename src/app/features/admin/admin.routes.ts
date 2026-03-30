@@ -86,6 +86,11 @@ export default [
         loadComponent: () => import('./pages/membership/admin-plan-editor.component').then((c) => c.AdminPlanEditorComponent),
         canActivate: [rolesGuard(['owner', 'admin'])],
       },
+      {
+        path: 'idolos',
+        loadComponent: () => import('./pages/idols/admin-idols-page.component').then((c) => c.AdminIdolsPageComponent),
+        canActivate: [rolesGuard(['owner', 'socio', 'admin'])],
+      },
     ],
   },
 ] satisfies Routes;

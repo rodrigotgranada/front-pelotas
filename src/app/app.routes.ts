@@ -67,6 +67,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/public-history/pages/history-page.component').then((m) => m.HistoryPageComponent),
   },
   {
+    path: 'idolos',
+    loadComponent: () => import('./features/public-idols/pages/public-idols-page.component').then((m) => m.PublicIdolsPageComponent),
+  },
+  {
     path: 'seja-socio',
     canActivate: [membershipEnabledGuard],
     loadComponent: () => import('./features/membership/pages/landing/membership-landing-page.component').then((m) => m.MembershipLandingPageComponent),

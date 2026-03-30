@@ -102,7 +102,7 @@ export class RegisterPageComponent {
   readonly pendingEmailVerification = signal(false);
   readonly verificationEmail = signal<string | null>(null);
   
-  imageChangedEvent: any = '';
+  imageChangedEvent: any = undefined;
   private selectedPhoto: File | Blob | null = null;
   readonly photoPreviewUrl = signal<string | null>(null); // To show preview on the form
 
@@ -224,16 +224,8 @@ export class RegisterPageComponent {
     }
   }
 
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      if (!input.files[0].type.startsWith('image/')) {
-        this.toast.showWarning('Selecione apenas arquivos de imagem.', ToastTitle.Warning);
-        input.value = '';
-        return;
-      }
-      this.imageChangedEvent = event;
-    }
+  onFileSelected(file: File): void {
+    this.imageChangedEvent = file;
   }
 
   onImageCropped(blob: Blob): void {

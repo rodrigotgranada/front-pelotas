@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Sponsor } from '../../../../../core/models/sponsor.model';
 import { SponsorsService } from '../../../../../core/services/sponsors.service';
 import { NewsApiService } from '../../../../../core/services/news-api.service';
+import { compressImage } from '../../../../../shared/utils/image-compress.util';
 import { finalize } from 'rxjs';
 
 @Component({
@@ -156,6 +157,8 @@ export class AdminCreateSponsorDrawerComponent implements OnInit {
       };
       reader.readAsDataURL(file);
     }
+    // Reset so same file can be selected again without needing to pick twice
+    event.target.value = '';
   }
 
   clearImage() {
@@ -177,8 +180,11 @@ export class AdminCreateSponsorDrawerComponent implements OnInit {
       let logoStorageKey = this.sponsorToEdit?.logoStorageKey || '';
 
       if (this.selectedFile()) {
+        // Compress before upload (max 800px for logos, JPEG 88%)
+        const compressed = await compressImage(this.selectedFile()!, 800, 800, 0.88).catch(() => this.selectedFile()!);
+        const fileToUpload = new File([compressed], 'logo.jpg', { type: 'image/jpeg' });
         const uploadResult = await new Promise<any>((resolve, reject) => {
-          this.newsApiService.uploadImage(this.selectedFile()!).subscribe({
+          this.newsApiService.uploadImage(fileToUpload).subscribe({
             next: (res) => {
               if (res.success && res.file?.url) {
                 resolve({ publicUrl: res.file.url, id: '' });
