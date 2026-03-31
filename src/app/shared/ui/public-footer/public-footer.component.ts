@@ -107,6 +107,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
             </h4>
             <ul class="space-y-4">
               <li><a routerLink="/historia" class="text-slate-400 font-medium hover:text-white hover:translate-x-1 transition-all inline-block">História do Clube</a></li>
+              <li><a routerLink="/elenco" class="text-slate-400 font-medium hover:text-white hover:translate-x-1 transition-all inline-block">Elenco Atual</a></li>
               <li><a routerLink="/idolos" class="text-slate-400 font-medium hover:text-white hover:translate-x-1 transition-all inline-block">Ídolos Históricos</a></li>
               @if (settings.isMembershipEnabled()) {
                 <li><a routerLink="/seja-socio" class="text-brand-400 font-bold hover:text-brand-300 hover:translate-x-1 transition-all inline-block">Seja Sócio</a></li>

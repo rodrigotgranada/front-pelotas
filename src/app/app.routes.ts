@@ -71,6 +71,14 @@ export const routes: Routes = [
     loadComponent: () => import('./features/public-idols/pages/public-idols-page.component').then((m) => m.PublicIdolsPageComponent),
   },
   {
+    path: 'elenco',
+    loadComponent: () => import('./features/public-squads/pages/public-squads-page.component').then((m) => m.PublicSquadsPageComponent),
+  },
+  {
+    path: 'elenco/:year/:competition',
+    loadComponent: () => import('./features/public-squads/pages/public-squads-page.component').then((m) => m.PublicSquadsPageComponent),
+  },
+  {
     path: 'seja-socio',
     canActivate: [membershipEnabledGuard],
     loadComponent: () => import('./features/membership/pages/landing/membership-landing-page.component').then((m) => m.MembershipLandingPageComponent),

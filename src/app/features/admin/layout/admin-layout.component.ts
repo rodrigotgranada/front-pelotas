@@ -165,6 +165,30 @@ import { MembershipInterestApiService } from '../../../core/services/membership-
               Logs do Sistema
             </a>
 
+            <div class="pt-4 pb-2">
+              <p class="px-3 text-xs font-bold uppercase tracking-wider text-slate-400">Futebol</p>
+            </div>
+
+            <a
+              routerLink="/admin/atletas"
+              routerLinkActive="bg-cyan-50 text-cyan-700 font-semibold"
+              (click)="isSidebarOpen.set(false)"
+              class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              Atletas e Comissão
+            </a>
+
+            <a
+              routerLink="/admin/elencos"
+              routerLinkActive="bg-cyan-50 text-cyan-700 font-semibold"
+              (click)="isSidebarOpen.set(false)"
+              class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M17 6.1H3"/><path d="M21 12.1H3"/><path d="M15.1 18.1H3"/></svg>
+              Elencos Históricos
+            </a>
+
             <a
               routerLink="/admin/settings"
               routerLinkActive="bg-cyan-50 text-cyan-700 font-semibold"

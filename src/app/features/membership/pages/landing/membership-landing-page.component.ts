@@ -7,6 +7,7 @@ import { AuthSessionService } from '../../../../core/auth/auth-session.service';
 import { MembershipInterestApiService } from '../../../../core/services/membership-interest-api.service';
 import { FormsModule } from '@angular/forms';
 import { ToastMessagesService } from '../../../../core/notifications/toast-messages.service';
+import { AppSettingsService } from '../../../../core/services/app-settings.service';
 
 
 @Component({
@@ -62,7 +63,11 @@ import { ToastMessagesService } from '../../../../core/notifications/toast-messa
 
             <div class="bg-white rounded-[40px] border border-slate-200 p-8 md:p-12 shadow-2xl relative overflow-hidden">
                <div class="absolute top-0 right-0 p-8 opacity-5">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.35C17.25 23.15 21 18.25 21 13V7L12 2Z"/></svg>
+                  @if (appSettings.badgeUrl()) {
+                    <img [src]="appSettings.badgeUrl()" class="w-24 h-24 grayscale brightness-0 opacity-40">
+                  } @else {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.35C17.25 23.15 21 18.25 21 13V7L12 2Z"/></svg>
+                  }
                </div>
 
                <h2 class="text-3xl font-black text-slate-900 mb-2">Solicitar Adesão</h2>
@@ -131,6 +136,7 @@ export class MembershipLandingPageComponent implements OnInit {
   private readonly interestApi = inject(MembershipInterestApiService);
   private readonly session = inject(AuthSessionService);
   private readonly toast = inject(ToastMessagesService);
+  protected readonly appSettings = inject(AppSettingsService);
 
   readonly plans = signal<MembershipPlan[]>([]);
   readonly loading = signal(false);

@@ -7,7 +7,7 @@ import { provideToastr } from 'ngx-toastr';
 
 import { authInterceptor } from './core/http/auth.interceptor';
 import { loadingInterceptor } from './core/http/loading.interceptor';
-import { routes } from './shared/master-bypass-v2';
+import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [

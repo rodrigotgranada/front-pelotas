@@ -91,6 +91,16 @@ export default [
         loadComponent: () => import('./pages/idols/admin-idols-page.component').then((c) => c.AdminIdolsPageComponent),
         canActivate: [rolesGuard(['owner', 'socio', 'admin'])],
       },
+      {
+        path: 'atletas',
+        loadComponent: () => import('./pages/athletes/admin-athletes-page.component').then((c) => c.AdminAthletesPageComponent),
+        canActivate: [rolesGuard(['owner', 'socio', 'admin'])],
+      },
+      {
+        path: 'elencos',
+        loadComponent: () => import('./pages/squads/admin-squads-page.component').then((c) => c.AdminSquadsPageComponent),
+        canActivate: [rolesGuard(['owner', 'socio', 'admin'])],
+      },
     ],
   },
 ] satisfies Routes;

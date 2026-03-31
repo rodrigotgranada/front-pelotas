@@ -445,15 +445,16 @@ import { compressImage } from '../../../../shared/utils/image-compress.util';
             <div class="space-y-4 pt-4 border-t border-slate-100">
               <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest border-b border-slate-100 pb-2">Créditos de Desenvolvimento</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="space-y-1">
-                  <label class="text-xs font-bold text-slate-700">Nome do Desenvolvedor</label>
-                  <input type="text" formControlName="footerDevName" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 text-sm" placeholder="Ex: Rodrigo Granada">
+                <div class="space-y-1 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                  <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Desenvolvedor</p>
+                  <p class="text-sm font-semibold text-slate-700">{{ appSettings.footerDevName() || 'N/A' }}</p>
                 </div>
-                <div class="space-y-1">
-                  <label class="text-xs font-bold text-slate-700">Link do Portfólio / LinkedIn</label>
-                  <input type="url" formControlName="footerDevUrl" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 text-sm" placeholder="https://linkedin.com/in/...">
+                <div class="space-y-1 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                  <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Link / Portfólio</p>
+                  <p class="text-sm font-semibold text-brand-600 truncate underline">{{ appSettings.footerDevUrl() || 'N/A' }}</p>
                 </div>
               </div>
+              <p class="text-[10px] text-slate-400 mt-2 italic">* Estes dados são definidos no código do portal e não podem ser alterados pelo painel administrativo.</p>
             </div>
 
             <div class="pt-6 flex justify-end">
@@ -480,7 +481,7 @@ import { compressImage } from '../../../../shared/utils/image-compress.util';
   `,
 })
 export class AdminSettingsPageComponent implements OnInit {
-  private readonly appSettings = inject(AppSettingsService);
+  protected readonly appSettings = inject(AppSettingsService);
   private readonly newsApi = inject(NewsApiService);
   private readonly toast = inject(ToastMessagesService);
   private readonly fb = inject(FormBuilder);
@@ -506,8 +507,6 @@ export class AdminSettingsPageComponent implements OnInit {
     footerEmail: [''],
     footerAddress: [''],
     footerMapsEmbedUrl: [''],
-    footerDevName: [''],
-    footerDevUrl: [''],
     footerSocialLinks: this.fb.array([]),
     footerLinks: this.fb.array([])
   });
@@ -533,8 +532,6 @@ export class AdminSettingsPageComponent implements OnInit {
         footerEmail: this.appSettings.footerEmail() || '',
         footerAddress: this.appSettings.footerAddress() || '',
         footerMapsEmbedUrl: this.appSettings.footerMapsEmbedUrl() || '',
-        footerDevName: this.appSettings.footerDevName() || '',
-        footerDevUrl: this.appSettings.footerDevUrl() || '',
       }, { emitEvent: false });
 
       // Update Social Array
@@ -585,7 +582,7 @@ export class AdminSettingsPageComponent implements OnInit {
       const keys = Object.keys(raw);
       
       // Save basic settings
-      const basicKeys = ['footerPhone', 'footerIsWhatsapp', 'footerEmail', 'footerAddress', 'footerMapsEmbedUrl', 'footerDevName', 'footerDevUrl'];
+      const basicKeys = ['footerPhone', 'footerIsWhatsapp', 'footerEmail', 'footerAddress', 'footerMapsEmbedUrl'];
       for (const k of basicKeys) {
         const val = String(raw[k]);
         await this.appSettings.saveSetting(k, val);
