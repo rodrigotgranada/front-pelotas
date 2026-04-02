@@ -11,12 +11,13 @@ import { SeoService } from '../../../core/services/seo.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NewsletterWidgetComponent } from '../../../shared/ui/newsletter-widget/newsletter-widget.component';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
+import { FallbackImgDirective } from '../../../shared/directives/fallback-img.directive';
 
 
 @Component({
   selector: 'app-news-article-page',
   standalone: true,
-  imports: [CommonModule, DatePipe, RouterLink, SpinnerComponent, FormsModule, NewsletterWidgetComponent],
+  imports: [CommonModule, DatePipe, RouterLink, SpinnerComponent, FormsModule, NewsletterWidgetComponent, FallbackImgDirective],
   template: `
       <main class="flex-1 w-full max-w-7xl mx-auto px-4 py-8 flex flex-col relative pb-20">
         @if (loading()) {
@@ -30,12 +31,21 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
           <!-- Capa Hero -->
           @if (article()?.coverImageUrl || appSettings.defaultNewsImageUrl()) {
             <div class="w-full h-64 sm:h-96 relative overflow-hidden bg-slate-900 flex items-center justify-center">
-              <img [src]="article()!.coverImageUrl || appSettings.defaultNewsImageUrl()" class="w-full h-full object-cover opacity-90 transition-transform duration-700 hover:scale-105" alt="Capa da Matéria">
+              <img [src]="article()!.coverImageUrl || appSettings.defaultNewsImageUrl()" appFallbackImg="cover" class="w-full h-full object-cover opacity-90 transition-transform duration-700 hover:scale-105" alt="Capa da Matéria">
             </div>
           }
 
           <article class="px-6 py-8 sm:px-12 sm:py-12 flex-1 flex flex-col">
             <header class="mb-10 text-center sm:text-left border-b border-slate-100 pb-8">
+              @if (article()?.categories?.length) {
+                <div class="flex flex-wrap gap-2 mb-4 justify-center sm:justify-start">
+                  @for (cat of article()!.categories; track cat) {
+                    <span class="px-2.5 py-0.5 bg-indigo-600 text-white rounded-md text-[10px] font-black uppercase tracking-wider">
+                      {{ cat }}
+                    </span>
+                  }
+                </div>
+              }
               <h1 class="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-4">
                 {{ article()!.title }}
               </h1>
@@ -93,6 +103,15 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
             </div>
             
             <div class="mt-16 pt-8 border-t border-slate-100 flex flex-col items-center justify-center gap-4">
+              @if (article()?.tags?.length) {
+                <div class="flex flex-wrap items-center justify-center gap-2 mb-4">
+                  @for (tag of article()!.tags; track tag) {
+                    <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-bold hover:bg-slate-200 transition-colors cursor-default">
+                      #{{ tag }}
+                    </span>
+                  }
+                </div>
+              }
               <p class="font-medium text-slate-500 text-sm">Gostou dessa matéria? Compartilhe com amigos.</p>
               
               <div class="flex items-center gap-3">
@@ -186,7 +205,7 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
                   @for (news of relatedNews(); track news.id) {
                     <a [routerLink]="['/noticias', news.slug]" class="group block bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-300">
                       <div class="h-40 overflow-hidden relative">
-                        <img [src]="news.coverImageUrl || appSettings.defaultNewsImageUrl() || 'assets/placeholder-cover.jpg'" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+                        <img [src]="news.coverImageUrl || appSettings.defaultNewsImageUrl() || '/placeholder-cover.svg'" appFallbackImg="cover" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
                       </div>
                       <div class="p-4">
@@ -201,9 +220,11 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
               </div>
             }
             <!-- Newsletter Widget on Article -->
-            <div class="mt-20">
-              <app-newsletter-widget></app-newsletter-widget>
-            </div>
+            @if (appSettings.isNewsletterEnabled()) {
+              <div class="mt-20">
+                <app-newsletter-widget></app-newsletter-widget>
+              </div>
+            }
           </article>
         }
       </main>

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { AuthTokenService } from './core/auth/auth-token.service';
 import { AuthApiService } from './core/services/auth-api.service';
 import { AuthSessionService } from './core/auth/auth-session.service';
@@ -14,7 +14,7 @@ import { PublicFooterComponent } from './shared/ui/public-footer/public-footer.c
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, SpinnerOverlayComponent, FormsModule, PublicFooterComponent],
+  imports: [RouterOutlet, RouterLink, SpinnerOverlayComponent, FormsModule, PublicFooterComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,6 +34,9 @@ export class App implements OnInit {
   readonly me = this.session.me;
   readonly badgeUrl = this.appSettings.badgeUrl;
   readonly isMembershipEnabled = this.appSettings.isMembershipEnabled;
+  readonly isSquadsEnabled = this.appSettings.isSquadsEnabled;
+  readonly isNewsletterEnabled = this.appSettings.isNewsletterEnabled;
+  readonly isIdolsEnabled = this.appSettings.isIdolsEnabled;
 
   readonly dropdownOpen = signal(false);
   readonly isGlobalMenuOpen = signal(false);

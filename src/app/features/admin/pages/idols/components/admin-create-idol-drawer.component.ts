@@ -280,9 +280,9 @@ export class AdminCreateIdolDrawerComponent implements OnInit {
       let photoStorageKey = this.idolToEdit?.photoStorageKey || '';
 
       if (this.selectedFile()) {
-        // Compress before upload (max 1280px, JPEG 82%)
-        const compressed = await compressImage(this.selectedFile()!) as File;
-        const compressedFile = new File([compressed], 'idol.jpg', { type: 'image/jpeg' });
+        // Compress before upload (max 1280px, original format)
+        const compressed = await compressImage(this.selectedFile()!);
+        const compressedFile = new File([compressed], `idol-${Date.now()}.${compressed.type.split('/')[1]}`, { type: compressed.type });
         const uploadResult: any = await firstValueFrom(this.newsApi.uploadImage(compressedFile));
         if (uploadResult.success && uploadResult.file?.url) {
           photoUrl = uploadResult.file.url;

@@ -8,6 +8,8 @@ export interface ActivityLog {
   status: LogStatus;
   flag?: string;
   actorUserId?: string;
+  actorEmail?: string;
+  ipAddress?: string;
   message?: string;
   metadata?: Record<string, unknown>;
   createdAt: string;

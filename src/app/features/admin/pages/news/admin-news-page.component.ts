@@ -9,11 +9,12 @@ import { SpinnerComponent } from '../../../../shared/ui/spinner/spinner.componen
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { ToastMessagesService } from '../../../../core/notifications/toast-messages.service';
+import { FallbackImgDirective } from '../../../../shared/directives/fallback-img.directive';
 
 @Component({
   selector: 'app-admin-news-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, SpinnerComponent, FormsModule, ReactiveFormsModule, DatePipe],
+  imports: [CommonModule, RouterLink, SpinnerComponent, FormsModule, ReactiveFormsModule, DatePipe, FallbackImgDirective],
   template: `
     <div class="flex flex-col gap-6">
       <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-2">
@@ -53,9 +54,7 @@ import { ToastMessagesService } from '../../../../core/notifications/toast-messa
             @for (item of news().items; track item.id) {
               <div class="group bg-white border border-slate-200 rounded-2xl p-4 transition-all hover:shadow-xl flex flex-col md:flex-row gap-5">
                 <div class="w-full md:w-48 h-32 shrink-0 rounded-xl overflow-hidden bg-slate-100 border border-slate-100 relative">
-                  @if (item.coverImageUrl) {
-                    <img [src]="item.coverImageUrl" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                  }
+                  <img [src]="item.coverImageUrl || appSettings.defaultNewsImageUrl()" appFallbackImg="cover" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                 </div>
                 <div class="flex-1 flex flex-col min-w-0">
                   <div class="flex flex-wrap gap-2 mb-2">
@@ -86,11 +85,11 @@ import { ToastMessagesService } from '../../../../core/notifications/toast-messa
       </div>
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminNewsPageComponent implements OnInit {
   private readonly newsApi = inject(NewsApiService);
   private readonly toast = inject(ToastMessagesService);
+  readonly appSettings = inject(AppSettingsService);
   readonly loading = signal(false);
   readonly news = signal<PaginatedNews>({ items: [], total: 0, page: 1, limit: 10, pages: 0 });
 

@@ -3,6 +3,9 @@ import { authGuard } from './core/auth/auth.guard';
 import { guestGuard } from './core/auth/guest.guard';
 import { roleGuard } from './core/auth/role.guard';
 import { membershipEnabledGuard } from './core/guards/membership-enabled.guard';
+import { squadsEnabledGuard } from './core/guards/squads-enabled.guard';
+import { idolsEnabledGuard } from './core/guards/idols-enabled.guard';
+import { matchesEnabledGuard } from './core/guards/matches-enabled.guard';
 
 export const routes: Routes = [
   {
@@ -63,19 +66,32 @@ export const routes: Routes = [
     loadChildren: () => import('./features/admin/admin.routes'),
   },
   {
+    path: 'calendario',
+    canActivate: [matchesEnabledGuard],
+    loadComponent: () => import('./features/public-matches/pages/calendar-page.component').then((m) => m.CalendarPageComponent),
+  },
+  {
+    path: 'jogos/:id',
+    canActivate: [matchesEnabledGuard],
+    loadComponent: () => import('./features/public-matches/pages/match-details.component').then((m) => m.MatchDetailsComponent),
+  },
+  {
     path: 'historia',
     loadComponent: () => import('./features/public-history/pages/history-page.component').then((m) => m.HistoryPageComponent),
   },
   {
     path: 'idolos',
+    canActivate: [idolsEnabledGuard],
     loadComponent: () => import('./features/public-idols/pages/public-idols-page.component').then((m) => m.PublicIdolsPageComponent),
   },
   {
     path: 'elenco',
+    canActivate: [squadsEnabledGuard],
     loadComponent: () => import('./features/public-squads/pages/public-squads-page.component').then((m) => m.PublicSquadsPageComponent),
   },
   {
     path: 'elenco/:year/:competition',
+    canActivate: [squadsEnabledGuard],
     loadComponent: () => import('./features/public-squads/pages/public-squads-page.component').then((m) => m.PublicSquadsPageComponent),
   },
   {

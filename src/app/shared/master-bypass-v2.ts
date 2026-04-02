@@ -16,14 +16,8 @@ export interface MembershipPlan {
   isActive: boolean;
 }
 
-export interface History {
-  id: string;
-  title: string;
-  content: string | any;
-  format: 'HTML' | 'BLOCKS';
-  coverImageUrl?: string;
-  order: number;
-}
+import { History } from '../core/models/history.model';
+export type { History };
 
 // --- MEMBERSHIP SERVICE ---
 @Injectable({

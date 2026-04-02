@@ -12,6 +12,7 @@ export function compressImage(
   maxHeight = 1280,
   quality = 0.82
 ): Promise<Blob> {
+  const mimeType = (file as File).type || 'image/jpeg';
   return new Promise((resolve, reject) => {
     const img = new Image();
     const objectUrl = URL.createObjectURL(file);
@@ -48,7 +49,7 @@ export function compressImage(
             reject(new Error('Canvas toBlob failed'));
           }
         },
-        'image/jpeg',
+        mimeType,
         quality
       );
     };

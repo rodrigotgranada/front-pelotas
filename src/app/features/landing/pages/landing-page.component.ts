@@ -1,22 +1,22 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal, computed, DestroyRef } from '@angular/core';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Params } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthTokenService } from '../../../core/auth/auth-token.service';
 import { NewsApiService } from '../../../core/services/news-api.service';
 import { News } from '../../../core/models/news.model';
-import { SpinnerComponent } from '../../../shared/ui/spinner/spinner.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { NewsletterWidgetComponent } from '../../../shared/ui/newsletter-widget/newsletter-widget.component';
+import { SpinnerComponent } from '../../../shared/ui/spinner/spinner.component';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 import { SponsorsCarouselComponent } from '../components/sponsors-carousel.component';
 import { FallbackImgDirective } from '../../../shared/directives/fallback-img.directive';
+import { MatchesWidgetComponent } from '../../../shared/ui/matches-widget/matches-widget.component';
 
 
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [RouterLink, CommonModule, SpinnerComponent, NewsletterWidgetComponent, SponsorsCarouselComponent, FallbackImgDirective],
+  imports: [RouterLink, CommonModule, SpinnerComponent, SponsorsCarouselComponent, FallbackImgDirective, MatchesWidgetComponent],
   templateUrl: './landing-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -55,7 +55,7 @@ export class LandingPageComponent implements OnInit {
   ngOnInit() {
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(params => {
+      .subscribe((params: Params) => {
         const search = params['search'] || null;
         this.currentSearch.set(search);
         this.resetAndLoad();

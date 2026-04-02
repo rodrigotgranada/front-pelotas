@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { News, PaginatedNews } from '../models/news.model';
+import { News, PaginatedNews, NewsCategory } from '../models/news.model';
 
 @Injectable({
   providedIn: 'root',
@@ -39,8 +39,16 @@ export class NewsApiService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`, { params });
   }
 
-  getCategories(): Observable<string[]> {
-    return this.http.get<string[]>(`${this.apiUrl}/categories`);
+  getCategories(): Observable<NewsCategory[]> {
+    return this.http.get<NewsCategory[]>(`${this.apiUrl}/categories`);
+  }
+
+  createCategory(name: string, description?: string): Observable<NewsCategory> {
+    return this.http.post<NewsCategory>(`${this.apiUrl}/categories`, { name, description });
+  }
+
+  deleteCategory(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/categories/${id}`);
   }
 
   incrementView(slug: string): Observable<void> {
@@ -103,5 +111,9 @@ export class NewsApiService {
       }
     });
     return this.http.get<any>(`${environment.apiBaseUrl}/newsletter`, { params });
+  }
+
+  getNewsletterStats(): Observable<any[]> {
+    return this.http.get<any[]>(`${environment.apiBaseUrl}/newsletter/stats`);
   }
 }

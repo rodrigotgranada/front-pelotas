@@ -8,6 +8,7 @@ export interface Sponsor {
   order: number;
   createdAt: string;
   updatedAt: string;
+  expirationDate?: string | null;
 }
 
 export interface CreateSponsorDto {
@@ -17,6 +18,7 @@ export interface CreateSponsorDto {
   logoStorageKey?: string;
   isActive?: boolean;
   order?: number;
+  expirationDate?: string;
 }
 
 export interface UpdateSponsorDto extends Partial<CreateSponsorDto> {}

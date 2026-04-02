@@ -61,10 +61,12 @@
       </section>
     }
 
-    <!-- Newsletter Widget -->
-    <div class="mb-16">
-      <app-newsletter-widget></app-newsletter-widget>
-    </div>
+    <!-- Seção de Jogos e Resultados -->
+    @if (!currentSearch() && appSettings.isMatchesEnabled()) {
+      <section class="mb-16">
+        <app-matches-widget></app-matches-widget>
+      </section>
+    }
 
     <!-- Últimas Notícias -->
     <section class="mb-12">

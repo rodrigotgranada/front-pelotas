@@ -72,7 +72,7 @@ export class PhotoUploadComponent {
     // Compress before emitting (max 512px for avatars, JPEG 85%)
     try {
       const compressed = await compressImage(file, 512, 512, 0.85);
-      const compressedFile = new File([compressed], 'avatar.jpg', { type: 'image/jpeg' });
+      const compressedFile = new File([compressed], `avatar-${Date.now()}.${compressed.type.split('/')[1]}`, { type: compressed.type });
       this.fileSelected.emit(compressedFile);
     } catch {
       // Fallback: emit original file if compression fails

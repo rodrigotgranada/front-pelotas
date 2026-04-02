@@ -1,7 +1,8 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { HistoryApiService, History } from '../../../shared/master-bypass-v2';
+import { HistoryApiService } from '../../../shared/master-bypass-v2';
+import { History } from '../../../core/models/history.model';
 import { SpinnerComponent } from '../../../shared/ui/spinner/spinner.component';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
 
@@ -64,7 +65,9 @@ import { AppSettingsService } from '../../../core/services/app-settings.service'
                 <div class="w-full md:w-1/2 space-y-4 animate-in fade-in slide-in-from-{{ i % 2 === 0 ? 'right' : 'left' }}-12 duration-1000">
                   <div class="flex items-center gap-4 mb-2">
                     <div class="h-px flex-1 bg-slate-200 md:hidden"></div>
-                    <span class="text-cyan-600 font-black text-xl italic tracking-tighter">Etapa {{ i + 1 }}</span>
+                    <span class="text-cyan-600 font-black text-xl italic tracking-tighter">
+                      {{ section.year || ('Etapa ' + (i + 1)) }}
+                    </span>
                     <div class="h-px flex-1 bg-slate-200"></div>
                   </div>
                   

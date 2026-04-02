@@ -1,3 +1,11 @@
+export interface NewsCategory {
+  id?: string;
+  name: string;
+  slug: string;
+  isActive: boolean;
+  description?: string;
+}
+
 export interface News {
   id: string;
   title: string;
@@ -5,6 +13,7 @@ export interface News {
   subtitle?: string | null;
   authorDisplayName?: string | null;
   categories: string[];
+  tags: string[];
   content: any;
   format: 'HTML' | 'BLOCKS';
   allowComments: boolean;

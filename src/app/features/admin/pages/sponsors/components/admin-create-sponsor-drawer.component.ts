@@ -58,6 +58,14 @@ import { finalize } from 'rxjs';
                     </div>
                     <p class="mt-1 text-xs text-slate-500">Números menores aparecem primeiro (0, 1, 2...)</p>
                   </div>
+ 
+                  <div>
+                    <label class="block text-sm font-semibold leading-6 text-slate-900">Vencimento do Contrato (Opcional)</label>
+                    <div class="mt-2">
+                      <input type="date" formControlName="expirationDate" class="block w-full rounded-md border-0 py-2.5 px-3.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                    </div>
+                    <p class="mt-1 text-xs text-slate-500">Se preenchido, o patrocinador ficará inativo automaticamente após esta data.</p>
+                  </div>
 
                   <div class="flex items-center gap-3">
                     <input type="checkbox" formControlName="isActive" id="isActive" class="h-5 w-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-600">
@@ -132,6 +140,7 @@ export class AdminCreateSponsorDrawerComponent implements OnInit {
       websiteUrl: [''],
       order: [0],
       isActive: [true],
+      expirationDate: [null],
     });
   }
 
@@ -142,6 +151,7 @@ export class AdminCreateSponsorDrawerComponent implements OnInit {
         websiteUrl: this.sponsorToEdit.websiteUrl,
         order: this.sponsorToEdit.order,
         isActive: this.sponsorToEdit.isActive,
+        expirationDate: this.sponsorToEdit.expirationDate ? new Date(this.sponsorToEdit.expirationDate).toISOString().split('T')[0] : null,
       });
       this.previewUrl.set(this.sponsorToEdit.logoUrl);
     }
@@ -180,9 +190,10 @@ export class AdminCreateSponsorDrawerComponent implements OnInit {
       let logoStorageKey = this.sponsorToEdit?.logoStorageKey || '';
 
       if (this.selectedFile()) {
-        // Compress before upload (max 800px for logos, JPEG 88%)
-        const compressed = await compressImage(this.selectedFile()!, 800, 800, 0.88).catch(() => this.selectedFile()!);
-        const fileToUpload = new File([compressed], 'logo.jpg', { type: 'image/jpeg' });
+        // Compress before upload (max 800px for logos, quality 0.88)
+        const compressed = await compressImage(this.selectedFile()!, 800, 800, 0.88)
+          .catch(() => this.selectedFile()!);
+        const fileToUpload = new File([compressed], `logo-${Date.now()}.${compressed.type.split('/')[1]}`, { type: compressed.type });
         const uploadResult = await new Promise<any>((resolve, reject) => {
           this.newsApiService.uploadImage(fileToUpload).subscribe({
             next: (res) => {
@@ -206,6 +217,7 @@ export class AdminCreateSponsorDrawerComponent implements OnInit {
         isActive: formVal.isActive,
         logoUrl,
         logoStorageKey,
+        expirationDate: formVal.expirationDate && formVal.expirationDate !== '' ? new Date(formVal.expirationDate).toISOString() : null,
       };
       
       if (formVal.websiteUrl && formVal.websiteUrl.trim() !== '') {

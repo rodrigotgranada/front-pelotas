@@ -1,13 +1,16 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AppSettingsService, PublicSocialLink } from '../../../core/services/app-settings.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+import { NewsApiService } from '../../../core/services/news-api.service';
+import { ToastMessagesService } from '../../../core/notifications/toast-messages.service';
 
 @Component({
   selector: 'app-public-footer',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   template: `
     <footer class="bg-slate-950 pt-20 pb-10 border-t-4 border-brand-500 relative overflow-hidden">
       <!-- Decorator -->
@@ -107,8 +110,12 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
             </h4>
             <ul class="space-y-4">
               <li><a routerLink="/historia" class="text-slate-400 font-medium hover:text-white hover:translate-x-1 transition-all inline-block">História do Clube</a></li>
-              <li><a routerLink="/elenco" class="text-slate-400 font-medium hover:text-white hover:translate-x-1 transition-all inline-block">Elenco Atual</a></li>
-              <li><a routerLink="/idolos" class="text-slate-400 font-medium hover:text-white hover:translate-x-1 transition-all inline-block">Ídolos Históricos</a></li>
+              @if (isSquadsEnabled()) {
+                <li><a routerLink="/elenco" class="text-slate-400 font-medium hover:text-white hover:translate-x-1 transition-all inline-block">Elenco Atual</a></li>
+              }
+              @if (isIdolsEnabled()) {
+                <li><a routerLink="/idolos" class="text-slate-400 font-medium hover:text-white hover:translate-x-1 transition-all inline-block">Ídolos Históricos</a></li>
+              }
               @if (settings.isMembershipEnabled()) {
                 <li><a routerLink="/seja-socio" class="text-brand-400 font-bold hover:text-brand-300 hover:translate-x-1 transition-all inline-block">Seja Sócio</a></li>
               }
@@ -123,6 +130,37 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
                 </li>
               }
             </ul>
+
+            <!-- Newsletter Section Integration -->
+            @if (isNewsletterEnabled()) {
+              <div class="mt-12 w-full pt-8 border-t border-white/5">
+                <h4 class="text-white font-black uppercase tracking-widest text-xs mb-4">Newsletter</h4>
+                <p class="text-slate-500 text-xs mb-4 leading-relaxed">Fique por dentro das novidades do Lobão direto no seu e-mail.</p>
+                
+                <form (ngSubmit)="subscribeNewsletter()" class="relative group">
+                  <input 
+                    type="email" 
+                    [(ngModel)]="newsletterEmail" 
+                    name="email"
+                    placeholder="Seu melhor e-mail" 
+                    class="w-full bg-slate-900 border border-slate-800 rounded-xl py-3 pl-4 pr-12 text-sm text-white placeholder:text-slate-600 focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all outline-none"
+                    required
+                  />
+                  <button 
+                    type="submit" 
+                    [disabled]="isLoading() || !newsletterEmail()"
+                    class="absolute right-1 top-1 bottom-1 px-3 bg-brand-600 text-white rounded-lg hover:bg-brand-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Inscrever-se"
+                  >
+                    @if (isLoading()) {
+                      <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    } @else {
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    }
+                  </button>
+                </form>
+              </div>
+            }
           </div>
 
         </div>
@@ -148,10 +186,18 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 })
 export class PublicFooterComponent {
   readonly settings = inject(AppSettingsService);
+  private readonly newsApi = inject(NewsApiService);
+  private readonly toast = inject(ToastMessagesService);
   private readonly sanitizer = inject(DomSanitizer);
 
   readonly currentYear = new Date().getFullYear();
   readonly badgeUrl = this.settings.badgeUrl;
+  readonly isSquadsEnabled = this.settings.isSquadsEnabled;
+  readonly isNewsletterEnabled = this.settings.isNewsletterEnabled;
+  readonly isIdolsEnabled = this.settings.isIdolsEnabled;
+
+  readonly newsletterEmail = signal('');
+  readonly isLoading = signal(false);
   
   readonly phone = this.settings.footerPhone;
   readonly email = this.settings.footerEmail;
@@ -194,5 +240,31 @@ export class PublicFooterComponent {
     const rawUrl = this.settings.footerMapsEmbedUrl();
     if (!rawUrl || !rawUrl.includes('<iframe')) return null;
     return this.sanitizer.bypassSecurityTrustHtml(rawUrl);
+  }
+
+  subscribeNewsletter() {
+    const email = this.newsletterEmail().trim();
+    if (!email) return;
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      this.toast.showError('Por favor, informe um e-mail válido.');
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.newsApi.subscribeNewsletter(email).subscribe({
+      next: () => {
+        this.toast.showSuccess('Inscrição confirmada! Boas-vindas à nossa Newsletter.');
+        this.newsletterEmail.set('');
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        const msg = err.error?.message || 'Erro ao realizar inscrição. Tente novamente.';
+        this.toast.showError(msg);
+        this.isLoading.set(false);
+      }
+    });
   }
 }

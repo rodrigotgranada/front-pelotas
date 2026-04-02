@@ -27,4 +27,8 @@ export class LogsApiService {
       withSkipGlobalLoading({ params }),
     );
   }
+
+  clearAll(): Observable<void> {
+    return this.http.delete<void>(`${environment.apiBaseUrl}/logs`);
+  }
 }

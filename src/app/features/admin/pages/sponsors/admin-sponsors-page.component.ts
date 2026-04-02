@@ -37,6 +37,7 @@ import { AdminCreateSponsorDrawerComponent } from './components/admin-create-spo
                 <th class="px-6 py-4">Logo</th>
                 <th class="px-6 py-4">Patrocinador</th>
                 <th class="px-6 py-4">Ordem</th>
+                <th class="px-6 py-4">Vencimento</th>
                 <th class="px-6 py-4">Status</th>
                 <th class="px-6 py-4 text-right">Ações</th>
               </tr>
@@ -61,6 +62,20 @@ import { AdminCreateSponsorDrawerComponent } from './components/admin-create-spo
                     </div>
                   </td>
                   <td class="px-6 py-4">
+                    @if (item.expirationDate) {
+                      <div class="flex flex-col gap-1">
+                        <span [class]="isExpired(item) ? 'text-rose-600 font-bold' : ''">
+                          {{ item.expirationDate | date:'dd/MM/yyyy' }}
+                        </span>
+                        @if (isExpired(item)) {
+                          <span class="inline-flex items-center rounded-md bg-rose-50 px-1.5 py-0.5 text-[10px] font-medium text-rose-700 ring-1 ring-inset ring-rose-600/20 w-fit">Expirado</span>
+                        }
+                      </div>
+                    } @else {
+                      <span class="text-slate-300">Sem prazo</span>
+                    }
+                  </td>
+                  <td class="px-6 py-4">
                     @if (item.isActive) {
                       <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800">
                         Ativo
@@ -80,7 +95,7 @@ import { AdminCreateSponsorDrawerComponent } from './components/admin-create-spo
                 </tr>
               } @empty {
                 <tr>
-                  <td colspan="5" class="p-8 text-center text-slate-500">Nenhum patrocinador cadastrado ainda.</td>
+                  <td colspan="6" class="p-8 text-center text-slate-500">Nenhum patrocinador cadastrado ainda.</td>
                 </tr>
               }
             </tbody>
@@ -106,6 +121,11 @@ export class AdminSponsorsPageComponent implements OnInit {
   
   readonly isDrawerOpen = signal(false);
   readonly selectedSponsor = signal<Sponsor | null>(null);
+
+  isExpired(sponsor: Sponsor): boolean {
+    if (!sponsor.expirationDate) return false;
+    return new Date(sponsor.expirationDate) < new Date();
+  }
 
   ngOnInit() {
     this.loadSponsors();

@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { rolesGuard } from '../../core/guards/roles.guard';
 import { AdminLayoutComponent } from './layout/admin-layout.component';
 
+import { matchesEnabledGuard } from '../../core/guards/matches-enabled.guard';
+
 export default [
   {
     path: '',
@@ -15,22 +17,22 @@ export default [
       {
         path: 'dashboard',
         loadComponent: () => import('./pages/dashboard/dashboard-page.component').then((c) => c.DashboardPageComponent),
-        canActivate: [rolesGuard(['owner', 'socio', 'admin', 'editor'])],
+        canActivate: [rolesGuard(['owner', 'admin', 'editor'])],
       },
       {
         path: 'users',
         loadComponent: () => import('./pages/users/admin-users-page.component').then((c) => c.AdminUsersPageComponent),
-        canActivate: [rolesGuard(['owner', 'socio', 'admin'])],
+        canActivate: [rolesGuard(['owner', 'admin'])],
       },
       {
         path: 'sponsors',
         loadComponent: () => import('./pages/sponsors/admin-sponsors-page.component').then((c) => c.AdminSponsorsPageComponent),
-        canActivate: [rolesGuard(['owner', 'socio', 'admin'])],
+        canActivate: [rolesGuard(['owner', 'admin'])],
       },
       {
         path: 'news',
         loadComponent: () => import('./pages/news/admin-news-page.component').then((c) => c.AdminNewsPageComponent),
-        canActivate: [rolesGuard(['owner', 'socio', 'admin', 'editor'])],
+        canActivate: [rolesGuard(['owner', 'admin', 'editor'])],
       },
       {
         path: 'intencoes',
@@ -44,7 +46,7 @@ export default [
       {
         path: 'news/editor/:id',
         loadComponent: () => import('./pages/news/admin-news-editor.component').then((c) => c.AdminNewsEditorComponent),
-        canActivate: [rolesGuard(['owner', 'socio', 'admin', 'editor'])],
+        canActivate: [rolesGuard(['owner', 'admin', 'editor'])],
       },
       {
         path: 'logs',
@@ -89,17 +91,42 @@ export default [
       {
         path: 'idolos',
         loadComponent: () => import('./pages/idols/admin-idols-page.component').then((c) => c.AdminIdolsPageComponent),
-        canActivate: [rolesGuard(['owner', 'socio', 'admin'])],
+        canActivate: [rolesGuard(['owner', 'admin'])],
       },
       {
         path: 'atletas',
         loadComponent: () => import('./pages/athletes/admin-athletes-page.component').then((c) => c.AdminAthletesPageComponent),
-        canActivate: [rolesGuard(['owner', 'socio', 'admin'])],
+        canActivate: [rolesGuard(['owner', 'admin'])],
       },
       {
         path: 'elencos',
         loadComponent: () => import('./pages/squads/admin-squads-page.component').then((c) => c.AdminSquadsPageComponent),
-        canActivate: [rolesGuard(['owner', 'socio', 'admin'])],
+        canActivate: [rolesGuard(['owner', 'admin'])],
+      },
+      {
+        path: 'jogos',
+        loadComponent: () => import('./pages/matches/admin-matches-page.component').then((c) => c.AdminMatchesPageComponent),
+        canActivate: [matchesEnabledGuard, rolesGuard(['owner', 'admin'])],
+      },
+      {
+        path: 'jogos/editor/:id',
+        loadComponent: () => import('./pages/matches/admin-match-editor.component').then((c) => c.AdminMatchEditorComponent),
+        canActivate: [matchesEnabledGuard, rolesGuard(['owner', 'admin'])],
+      },
+      {
+        path: 'jogos/live/:id',
+        loadComponent: () => import('./pages/matches/admin-match-live.component').then((c) => c.AdminMatchLiveComponent),
+        canActivate: [matchesEnabledGuard, rolesGuard(['owner', 'admin'])],
+      },
+      {
+        path: 'competicoes',
+        loadComponent: () => import('./pages/competitions/admin-competitions-page.component').then((c) => c.AdminCompetitionsPageComponent),
+        canActivate: [matchesEnabledGuard, rolesGuard(['owner', 'admin'])],
+      },
+      {
+        path: 'times',
+        loadComponent: () => import('./pages/teams/admin-teams-page.component').then((c) => c.AdminTeamsPageComponent),
+        canActivate: [matchesEnabledGuard, rolesGuard(['owner', 'admin'])],
       },
     ],
   },

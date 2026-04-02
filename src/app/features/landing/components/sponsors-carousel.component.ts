@@ -29,13 +29,14 @@ import { SponsorsService } from '../../../core/services/sponsors.service';
             @for (sponsor of sponsors(); track sponsor._id; let i = $index) {
               <div 
                 class="h-16 w-32 mx-4 flex shrink-0 items-center justify-center transition-all duration-500 ease-out"
+                [title]="sponsor.name"
                 (click)="$event.stopPropagation(); onClickSponsor(sponsor, i)"
                 [ngClass]="{
                   'grayscale-0 scale-125 opacity-100 drop-shadow-md z-20': i === currentIndex(),
                   'grayscale opacity-30 scale-90 z-0 hover:opacity-60': i !== currentIndex()
                 }"
               >
-                <img [src]="sponsor.logoUrl" appFallbackImg="sponsor" class="max-h-full max-w-full object-contain pointer-events-none" />
+                <img [src]="sponsor.logoUrl" [alt]="sponsor.name" appFallbackImg="sponsor" class="max-h-full max-w-full object-contain" />
               </div>
             }
           </div>

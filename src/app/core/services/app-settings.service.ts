@@ -9,6 +9,10 @@ export interface PublicSettings {
   defaultNewsImageUrl: string | null;
   isMembershipEnabled: boolean;
   isSponsorsEnabled: boolean;
+  isSquadsEnabled: boolean;
+  isNewsletterEnabled: boolean;
+  isIdolsEnabled: boolean;
+  isMatchesEnabled: boolean;
 
   // Footer
   footerPhone?: string;
@@ -111,6 +115,10 @@ export class AppSettingsService {
   readonly defaultNewsImageUrl = signal<string | null>(null);
   readonly isMembershipEnabled = signal<boolean>(true);
   readonly isSponsorsEnabled = signal<boolean>(true);
+  readonly isSquadsEnabled = signal<boolean>(true);
+  readonly isNewsletterEnabled = signal<boolean>(true);
+  readonly isIdolsEnabled = signal<boolean>(true);
+  readonly isMatchesEnabled = signal<boolean>(true);
 
   // Footer signals
   readonly footerPhone = signal<string>('');
@@ -128,11 +136,15 @@ export class AppSettingsService {
       const settings = await firstValueFrom(
         this.http.get<PublicSettings>(`${this.apiUrl}/public`),
       );
-      this.badgeUrl.set(settings.badgeUrl ?? null);
-      this.themePreset.set(settings.themePreset ?? 'default');
-      this.defaultNewsImageUrl.set(settings.defaultNewsImageUrl ?? null);
+      this.badgeUrl.set(settings.badgeUrl || null);
+      this.themePreset.set(settings.themePreset || 'default');
+      this.defaultNewsImageUrl.set(settings.defaultNewsImageUrl || null);
       this.isMembershipEnabled.set(settings.isMembershipEnabled ?? true);
       this.isSponsorsEnabled.set(settings.isSponsorsEnabled ?? true);
+      this.isSquadsEnabled.set(settings.isSquadsEnabled ?? true);
+      this.isNewsletterEnabled.set(settings.isNewsletterEnabled ?? true);
+      this.isIdolsEnabled.set(settings.isIdolsEnabled ?? true);
+      this.isMatchesEnabled.set(settings.isMatchesEnabled ?? true);
       
       this.footerPhone.set(settings.footerPhone ?? '');
       this.footerIsWhatsapp.set(settings.footerIsWhatsapp ?? false);

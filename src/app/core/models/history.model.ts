@@ -2,6 +2,7 @@ export interface History {
   id: string;
   _id?: string;
   title: string;
+  year?: string;
   slug: string;
   content: any;
   format: 'HTML' | 'BLOCKS';
@@ -14,6 +15,7 @@ export interface History {
 
 export interface CreateHistoryPayload {
   title: string;
+  year?: string;
   slug?: string;
   content: any;
   format?: 'HTML' | 'BLOCKS';

@@ -56,6 +56,11 @@ import { firstValueFrom } from 'rxjs';
                 <input type="text" formControlName="title" class="w-full rounded-2xl border-slate-200 text-slate-900 font-black focus:border-indigo-500 focus:ring-0 py-3 px-5 transition-all border-2" placeholder="Ex: A Fundação (1908)">
               </div>
               
+              <div>
+                <label class="mb-1.5 block text-xs font-black text-slate-400 uppercase tracking-widest px-1">Ano (Display)</label>
+                <input type="text" formControlName="year" class="w-24 rounded-2xl border-slate-200 text-slate-900 font-black focus:border-indigo-500 focus:ring-0 py-3 px-5 transition-all border-2" placeholder="1908">
+              </div>
+              
               <div class="flex items-center gap-6 pt-2">
                  <div class="flex items-center gap-3">
                     <label class="text-xs font-black text-slate-900 uppercase tracking-tighter">Visível no Portal</label>
@@ -133,6 +138,7 @@ export class AdminHistoryEditorComponent implements OnInit, OnDestroy {
 
   readonly form = this.fb.group({
     title: ['', [Validators.required]],
+    year: [''],
     slug: [''],
     coverImageUrl: [null as string | null],
     isActive: [true],
@@ -194,6 +200,7 @@ export class AdminHistoryEditorComponent implements OnInit, OnDestroy {
       next: (data: History) => {
         this.form.patchValue({
           title: data.title,
+          year: data.year || '',
           slug: data.slug,
           coverImageUrl: data.coverImageUrl,
           isActive: data.isActive,
@@ -260,7 +267,7 @@ export class AdminHistoryEditorComponent implements OnInit, OnDestroy {
     if (this.pendingCoverBlob) {
       try {
         const compressed = await compressImage(this.pendingCoverBlob, 1280, 720, 0.85);
-        const file = new File([compressed], 'cover.jpg', { type: 'image/jpeg' });
+        const file = new File([compressed], `cover-${Date.now()}.${compressed.type.split('/')[1]}`, { type: compressed.type });
         const res: any = await firstValueFrom(this.newsApi.uploadImage(file));
         if (res.success && res.file?.url) {
           this.form.patchValue({ coverImageUrl: res.file.url });

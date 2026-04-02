@@ -417,7 +417,7 @@ export class AdminAthleteDrawerComponent implements OnChanges {
       if (this.pendingPhotoBlob) {
         try {
           const compressed = await compressImage(this.pendingPhotoBlob, 600, 600, 0.8);
-          const file = new File([compressed], 'athlete-photo.jpg', { type: 'image/jpeg' });
+          const file = new File([compressed], `athlete-${Date.now()}.${compressed.type.split('/')[1]}`, { type: compressed.type });
           const res = await firstValueFrom(this.athletesApi.uploadImage(file));
           if (res.success && res.file?.url) {
             data.photoUrl = res.file.url;

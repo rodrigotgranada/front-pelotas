@@ -322,6 +322,162 @@ import { compressImage } from '../../../../shared/utils/image-compress.util';
                 Salvando alteração...
               </div>
             }
+
+            <!-- Squads Toggle -->
+            <div class="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50 mt-6">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M7 11V7l5-5 5 5v4"/><path d="M11 11.5l1.5 1.5 3-3"/></svg>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">Módulo de Elencos</h3>
+                  <p class="text-xs text-slate-500 mt-0.5">Se desativado, remove o link 'Elenco' do menu e bloqueia o acesso à página de jogadores.</p>
+                </div>
+              </div>
+
+              <!-- Toggle -->
+              <button
+                type="button"
+                (click)="toggleSquads()"
+                [disabled]="squadsSaving()"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2"
+                [class.bg-brand-600]="isSquadsEnabled()"
+                [class.bg-slate-200]="!isSquadsEnabled()"
+              >
+                <span
+                  class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                  [class.translate-x-5]="isSquadsEnabled()"
+                  [class.translate-x-0]="!isSquadsEnabled()"
+                ></span>
+              </button>
+            </div>
+
+            @if (squadsSaving()) {
+              <div class="flex items-center gap-2 text-xs text-slate-500 mt-2">
+                <svg class="animate-spin h-3.5 w-3.5 text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Salvando alteração...
+              </div>
+            }
+
+            <!-- Newsletter Toggle -->
+            <div class="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50 mt-6">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">Módulo de Newsletter</h3>
+                  <p class="text-xs text-slate-500 mt-0.5">Se desativado, esconde todos os widgets de captura de e-mail e desativa o rodapé especial.</p>
+                </div>
+              </div>
+
+              <!-- Toggle -->
+              <button
+                type="button"
+                (click)="toggleNewsletterVisibility()"
+                [disabled]="newsletterSaving()"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2"
+                [class.bg-brand-600]="isNewsletterEnabled()"
+                [class.bg-slate-200]="!isNewsletterEnabled()"
+              >
+                <span
+                  class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                  [class.translate-x-5]="isNewsletterEnabled()"
+                  [class.translate-x-0]="!isNewsletterEnabled()"
+                ></span>
+              </button>
+            </div>
+
+            @if (newsletterSaving()) {
+              <div class="flex items-center gap-2 text-xs text-slate-500 mt-2">
+                <svg class="animate-spin h-3.5 w-3.5 text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Salvando alteração...
+              </div>
+            }
+            
+            <!-- Idols Toggle -->
+            <div class="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50 mt-6">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">Módulo de Ídolos</h3>
+                  <p class="text-xs text-slate-500 mt-0.5">Se desativado, remove o link 'Ídolos' do menu e bloqueia o acesso à galeria de ídolos.</p>
+                </div>
+              </div>
+
+              <!-- Toggle -->
+              <button
+                type="button"
+                (click)="toggleIdols()"
+                [disabled]="idolsSaving()"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2"
+                [class.bg-brand-600]="isIdolsEnabled()"
+                [class.bg-slate-200]="!isIdolsEnabled()"
+              >
+                <span
+                  class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                  [class.translate-x-5]="isIdolsEnabled()"
+                  [class.translate-x-0]="!isIdolsEnabled()"
+                ></span>
+              </button>
+            </div>
+
+            @if (idolsSaving()) {
+              <div class="flex items-center gap-2 text-xs text-slate-500 mt-2">
+                <svg class="animate-spin h-3.5 w-3.5 text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Salvando alteração...
+              </div>
+            }
+
+            <!-- Matches Toggle -->
+            <div class="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50 mt-6">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-cyan-100 text-cyan-600 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 4 4 8-8"/></svg>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">Módulo de Jogos</h3>
+                  <p class="text-xs text-slate-500 mt-0.5">Se desativado, remove calendários e resultados do site e bloqueia as rotas de gestão.</p>
+                </div>
+              </div>
+
+              <!-- Toggle -->
+              <button
+                type="button"
+                (click)="toggleMatches()"
+                [disabled]="matchesSaving()"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2"
+                [class.bg-brand-600]="isMatchesEnabled()"
+                [class.bg-slate-200]="!isMatchesEnabled()"
+              >
+                <span
+                  class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                  [class.translate-x-5]="isMatchesEnabled()"
+                  [class.translate-x-0]="!isMatchesEnabled()"
+                ></span>
+              </button>
+            </div>
+
+            @if (matchesSaving()) {
+              <div class="flex items-center gap-2 text-xs text-slate-500 mt-2">
+                <svg class="animate-spin h-3.5 w-3.5 text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Salvando alteração...
+              </div>
+            }
           </div>
         </section>
       }
@@ -496,10 +652,18 @@ export class AdminSettingsPageComponent implements OnInit {
   readonly defaultNewsSaving = signal(false);
   readonly membershipSaving = signal(false);
   readonly sponsorsSaving = signal(false);
+  readonly squadsSaving = signal(false);
+  readonly newsletterSaving = signal(false);
   readonly themeSaving = signal(false);
   readonly footerSaving = signal(false);
+  readonly idolsSaving = signal(false);
+  readonly matchesSaving = signal(false);
   readonly isMembershipEnabled = this.appSettings.isMembershipEnabled;
   readonly isSponsorsEnabled = this.appSettings.isSponsorsEnabled;
+  readonly isSquadsEnabled = this.appSettings.isSquadsEnabled;
+  readonly isNewsletterEnabled = this.appSettings.isNewsletterEnabled;
+  readonly isIdolsEnabled = this.appSettings.isIdolsEnabled;
+  readonly isMatchesEnabled = this.appSettings.isMatchesEnabled;
 
   readonly footerForm: FormGroup = this.fb.group({
     footerPhone: [''],
@@ -716,9 +880,22 @@ export class AdminSettingsPageComponent implements OnInit {
       this.appSettings.badgeUrl.set(null);
       this.toast.showSuccess('Distintivo removido.');
     } catch {
-      this.toast.showError('Erro ao remover distintivo.');
     } finally {
       this.badgeSaving.set(false);
+    }
+  }
+
+  async toggleIdols() {
+    this.idolsSaving.set(true);
+    try {
+      const newVal = !this.isIdolsEnabled();
+      await this.appSettings.saveSetting('isIdolsEnabled', String(newVal));
+      this.isIdolsEnabled.set(newVal);
+      this.toast.showSuccess(`Módulo de Ídolos ${newVal ? 'ativado' : 'desativado'}`);
+    } catch {
+      this.toast.showError('Erro ao alterar o status do módulo.');
+    } finally {
+      this.idolsSaving.set(false);
     }
   }
 
@@ -790,6 +967,48 @@ export class AdminSettingsPageComponent implements OnInit {
       this.toast.showError('Erro ao alterar status do módulo.');
     } finally {
       this.sponsorsSaving.set(false);
+    }
+  }
+
+  async toggleSquads() {
+    this.squadsSaving.set(true);
+    const newValue = !this.isSquadsEnabled();
+    try {
+      await this.appSettings.saveSetting('isSquadsEnabled', String(newValue));
+      this.appSettings.isSquadsEnabled.set(newValue);
+      this.toast.showSuccess(newValue ? 'Módulo de Elencos ativado!' : 'Módulo de Elencos desativado!');
+    } catch {
+      this.toast.showError('Erro ao alterar status do módulo.');
+    } finally {
+      this.squadsSaving.set(false);
+    }
+  }
+
+  async toggleNewsletterVisibility() {
+    this.newsletterSaving.set(true);
+    const newValue = !this.isNewsletterEnabled();
+    try {
+      await this.appSettings.saveSetting('isNewsletterEnabled', String(newValue));
+      this.appSettings.isNewsletterEnabled.set(newValue);
+      this.toast.showSuccess(newValue ? 'Módulo de Newsletter ativado!' : 'Módulo de Newsletter desativado!');
+    } catch {
+      this.toast.showError('Erro ao alterar status do módulo.');
+    } finally {
+      this.newsletterSaving.set(false);
+    }
+  }
+
+  async toggleMatches() {
+    this.matchesSaving.set(true);
+    const newValue = !this.isMatchesEnabled();
+    try {
+      await this.appSettings.saveSetting('isMatchesEnabled', String(newValue));
+      this.appSettings.isMatchesEnabled.set(newValue);
+      this.toast.showSuccess(newValue ? 'Módulo de Jogos ativado!' : 'Módulo de Jogos desativado!');
+    } catch {
+      this.toast.showError('Erro ao alterar status do módulo.');
+    } finally {
+      this.matchesSaving.set(false);
     }
   }
 }
