@@ -220,6 +220,7 @@ export class CalendarPageComponent implements OnInit {
   }
 
   getCompetitionName(match: Match): string {
+    if (!match.competitionId) return 'Amistoso';
     if (typeof match.competitionId === 'string') return '';
     return (match.competitionId as Competition).name;
   }

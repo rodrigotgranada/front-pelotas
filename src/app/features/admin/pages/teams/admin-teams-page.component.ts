@@ -8,6 +8,7 @@ import { ToastMessagesService } from '../../../../core/notifications/toast-messa
 import { finalize } from 'rxjs';
 import { FallbackImgDirective } from '../../../../shared/directives/fallback-img.directive';
 import { AdminTeamDrawerComponent } from './components/admin-team-drawer.component';
+import { AdminConfirmModalComponent } from '../../../../shared/ui/admin-confirm-modal/admin-confirm-modal.component';
 
 @Component({
   selector: 'app-admin-teams-page',
@@ -18,7 +19,8 @@ import { AdminTeamDrawerComponent } from './components/admin-team-drawer.compone
     ReactiveFormsModule, 
     SpinnerComponent, 
     FallbackImgDirective, 
-    AdminTeamDrawerComponent
+    AdminTeamDrawerComponent,
+    AdminConfirmModalComponent
   ],
   template: `
     <div class="flex flex-col gap-6">
@@ -62,7 +64,7 @@ import { AdminTeamDrawerComponent } from './components/admin-team-drawer.compone
                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                 </button>
                 @if (!team.isPelotas) {
-                  <button (click)="deleteTeam(team.id)" class="p-1.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-rose-50 hover:text-rose-600 transition-all">
+                  <button (click)="openDeleteConfirm(team)" class="p-1.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-rose-50 hover:text-rose-600 transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                   </button>
                 }
@@ -70,13 +72,25 @@ import { AdminTeamDrawerComponent } from './components/admin-team-drawer.compone
           </div>
         }
       </div>
+      
+      @if (showModal()) {
+        <app-admin-team-drawer
+          [isOpen]="true"
+          [team]="selectedTeam()"
+          (closed)="closeModal($event)"
+        />
+      }
 
-      <!-- Novo Drawer Reutilizável -->
-      <app-admin-team-drawer
-        [isOpen]="showModal()"
-        [team]="selectedTeam()"
-        (closed)="closeModal($event)"
-      />
+      @if (showConfirm()) {
+        <app-admin-confirm-modal
+          [title]="'Remover ' + teamToDelete()?.name + '?'"
+          message="Este time será excluído da biblioteca permanentemente."
+          confirmText="Sim, Excluir"
+          type="danger"
+          (confirmed)="confirmDelete()"
+          (cancelled)="showConfirm.set(false)"
+        />
+      }
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -89,32 +103,54 @@ export class AdminTeamsPageComponent implements OnInit {
   readonly loading = signal(false);
   readonly showModal = signal(false);
   readonly selectedTeam = signal<Team | null>(null);
+  readonly showConfirm = signal(false);
+  readonly teamToDelete = signal<Team | null>(null);
 
   ngOnInit() {
+    (window as any).LOBO_DEBUG = true;
+    if ((window as any).LOBO_DEBUG) {
+      console.log('🐺 LOBO DEBUG: AdminTeamsPageComponent inicializado');
+    }
     this.loadTeams();
   }
 
   loadTeams() {
+    if ((window as any).LOBO_DEBUG) {
+      console.log('🐺 LOBO DEBUG: Chamando loadTeams()...');
+    }
     this.loading.set(true);
     this.matchesApi.listTeams()
-      .pipe(finalize(() => this.loading.set(false)))
+      .pipe(finalize(() => {
+        this.loading.set(false);
+        if ((window as any).LOBO_DEBUG) {
+          console.log('🐺 LOBO DEBUG: loadTeams() finalizado');
+        }
+      }))
       .subscribe({
-        next: (data) => this.teams.set(data),
+        next: (data) => {
+          if ((window as any).LOBO_DEBUG) {
+            console.log(`🐺 LOBO DEBUG: Recebidos ${data.length} times`);
+          }
+          this.teams.set(data);
+        },
         error: (err) => this.toast.showApiError(err, 'Erro ao carregar biblioteca')
       });
   }
 
   openAddModal() {
+    if ((window as any).LOBO_DEBUG) console.log('🐺 LOBO DEBUG: Abrindo modal Adicionar');
     this.selectedTeam.set(null);
     this.showModal.set(true);
   }
 
   openEditModal(team: Team) {
+    if ((window as any).LOBO_DEBUG) console.log('🐺 LOBO DEBUG: Abrindo modal Editar', team.name);
     this.selectedTeam.set(team);
     this.showModal.set(true);
   }
 
   closeModal(team: Team | null) {
+    if ((window as any).LOBO_DEBUG) console.log('🐺 LOBO DEBUG: Fechando modal', team?.name || 'Cancelado');
     this.showModal.set(false);
     this.selectedTeam.set(null);
     if (team) {
@@ -122,11 +158,19 @@ export class AdminTeamsPageComponent implements OnInit {
     }
   }
 
-  deleteTeam(id: string) {
-    if (!confirm('Remover este time da biblioteca?')) return;
-    this.matchesApi.deleteTeam(id).subscribe({
+  openDeleteConfirm(team: Team) {
+    this.teamToDelete.set(team);
+    this.showConfirm.set(true);
+  }
+
+  confirmDelete() {
+    const team = this.teamToDelete();
+    if (!team) return;
+
+    this.showConfirm.set(false);
+    this.matchesApi.deleteTeam(team.id).subscribe({
       next: () => {
-        this.toast.showSuccess('Time removido');
+        this.toast.showSuccess(`Time ${team.name} removido!`);
         this.loadTeams();
       },
       error: (err) => this.toast.showApiError(err, 'Erro ao remover')

@@ -4,13 +4,15 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angu
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatchesApiService } from '../../../../core/services/matches-api.service';
 import { ToastMessagesService } from '../../../../core/notifications/toast-messages.service';
+import { AppSettingsService } from '../../../../core/services/app-settings.service';
 import { Match, MatchGoal, Team, Competition } from '../../../../core/models/match.model';
 import { finalize } from 'rxjs';
+import { AdminConfirmModalComponent } from '../../../../shared/ui/admin-confirm-modal/admin-confirm-modal.component';
 
 @Component({
   selector: 'app-admin-match-live',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, AdminConfirmModalComponent],
   template: `
     <div class="min-h-screen bg-slate-900 text-white p-4 md:p-8">
       <div class="max-w-4xl mx-auto flex flex-col gap-8">
@@ -48,7 +50,7 @@ import { finalize } from 'rxjs';
               <!-- Pelotas -->
               <div class="flex flex-col items-center gap-6 flex-1 order-2 md:order-1">
                  <div class="w-24 h-24 bg-white/5 rounded-3xl p-4 border border-white/10 flex items-center justify-center">
-                    <img src="https://s.sde.globo.com/media/organizations/2019/01/03/Pelotas-01.svg" class="w-full h-full object-contain">
+                    <img [src]="appSettings.badgeUrl() || '/assets/placeholder-team.png'" appFallbackImg="team" class="w-full h-full object-contain">
                  </div>
                  <span class="text-lg font-black uppercase tracking-widest">PELOTAS</span>
                  <button (click)="openGoalModal('PELOTAS')" class="w-full py-4 bg-white/5 hover:bg-indigo-600 text-white border border-white/10 rounded-2xl text-xs font-black uppercase tracking-[0.2em] transition-all group">
@@ -108,18 +110,15 @@ import { finalize } from 'rxjs';
               }
            </div>
         </section>
-      </div>
-
-      <!-- Modal de Gol Rápido -->
       @if (showGoalModal()) {
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-           <div class="bg-slate-800 border border-white/10 p-8 rounded-[32px] w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200">
+           <div class="bg-slate-800 border border-white/10 p-8 rounded-[32px] w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200 text-white">
               <h2 class="text-xl font-black uppercase tracking-tighter mb-6 flex items-center gap-3">
                  ⚽ Registrar Gol para o {{ selectedTeam() === 'PELOTAS' ? 'Pelotas' : 'Adversário' }}
               </h2>
               
               <form [formGroup]="goalForm" (ngSubmit)="saveGoal()" class="space-y-6">
-                 <div class="grid grid-cols-3 gap-4 text-white">
+                 <div class="grid grid-cols-3 gap-4">
                     <div class="space-y-2">
                        <label class="text-[10px] font-black text-slate-500 uppercase">Minuto</label>
                        <input type="number" formControlName="minute" class="w-full bg-slate-900 border-white/10 rounded-xl p-3 font-black text-center text-xl focus:ring-indigo-500" placeholder="00" autofocus>
@@ -130,13 +129,35 @@ import { finalize } from 'rxjs';
                     </div>
                  </div>
 
-                 <div class="flex gap-4 pt-4 text-white">
+                 <div class="flex gap-4 pt-4">
                     <button type="button" (click)="showGoalModal.set(false)" class="flex-1 py-4 bg-white/5 hover:bg-white/10 rounded-2xl text-xs font-black uppercase tracking-widest transition-all">Cancelar</button>
                     <button type="submit" [disabled]="goalForm.invalid || loading()" class="flex-1 py-4 bg-indigo-600 hover:bg-indigo-700 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-indigo-500/20">Registrar Gol</button>
                  </div>
               </form>
            </div>
         </div>
+      }
+
+      @if (showFinishConfirm()) {
+        <app-admin-confirm-modal
+          title="Finalizar Partida?"
+          message="Isso marcará o jogo como encerrado e redirecionará para a criação da notícia de pós-jogo."
+          confirmText="Confirmar Encerramento"
+          type="success"
+          (confirmed)="onFinishConfirmed()"
+          (cancelled)="showFinishConfirm.set(false)"
+        />
+      }
+
+      @if (showRemoveGoalConfirm()) {
+        <app-admin-confirm-modal
+          title="Remover Gol?"
+          message="Tem certeza que deseja remover este registro de gol do placar?"
+          confirmText="Sim, Remover"
+          type="danger"
+          (confirmed)="onRemoveGoalConfirmed()"
+          (cancelled)="showRemoveGoalConfirm.set(false)"
+        />
       }
     </div>
   `,
@@ -151,11 +172,15 @@ export class AdminMatchLiveComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly matchesApi = inject(MatchesApiService);
   private readonly toast = inject(ToastMessagesService);
+  readonly appSettings = inject(AppSettingsService);
 
   readonly match = signal<Match | null>(null);
   readonly loading = signal(false);
   readonly showGoalModal = signal(false);
   readonly selectedTeam = signal<'PELOTAS' | 'OPPONENT'>('PELOTAS');
+  readonly showFinishConfirm = signal(false);
+  readonly showRemoveGoalConfirm = signal(false);
+  private goalToRemoveIndex: number | null = null;
 
   readonly goalForm = this.fb.group({
     minute: [null as number | null, [Validators.required, Validators.min(0), Validators.max(130)]],
@@ -220,10 +245,17 @@ export class AdminMatchLiveComponent implements OnInit {
   }
 
   removeGoal(index: number) {
-    if (!confirm('Remover este gol?') || !this.match()) return;
+    this.goalToRemoveIndex = index;
+    this.showRemoveGoalConfirm.set(true);
+  }
+
+  onRemoveGoalConfirmed() {
+    if (this.goalToRemoveIndex === null || !this.match()) return;
     const goals = [...(this.match()!.goals || [])];
-    goals.splice(index, 1);
+    goals.splice(this.goalToRemoveIndex, 1);
     this.updateMatchData({ goals });
+    this.showRemoveGoalConfirm.set(false);
+    this.goalToRemoveIndex = null;
   }
 
   changeStatus(status: string) {
@@ -272,8 +304,11 @@ export class AdminMatchLiveComponent implements OnInit {
   }
 
   finishMatch() {
-    if (!confirm('Deseja finalizar o jogo e criar o relato?')) return;
-    
+    this.showFinishConfirm.set(true);
+  }
+
+  onFinishConfirmed() {
+    this.showFinishConfirm.set(false);
     this.loading.set(true);
     this.matchesApi.finishMatch(this.match()!.id).subscribe({
       next: () => {

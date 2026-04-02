@@ -28,7 +28,7 @@ export type MatchStatus = 'SCHEDULED' | 'LIVE' | 'FINISHED' | 'POSTPONED';
 export interface Match {
   id: string;
   _id?: string;
-  competitionId: string | Competition;
+  competitionId?: string | Competition;
   opponentId: string | Team;
   date: string;
   stadium: string;
@@ -45,7 +45,7 @@ export interface Match {
 }
 
 export interface CreateMatchPayload {
-  competitionId: string;
+  competitionId?: string;
   opponentId: string;
   date: string;
   stadium: string;

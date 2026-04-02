@@ -8,11 +8,19 @@ import { ToastMessagesService } from '../../../../core/notifications/toast-messa
 import { finalize } from 'rxjs';
 import { FallbackImgDirective } from '../../../../shared/directives/fallback-img.directive';
 import { Competition, Team } from '../../../../core/models/match.model';
+import { AdminConfirmModalComponent } from '../../../../shared/ui/admin-confirm-modal/admin-confirm-modal.component';
 
 @Component({
   selector: 'app-admin-matches-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, SpinnerComponent, DatePipe, FallbackImgDirective],
+  imports: [
+    CommonModule, 
+    RouterLink, 
+    SpinnerComponent, 
+    DatePipe, 
+    FallbackImgDirective,
+    AdminConfirmModalComponent
+  ],
   template: `
     <div class="flex flex-col gap-6">
       <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-2">
@@ -97,19 +105,26 @@ import { Competition, Team } from '../../../../core/models/match.model';
                   <a [routerLink]="['editor', match.id]" class="p-3 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-all active:scale-90 shadow-sm border border-indigo-100" title="Editar Detalhes">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                   </a>
-                  <button (click)="deleteMatch(match.id)" class="p-3 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-100 transition-all active:scale-90 shadow-sm border border-rose-100">
+                  <button (click)="openDeleteConfirm(match)" class="p-3 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-100 transition-all active:scale-90 shadow-sm border border-rose-100">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
                   </button>
                 </div>
               </div>
             }
           </div>
-        } @else if (!loading()) {
-          <div class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border-2 border-dashed border-slate-100 text-slate-300">
-             <p class="font-bold uppercase tracking-widest text-xs">Nenhum jogo cadastrado</p>
-          </div>
         }
       </div>
+
+      @if (showConfirm()) {
+        <app-admin-confirm-modal
+          [title]="'Excluir Jogo?'"
+          [message]="'Tem certeza que deseja remover esta partida do calendário?'"
+          confirmText="Sim, Excluir"
+          type="danger"
+          (confirmed)="confirmDelete()"
+          (cancelled)="showConfirm.set(false)"
+        />
+      }
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -120,6 +135,8 @@ export class AdminMatchesPageComponent implements OnInit {
   
   readonly matches = signal<Match[]>([]);
   readonly loading = signal(false);
+  readonly showConfirm = signal(false);
+  readonly matchToDelete = signal<Match | null>(null);
 
   ngOnInit() {
     this.loadMatches();
@@ -135,10 +152,17 @@ export class AdminMatchesPageComponent implements OnInit {
       });
   }
 
-  deleteMatch(id: string) {
-    if (!confirm('Tem certeza que deseja excluir este jogo?')) return;
-    
-    this.matchesApi.deleteMatch(id).subscribe({
+  openDeleteConfirm(match: Match) {
+    this.matchToDelete.set(match);
+    this.showConfirm.set(true);
+  }
+
+  confirmDelete() {
+    const match = this.matchToDelete();
+    if (!match) return;
+
+    this.showConfirm.set(false);
+    this.matchesApi.deleteMatch(match.id).subscribe({
       next: () => {
         this.toast.showSuccess('Jogo excluído com sucesso');
         this.loadMatches();
@@ -157,7 +181,8 @@ export class AdminMatchesPageComponent implements OnInit {
     return opponent.logoUrl || null;
   }
 
-  getCompetitionName(comp: string | Competition): string {
+  getCompetitionName(comp: string | Competition | null | undefined): string {
+    if (!comp) return 'Amistoso';
     if (typeof comp === 'string') return 'Competição';
     return comp.name;
   }

@@ -7,6 +7,8 @@ export interface PublicSettings {
   badgeUrl: string | null;
   themePreset: string;
   defaultNewsImageUrl: string | null;
+  defaultTeamLogoUrl: string | null;
+  defaultCompetitionLogoUrl: string | null;
   isMembershipEnabled: boolean;
   isSponsorsEnabled: boolean;
   isSquadsEnabled: boolean;
@@ -113,6 +115,8 @@ export class AppSettingsService {
   readonly badgeUrl = signal<string | null>(null);
   readonly themePreset = signal<string>('default');
   readonly defaultNewsImageUrl = signal<string | null>(null);
+  readonly defaultTeamLogoUrl = signal<string | null>(null);
+  readonly defaultCompetitionLogoUrl = signal<string | null>(null);
   readonly isMembershipEnabled = signal<boolean>(true);
   readonly isSponsorsEnabled = signal<boolean>(true);
   readonly isSquadsEnabled = signal<boolean>(true);
@@ -139,6 +143,8 @@ export class AppSettingsService {
       this.badgeUrl.set(settings.badgeUrl || null);
       this.themePreset.set(settings.themePreset || 'default');
       this.defaultNewsImageUrl.set(settings.defaultNewsImageUrl || null);
+      this.defaultTeamLogoUrl.set(settings.defaultTeamLogoUrl || null);
+      this.defaultCompetitionLogoUrl.set(settings.defaultCompetitionLogoUrl || null);
       this.isMembershipEnabled.set(settings.isMembershipEnabled ?? true);
       this.isSponsorsEnabled.set(settings.isSponsorsEnabled ?? true);
       this.isSquadsEnabled.set(settings.isSquadsEnabled ?? true);

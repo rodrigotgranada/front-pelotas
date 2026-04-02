@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize, firstValueFrom } from 'rxjs';
-import { Team } from '../../../../../core/models/match.model';
+import { Competition } from '../../../../../core/models/match.model';
 import { MatchesApiService } from '../../../../../core/services/matches-api.service';
 import { ToastMessagesService } from '../../../../../core/notifications/toast-messages.service';
 import { SpinnerComponent } from '../../../../../shared/ui/spinner/spinner.component';
@@ -11,12 +11,12 @@ import { compressImage } from '../../../../../shared/utils/image-compress.util';
 import { AppSettingsService } from '../../../../../core/services/app-settings.service';
 
 @Component({
-  selector: 'app-admin-team-drawer',
+  selector: 'app-admin-competition-drawer',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, SpinnerComponent, FallbackImgDirective],
   template: `
     <div 
-      class="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300"
+      class="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in"
       [class.opacity-0.pointer-events-none]="!isOpen"
       (click)="close()"
     >
@@ -30,9 +30,9 @@ import { AppSettingsService } from '../../../../../core/services/app-settings.se
           <header class="flex items-center justify-between border-b border-slate-100 p-6">
             <div>
               <h2 class="text-xl font-black text-slate-900 leading-tight">
-                {{ teamId ? 'Editar Time' : 'Novo Time' }}
+                {{ competitionId ? 'Editar Campeonato' : 'Novo Campeonato' }}
               </h2>
-              <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Biblioteca de Clubes</p>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Gestão de Competições</p>
             </div>
             <button (click)="close()" class="rounded-xl p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-900 transition-all">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -42,18 +42,18 @@ import { AppSettingsService } from '../../../../../core/services/app-settings.se
           <!-- Content -->
           <div class="flex-1 overflow-y-auto p-6 md:p-8">
             <form [formGroup]="form" class="space-y-8">
-              <!-- Upload de Escudo -->
+              <!-- Upload de Capa/Logo -->
               <div class="flex flex-col items-center gap-4 py-4">
-                <div class="group relative h-32 w-32 shrink-0 overflow-hidden rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50 transition-all hover:border-indigo-400">
+                <div class="group relative h-40 w-full shrink-0 overflow-hidden rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50 transition-all hover:border-indigo-400">
                   <img 
-                    [src]="previewUrl() || appSettings.defaultTeamLogoUrl()" 
-                    appFallbackImg="team"
+                    [src]="previewUrl() || appSettings.defaultCompetitionLogoUrl()" 
+                    appFallbackImg="competition"
                     class="h-full w-full object-contain p-4 group-hover:scale-105 transition-transform"
                   />
                   
                   <label class="absolute inset-0 flex cursor-pointer flex-col items-center justify-center bg-slate-900/60 opacity-0 transition-opacity group-hover:opacity-100">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-                    <span class="mt-2 text-[10px] font-black uppercase tracking-widest text-white">Alterar Escudo</span>
+                    <span class="mt-2 text-[10px] font-black uppercase tracking-widest text-white">Alterar Capa</span>
                     <input type="file" class="hidden" accept="image/*" (change)="onFileSelected($event)">
                   </label>
 
@@ -64,20 +64,30 @@ import { AppSettingsService } from '../../../../../core/services/app-settings.se
                   }
                 </div>
                 <div class="text-center">
-                  <p class="text-xs font-black text-slate-900 uppercase tracking-tight">Distintivo do Clube</p>
-                  <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">PNG ou SVG recomendado</p>
+                  <p class="text-xs font-black text-slate-900 uppercase tracking-tight">Imagem da Competição</p>
+                  <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Recomendado: Logo ou Capa oficial</p>
                 </div>
               </div>
 
               <div class="space-y-5">
                 <div class="space-y-1.5">
-                  <label class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Nome Completo</label>
-                  <input type="text" formControlName="name" class="w-full rounded-2xl border-slate-200 bg-slate-50 focus:border-indigo-500 focus:ring-indigo-500 font-bold transition-all" placeholder="Ex: Grêmio Esportivo Brasil">
+                  <label class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Nome do Campeonato</label>
+                  <input type="text" formControlName="name" class="w-full rounded-2xl border-slate-200 bg-slate-50 focus:border-indigo-500 focus:ring-indigo-500 font-bold transition-all" placeholder="Ex: Gauchão Ipiranga 2024">
                 </div>
 
                 <div class="space-y-1.5">
-                  <label class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Apelido / Sigla</label>
-                  <input type="text" formControlName="shortName" class="w-full rounded-2xl border-slate-200 bg-slate-50 focus:border-indigo-500 focus:ring-indigo-500 font-bold transition-all" placeholder="Ex: Brasil de Pelotas">
+                  <label class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Temporada</label>
+                  <input type="text" formControlName="season" class="w-full rounded-2xl border-slate-200 bg-slate-50 focus:border-indigo-500 focus:ring-indigo-500 font-bold transition-all" placeholder="Ex: 2024">
+                </div>
+
+                <div class="space-y-1.5">
+                  <label class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Link Tabela Externa (FGF/GE)</label>
+                  <input type="url" formControlName="externalTableUrl" class="w-full rounded-2xl border-slate-200 bg-slate-50 focus:border-indigo-500 focus:ring-indigo-500 font-bold transition-all" placeholder="https://...">
+                </div>
+
+                <div class="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <input type="checkbox" formControlName="isActive" id="isActive" class="w-5 h-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                  <label for="isActive" class="text-sm font-bold text-slate-700 cursor-pointer select-none">Campeonato em andamento (Ativo)</label>
                 </div>
               </div>
             </form>
@@ -93,7 +103,7 @@ import { AppSettingsService } from '../../../../../core/services/app-settings.se
               @if (loading()) {
                 <app-spinner label="Salvando..." size="sm" [inline]="true" />
               } @else {
-                {{ teamId ? 'SALVAR ALTERAÇÕES' : 'CADASTRAR CLUBE' }}
+                {{ competitionId ? 'SALVAR ALTERAÇÕES' : 'CADASTRAR CAMPEONATO' }}
               }
             </button>
           </footer>
@@ -106,15 +116,15 @@ import { AppSettingsService } from '../../../../../core/services/app-settings.se
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AdminTeamDrawerComponent {
+export class AdminCompetitionDrawerComponent {
   private readonly fb = inject(FormBuilder).nonNullable;
   private readonly matchesApi = inject(MatchesApiService);
   private readonly toast = inject(ToastMessagesService);
   protected readonly appSettings = inject(AppSettingsService);
 
   @Input() isOpen = false;
-  @Input() teamId: string | null = null;
-  @Output() closed = new EventEmitter<Team | null>();
+  @Input() competitionId: string | null = null;
+  @Output() closed = new EventEmitter<Competition | null>();
 
   readonly loading = signal(false);
   readonly uploading = signal(false);
@@ -122,34 +132,31 @@ export class AdminTeamDrawerComponent {
 
   form = this.fb.group({
     name: ['', Validators.required],
-    shortName: [''],
-    logoUrl: ['']
+    season: ['', Validators.required],
+    externalTableUrl: [''],
+    logoUrl: [''],
+    isActive: [true]
   });
 
-  @Input() set team(data: Team | null) {
-    if ((window as any).LOBO_DEBUG) {
-      console.log('🐺 LOBO DEBUG: Drawer recebeu team:', data?.name || 'NULL');
-    }
+  @Input() set competition(data: Competition | null) {
     if (data) {
-      this.teamId = data.id;
+      this.competitionId = data.id;
       this.form.patchValue({
         name: data.name,
-        shortName: data.shortName || '',
-        logoUrl: data.logoUrl || ''
+        season: data.season,
+        externalTableUrl: data.externalTableUrl || '',
+        logoUrl: data.logoUrl || '',
+        isActive: data.isActive
       });
       this.previewUrl.set(data.logoUrl || null);
     } else {
-      this.teamId = null;
-      this.form.reset();
+      this.competitionId = null;
+      this.form.reset({ isActive: true });
       this.previewUrl.set(null);
     }
   }
 
   close() {
-    if (!this.isOpen) return;
-    if ((window as any).LOBO_DEBUG) {
-      console.log('🐺 LOBO DEBUG: Drawer fechando (emitindo closed)');
-    }
     this.closed.emit(null);
   }
 
@@ -159,13 +166,13 @@ export class AdminTeamDrawerComponent {
 
     this.uploading.set(true);
     try {
-      const compressed = await compressImage(file, 400); // Club logos can be small
-      const { url } = await firstValueFrom(this.matchesApi.uploadTeamLogo(compressed));
+      const compressed = await compressImage(file, 800); // Competition covers can be a bit larger
+      const { url } = await firstValueFrom(this.matchesApi.uploadCompetitionLogo(compressed));
       this.previewUrl.set(url);
       this.form.patchValue({ logoUrl: url });
-      this.toast.showSuccess('Logo processada com sucesso!');
+      this.toast.showSuccess('Capa processada com sucesso!');
     } catch (error) {
-      this.toast.showError('Erro ao processar imagem');
+      this.toast.showApiError(error, 'Erro ao processar imagem');
     } finally {
       this.uploading.set(false);
     }
@@ -176,16 +183,16 @@ export class AdminTeamDrawerComponent {
     this.loading.set(true);
 
     const payload = this.form.getRawValue();
-    const request = this.teamId 
-      ? this.matchesApi.updateTeam(this.teamId, payload)
-      : this.matchesApi.createTeam(payload);
+    const request = this.competitionId 
+      ? this.matchesApi.updateCompetition(this.competitionId, payload)
+      : this.matchesApi.createCompetition(payload);
 
     request.pipe(finalize(() => this.loading.set(false))).subscribe({
-      next: (savedTeam) => {
-        this.toast.showSuccess(`Time ${this.teamId ? 'atualizado' : 'cadastrado'}!`);
-        this.closed.emit(savedTeam);
+      next: (saved) => {
+        this.toast.showSuccess(`Campeonato ${this.competitionId ? 'atualizado' : 'cadastrado'}!`);
+        this.closed.emit(saved);
       },
-      error: (err) => this.toast.showApiError(err, 'Erro ao salvar clube')
+      error: (err) => this.toast.showApiError(err, 'Erro ao salvar campeonato')
     });
   }
 }

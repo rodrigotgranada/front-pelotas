@@ -178,6 +178,76 @@ import { compressImage } from '../../../../shared/utils/image-compress.util';
               </div>
             </div>
           </section>
+
+          <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+              <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Escudos Padrão (Fallback)</h2>
+            </div>
+            
+            <div class="p-6 space-y-8">
+              <!-- Default Team Logo -->
+              <div class="flex flex-col sm:flex-row gap-6 items-start border-b border-slate-50 pb-8">
+                <div class="w-24 h-24 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
+                   @if (defaultTeamUrl()) {
+                      <img [src]="defaultTeamUrl()" alt="Default Team" class="w-full h-full object-contain p-2" />
+                    } @else {
+                      <div class="flex flex-col items-center gap-1 text-slate-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+                      </div>
+                    }
+                </div>
+                <div class="flex-1 flex flex-col gap-3">
+                  <h4 class="text-xs font-black text-slate-900 uppercase tracking-tight">Escudo Padrão de Times</h4>
+                  <p class="text-[10px] text-slate-500 leading-relaxed uppercase font-bold tracking-widest">
+                    Exibido para adversários sem escudo cadastrado.
+                  </p>
+                  
+                  <div class="flex items-center gap-3 mt-1">
+                    <label class="cursor-pointer px-4 py-2 rounded-lg border border-slate-200 bg-white text-[10px] font-black uppercase text-slate-700 hover:bg-slate-50 transition flex items-center gap-2">
+                       {{ defaultTeamUrl() ? 'Trocar' : 'Enviar' }}
+                      <input type="file" class="hidden" accept="image/png, image/jpeg, image/webp" (change)="onDefaultTeamImageSelected($event)" />
+                    </label>
+                    @if (defaultTeamUrl()) {
+                      <button type="button" (click)="removeDefaultTeamImage()" class="px-4 py-2 rounded-lg border border-rose-200 bg-rose-50 text-[10px] font-black uppercase text-rose-700 hover:bg-rose-100 transition">
+                        Remover
+                      </button>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Default Competition Logo -->
+              <div class="flex flex-col sm:flex-row gap-6 items-start">
+                <div class="w-24 h-24 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
+                   @if (defaultCompUrl()) {
+                      <img [src]="defaultCompUrl()" alt="Default Competition" class="w-full h-full object-contain p-2" />
+                    } @else {
+                      <div class="flex flex-col items-center gap-1 text-slate-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+                      </div>
+                    }
+                </div>
+                <div class="flex-1 flex flex-col gap-3">
+                  <h4 class="text-xs font-black text-slate-900 uppercase tracking-tight">Escudo Padrão de Campeonatos</h4>
+                  <p class="text-[10px] text-slate-500 leading-relaxed uppercase font-bold tracking-widest">
+                    Exibido para competições sem imagem de capa.
+                  </p>
+                  
+                  <div class="flex items-center gap-3 mt-1">
+                    <label class="cursor-pointer px-4 py-2 rounded-lg border border-slate-200 bg-white text-[10px] font-black uppercase text-slate-700 hover:bg-slate-50 transition flex items-center gap-2">
+                       {{ defaultCompUrl() ? 'Trocar' : 'Enviar' }}
+                      <input type="file" class="hidden" accept="image/png, image/jpeg, image/webp" (change)="onDefaultCompImageSelected($event)" />
+                    </label>
+                    @if (defaultCompUrl()) {
+                      <button type="button" (click)="removeDefaultCompImage()" class="px-4 py-2 rounded-lg border border-rose-200 bg-rose-50 text-[10px] font-black uppercase text-rose-700 hover:bg-rose-100 transition">
+                        Remover
+                      </button>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
       }
 
@@ -645,11 +715,15 @@ export class AdminSettingsPageComponent implements OnInit {
   readonly themePresets = THEME_PRESETS;
   readonly badgeUrl = this.appSettings.badgeUrl;
   readonly defaultNewsUrl = this.appSettings.defaultNewsImageUrl;
+  readonly defaultTeamUrl = this.appSettings.defaultTeamLogoUrl;
+  readonly defaultCompUrl = this.appSettings.defaultCompetitionLogoUrl;
   readonly selectedTheme = signal(this.appSettings.themePreset());
 
   readonly activeTab = signal<'identidade' | 'tema' | 'modulos' | 'rodape'>('identidade');
   readonly badgeSaving = signal(false);
   readonly defaultNewsSaving = signal(false);
+  readonly defaultTeamSaving = signal(false);
+  readonly defaultCompSaving = signal(false);
   readonly membershipSaving = signal(false);
   readonly sponsorsSaving = signal(false);
   readonly squadsSaving = signal(false);
@@ -1009,6 +1083,84 @@ export class AdminSettingsPageComponent implements OnInit {
       this.toast.showError('Erro ao alterar status do módulo.');
     } finally {
       this.matchesSaving.set(false);
+    }
+  }
+
+  async onDefaultTeamImageSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    input.value = '';
+    
+    this.defaultTeamSaving.set(true);
+    try {
+      const compressed = await compressImage(file, 400).catch(() => file) as File;
+      this.newsApi.uploadImage(compressed).subscribe({
+        next: async (res) => {
+          if (res.success && res.file?.url) {
+            await this.appSettings.saveSetting('defaultTeamLogoUrl', res.file.url);
+            this.appSettings.defaultTeamLogoUrl.set(res.file.url);
+            this.toast.showSuccess('Logo padrão de times atualizada!');
+          }
+          this.defaultTeamSaving.set(false);
+        },
+        error: () => {
+          this.toast.showError('Erro ao enviar imagem.');
+          this.defaultTeamSaving.set(false);
+        }
+      });
+    } catch {
+      this.defaultTeamSaving.set(false);
+    }
+  }
+
+  async removeDefaultTeamImage() {
+    this.defaultTeamSaving.set(true);
+    try {
+      await this.appSettings.saveSetting('defaultTeamLogoUrl', '');
+      this.appSettings.defaultTeamLogoUrl.set(null);
+      this.toast.showSuccess('Logo padrão removida.');
+    } finally {
+      this.defaultTeamSaving.set(false);
+    }
+  }
+
+  async onDefaultCompImageSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    input.value = '';
+    
+    this.defaultCompSaving.set(true);
+    try {
+      const compressed = await compressImage(file, 400).catch(() => file) as File;
+      this.newsApi.uploadImage(compressed).subscribe({
+        next: async (res) => {
+          if (res.success && res.file?.url) {
+            await this.appSettings.saveSetting('defaultCompetitionLogoUrl', res.file.url);
+            this.appSettings.defaultCompetitionLogoUrl.set(res.file.url);
+            this.toast.showSuccess('Logo padrão de campeonatos atualizada!');
+          }
+          this.defaultCompSaving.set(false);
+        },
+        error: () => {
+          this.toast.showError('Erro ao enviar imagem.');
+          this.defaultCompSaving.set(false);
+        }
+      });
+    } catch {
+      this.defaultCompSaving.set(false);
+    }
+  }
+
+  async removeDefaultCompImage() {
+    this.defaultCompSaving.set(true);
+    try {
+      await this.appSettings.saveSetting('defaultCompetitionLogoUrl', '');
+      this.appSettings.defaultCompetitionLogoUrl.set(null);
+      this.toast.showSuccess('Logo padrão removida.');
+    } finally {
+      this.defaultCompSaving.set(false);
     }
   }
 }

@@ -88,4 +88,10 @@ export class MatchesApiService {
     formData.append('image', file, 'team-logo.jpg');
     return this.http.post<{ url: string }>(`${this.baseUrl}/teams/upload-image`, formData);
   }
+
+  uploadCompetitionLogo(file: Blob): Observable<{ url: string }> {
+    const formData = new FormData();
+    formData.append('image', file, 'comp-logo.jpg');
+    return this.http.post<{ url: string }>(`${this.baseUrl}/competitions/upload-image`, formData);
+  }
 }

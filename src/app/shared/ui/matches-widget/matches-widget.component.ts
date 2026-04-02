@@ -5,6 +5,7 @@ import { MatchesApiService } from '../../../core/services/matches-api.service';
 import { Match, Team, Competition } from '../../../core/models/match.model';
 import { FallbackImgDirective } from '../../directives/fallback-img.directive';
 import { SocketService } from '../../../core/services/socket.service';
+import { AppSettingsService } from '../../../core/services/app-settings.service';
 
 @Component({
   selector: 'app-matches-widget',
@@ -33,7 +34,7 @@ import { SocketService } from '../../../core/services/socket.service';
                <!-- Pelotas -->
                <div class="flex flex-col items-center gap-3 flex-1">
                  <div class="w-20 h-20 bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/10 flex items-center justify-center transition-transform group-hover:scale-110">
-                   <img src="https://s.sde.globo.com/media/organizations/2019/01/03/Pelotas-01.svg" class="w-full h-full object-contain drop-shadow-lg">
+                   <img [src]="appSettings.badgeUrl() || '/assets/placeholder-team.png'" appFallbackImg="team" class="w-full h-full object-contain drop-shadow-lg">
                  </div>
                  <span class="text-sm font-black uppercase tracking-tighter">PELOTAS</span>
                </div>
@@ -104,7 +105,7 @@ import { SocketService } from '../../../core/services/socket.service';
           <div class="flex-1 flex items-center justify-between gap-4">
              <!-- Pelotas -->
              <div class="flex flex-col items-center gap-2 flex-1">
-                 <img src="https://s.sde.globo.com/media/organizations/2019/01/03/Pelotas-01.svg" class="w-12 h-12 object-contain transition-transform group-hover:scale-110">
+                 <img [src]="appSettings.badgeUrl() || '/assets/placeholder-team.png'" appFallbackImg="team" class="w-12 h-12 object-contain transition-transform group-hover:scale-110">
                 <span class="text-xs font-black text-slate-400">PEL</span>
              </div>
 
@@ -147,6 +148,7 @@ import { SocketService } from '../../../core/services/socket.service';
 export class MatchesWidgetComponent implements OnInit {
   private readonly matchesApi = inject(MatchesApiService);
   private readonly socket = inject(SocketService);
+  readonly appSettings = inject(AppSettingsService);
   
   readonly nextMatch = signal<Match | null>(null);
   readonly lastResult = signal<Match | null>(null);

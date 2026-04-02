@@ -6,11 +6,22 @@ import { Competition } from '../../../../core/models/match.model';
 import { SpinnerComponent } from '../../../../shared/ui/spinner/spinner.component';
 import { ToastMessagesService } from '../../../../core/notifications/toast-messages.service';
 import { finalize } from 'rxjs';
+import { AdminCompetitionDrawerComponent } from './components/admin-competition-drawer.component';
+import { AdminConfirmModalComponent } from '../../../../shared/ui/admin-confirm-modal/admin-confirm-modal.component';
+import { FallbackImgDirective } from '../../../../shared/directives/fallback-img.directive';
 
 @Component({
   selector: 'app-admin-competitions-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, SpinnerComponent],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    ReactiveFormsModule, 
+    SpinnerComponent, 
+    AdminCompetitionDrawerComponent,
+    AdminConfirmModalComponent,
+    FallbackImgDirective
+  ],
   template: `
     <div class="flex flex-col gap-6">
       <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-2">
@@ -33,14 +44,14 @@ import { finalize } from 'rxjs';
         @for (comp of competitions(); track comp.id) {
           <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all group relative overflow-hidden">
             <div class="flex items-start justify-between mb-4">
-              <div class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 p-2 flex items-center justify-center">
-                <img [src]="comp.logoUrl || 'assets/placeholder-comp.png'" class="max-w-full max-h-full object-contain grayscale group-hover:grayscale-0 transition-all">
+              <div class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 p-2 flex items-center justify-center overflow-hidden shrink-0">
+                <img [src]="comp.logoUrl || 'assets/placeholder-comp.png'" appFallbackImg="competition" class="max-w-full max-h-full object-contain grayscale group-hover:grayscale-0 transition-all">
               </div>
               <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button (click)="openEditModal(comp)" class="p-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-indigo-50 hover:text-indigo-600 transition-all">
                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                 </button>
-                <button (click)="deleteCompetition(comp.id)" class="p-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-rose-50 hover:text-rose-600 transition-all">
+                <button (click)="openDeleteConfirm(comp)" class="p-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-rose-50 hover:text-rose-600 transition-all">
                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                 </button>
               </div>
@@ -66,54 +77,23 @@ import { finalize } from 'rxjs';
         }
       </div>
 
-      <!-- Modal de Cadastro/Edição -->
       @if (showModal()) {
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div class="bg-white w-full max-w-md rounded-[32px] overflow-hidden shadow-2xl p-8 animate-in zoom-in-95 duration-300">
-            <div class="flex items-center justify-between mb-8">
-              <h2 class="text-xl font-black text-slate-900 leading-tight">
-                {{ editingId() ? 'Editar Competição' : 'Nova Competição' }}
-              </h2>
-              <button (click)="closeModal()" class="text-slate-400 hover:text-slate-900 transition-colors">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-              </button>
-            </div>
+        <app-admin-competition-drawer
+          [isOpen]="true"
+          [competition]="selectedComp()"
+          (closed)="closeModal($event)"
+        />
+      }
 
-            <form [formGroup]="form" (ngSubmit)="save()" class="space-y-5">
-              <div class="space-y-1.5">
-                <label class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Nome da Competição</label>
-                <input type="text" formControlName="name" class="w-full rounded-2xl border-slate-200 bg-slate-50 focus:border-indigo-500 focus:ring-indigo-500 font-bold transition-all" placeholder="Ex: Gauchão Ipiranga">
-              </div>
-
-              <div class="space-y-1.5">
-                <label class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Temporada</label>
-                <input type="text" formControlName="season" class="w-full rounded-2xl border-slate-200 bg-slate-50 focus:border-indigo-500 focus:ring-indigo-500 font-bold transition-all" placeholder="Ex: 2027">
-              </div>
-
-              <div class="space-y-1.5">
-                <label class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Link da Tabela (FGF/GE)</label>
-                <input type="url" formControlName="externalTableUrl" class="w-full rounded-2xl border-slate-200 bg-slate-50 focus:border-indigo-500 focus:ring-indigo-500 font-bold transition-all" placeholder="https://...">
-              </div>
-
-              <div class="space-y-1.5">
-                <label class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">URL da Logo (Opcional)</label>
-                <input type="url" formControlName="logoUrl" class="w-full rounded-2xl border-slate-200 bg-slate-50 focus:border-indigo-500 focus:ring-indigo-500 font-bold transition-all" placeholder="https://...">
-              </div>
-
-              <div class="flex items-center gap-3 pt-2">
-                <input type="checkbox" formControlName="isActive" id="isActive" class="rounded text-indigo-600 focus:ring-indigo-500">
-                <label for="isActive" class="text-sm font-bold text-slate-700">Competição ativa no sistema</label>
-              </div>
-
-              <div class="pt-4 flex gap-3">
-                <button type="button" (click)="closeModal()" class="flex-1 px-4 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition-all">Cancelar</button>
-                <button type="submit" [disabled]="form.invalid || loading()" class="flex-2 px-8 py-3 bg-indigo-600 text-white rounded-xl font-black shadow-lg shadow-indigo-900/20 hover:bg-indigo-700 transition-all disabled:opacity-50">
-                  {{ loading() ? 'Salvando...' : 'Salvar Competição' }}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+      @if (showConfirm()) {
+        <app-admin-confirm-modal
+          [title]="'Remover ' + compToDelete()?.name + '?'"
+          message="Esta ação não afetará os jogos já cadastrados no sistema."
+          confirmText="Sim, Remover"
+          type="danger"
+          (confirmed)="confirmDelete()"
+          (cancelled)="showConfirm.set(false)"
+        />
       }
     </div>
   `,
@@ -127,15 +107,9 @@ export class AdminCompetitionsPageComponent implements OnInit {
   readonly competitions = signal<Competition[]>([]);
   readonly loading = signal(false);
   readonly showModal = signal(false);
-  readonly editingId = signal<string | null>(null);
-
-  form = this.fb.group({
-    name: ['', Validators.required],
-    season: ['', Validators.required],
-    externalTableUrl: [''],
-    logoUrl: [''],
-    isActive: [true]
-  });
+  readonly selectedComp = signal<Competition | null>(null);
+  readonly showConfirm = signal(false);
+  readonly compToDelete = signal<Competition | null>(null);
 
   ngOnInit() {
     this.loadCompetitions();
@@ -152,52 +126,41 @@ export class AdminCompetitionsPageComponent implements OnInit {
   }
 
   openAddModal() {
-    this.editingId.set(null);
-    this.form.reset({ isActive: true });
+    this.selectedComp.set(null);
     this.showModal.set(true);
   }
 
   openEditModal(comp: Competition) {
-    this.editingId.set(comp.id);
-    this.form.patchValue({
-      name: comp.name,
-      season: comp.season,
-      externalTableUrl: comp.externalTableUrl || '',
-      logoUrl: comp.logoUrl || '',
-      isActive: comp.isActive
-    });
+    this.selectedComp.set(comp);
     this.showModal.set(true);
   }
 
-  closeModal() {
+  closeModal(comp: Competition | null) {
     this.showModal.set(false);
-    this.editingId.set(null);
+    this.selectedComp.set(null);
+    if (comp) {
+      this.loadCompetitions();
+    }
   }
 
   save() {
-    if (this.form.invalid) return;
-    this.loading.set(true);
-
-    const payload = this.form.getRawValue();
-    const request = this.editingId() 
-      ? this.matchesApi.updateCompetition(this.editingId()!, payload)
-      : this.matchesApi.createCompetition(payload);
-
-    request.pipe(finalize(() => this.loading.set(false))).subscribe({
-      next: () => {
-        this.toast.showSuccess(`Competição ${this.editingId() ? 'atualizada' : 'criada'} com sucesso!`);
-        this.closeModal();
-        this.loadCompetitions();
-      },
-      error: (err) => this.toast.showApiError(err, 'Erro ao salvar')
-    });
+    // A lógica de save agora fica dentro do Drawer, 
+    // AdminCompetitionsPageComponent apenas reage ao evento (closed)
   }
 
-  deleteCompetition(id: string) {
-    if (!confirm('Excluir esta competição? Isso não removerá os jogos já cadastrados nela.')) return;
-    this.matchesApi.deleteCompetition(id).subscribe({
+  openDeleteConfirm(comp: Competition) {
+    this.compToDelete.set(comp);
+    this.showConfirm.set(true);
+  }
+
+  confirmDelete() {
+    const comp = this.compToDelete();
+    if (!comp) return;
+
+    this.showConfirm.set(false);
+    this.matchesApi.deleteCompetition(comp.id).subscribe({
       next: () => {
-        this.toast.showSuccess('Competição removida');
+        this.toast.showSuccess(`Competição ${comp.name} removida!`);
         this.loadCompetitions();
       },
       error: (err) => this.toast.showApiError(err, 'Erro ao remover')
