@@ -26,6 +26,7 @@ export interface PublicSettings {
   footerLinks?: string;
   footerDevName?: string;
   footerDevUrl?: string;
+  termsOfConduct?: string;
 }
 
 export interface PublicSocialLink {
@@ -134,6 +135,7 @@ export class AppSettingsService {
   readonly footerLinks = signal<any[]>([]);
   readonly footerDevName = signal<string>('Rodrigo Granada');
   readonly footerDevUrl = signal<string>('https://www.linkedin.com/in/rtgranada-desenvolvedor/');
+  readonly termsOfConduct = signal<string>('');
 
   async loadPublicSettings(): Promise<void> {
     try {
@@ -171,6 +173,7 @@ export class AppSettingsService {
 
       this.footerDevName.set(settings.footerDevName ?? 'Rodrigo Granada');
       this.footerDevUrl.set(settings.footerDevUrl ?? 'https://www.linkedin.com/in/rtgranada-desenvolvedor/');
+      this.termsOfConduct.set(settings.termsOfConduct ?? '');
 
       this.applyTheme(settings.themePreset ?? 'default');
     } catch {

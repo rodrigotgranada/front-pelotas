@@ -9,7 +9,9 @@ import { CommonModule } from '@angular/common';
   template: `
     <div class="relative w-full">
       <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-        <svg class="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+        <svg class="h-5 w-5 transition-colors" 
+             [class]="dark ? 'text-white/20' : 'text-slate-400'"
+             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
       </div>
       <input
         type="email"
@@ -19,18 +21,18 @@ import { CommonModule } from '@angular/common';
         (input)="onInput($event)"
         (blur)="onBlur()"
         [disabled]="disabled()"
-        class="w-full rounded-xl border py-3 pl-11 pr-4 text-sm text-slate-800 placeholder-slate-400 outline-none transition focus:ring disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-75"
-        [class.border-red-400]="isInvalidAndTouched()"
-        [class.ring-red-200]="isInvalidAndTouched()"
-        [class.border-slate-300]="!isInvalidAndTouched()"
-        [class.ring-cyan-200]="!isInvalidAndTouched()"
+        [class]="dark ? 'bg-white/5 border-white/5 text-white placeholder:text-white/10 focus:ring-amber-400/20 focus:border-amber-400/50 focus:bg-white/10' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:ring-indigo-500/10 focus:border-indigo-500'"
+        class="w-full rounded-2xl border py-4 pl-12 pr-4 text-sm font-bold outline-none transition-all disabled:cursor-not-allowed disabled:bg-slate-50/5 disabled:opacity-50"
+        [class.border-rose-500]="isInvalidAndTouched() && !dark"
+        [class.border-rose-500/50]="isInvalidAndTouched() && dark"
+        [class.ring-rose-500/20]="isInvalidAndTouched()"
       />
     </div>
     @if (isInvalidAndTouched()) {
-      <p class="mt-1 text-xs text-red-500 font-semibold flex items-center gap-1">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        E-mail ivalido. Verifique o endereco digitado.
-      </p>
+      <div class="flex items-center gap-1.5 ml-2 mt-1 animate-in fade-in slide-in-from-top-1 duration-200">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-rose-500"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+        <span class="text-[10px] font-black text-rose-500 uppercase tracking-wider">E-mail inválido</span>
+      </div>
     }
   `,
   providers: []
@@ -38,6 +40,7 @@ import { CommonModule } from '@angular/common';
 export class EmailInputComponent implements ControlValueAccessor {
   @Input() id = 'email';
   @Input() placeholder = 'seu@email.com';
+  @Input() dark = false;
 
   readonly value = signal('');
   readonly disabled = signal(false);

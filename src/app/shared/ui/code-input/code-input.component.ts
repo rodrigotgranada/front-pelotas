@@ -11,7 +11,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 @Component({
   selector: 'app-code-input',
   template: `
-    <div class="flex gap-2 items-center justify-between" [class.opacity-50]="disabled">
+    <div class="flex gap-3 items-center justify-center" [class.opacity-50]="disabled">
       @for (digit of digits; track $index) {
         <input
           #inputRef
@@ -24,10 +24,10 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
           (keydown)="onKeyDown($event, $index)"
           (paste)="onPaste($event, $index)"
           (focus)="onFocus($event)"
-          class="w-12 h-14 text-center text-xl font-bold rounded-xl border border-slate-300 bg-white shadow-sm outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200"
-          [class.border-red-300]="hasError"
-          [class.focus:border-red-500]="hasError"
-          [class.focus:ring-red-200]="hasError"
+          [class]="dark ? 'bg-black/20 border-white/10 text-white focus:border-amber-400 focus:ring-amber-400/20' : 'bg-white border-slate-300 text-slate-900 focus:border-indigo-500 focus:ring-indigo-500/10'"
+          class="w-12 h-16 text-center text-2xl font-black rounded-2xl border shadow-xl outline-none transition-all"
+          [class.border-rose-500]="hasError"
+          [class.focus:ring-rose-500/20]="hasError"
         />
       }
     </div>
@@ -43,6 +43,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 export class CodeInputComponent implements ControlValueAccessor {
   @Input() length = 6;
   @Input() hasError = false;
+  @Input() dark = false;
   
   @ViewChildren('inputRef') inputRefs!: QueryList<ElementRef<HTMLInputElement>>;
 

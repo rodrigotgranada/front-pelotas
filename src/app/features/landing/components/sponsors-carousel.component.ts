@@ -10,7 +10,7 @@ import { SponsorsService } from '../../../core/services/sponsors.service';
   imports: [CommonModule, FallbackImgDirective],
   template: `
     @if (sponsors().length > 0) {
-      <div class="w-full overflow-hidden border-b border-slate-200 bg-white relative select-none group">
+      <div class="w-full overflow-hidden bg-transparent relative select-none group">
         <!-- Carousel Track Container -->
         <div 
           class="h-28 w-full cursor-pointer relative flex items-center overflow-hidden" 
@@ -18,9 +18,9 @@ import { SponsorsService } from '../../../core/services/sponsors.service';
           (mouseenter)="pause()"
           (mouseleave)="resume()"
         >
-          <!-- Fading Edges -->
-          <div class="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
-          <div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
+          <!-- Fading Edges (Ajustados para o fundo escuro) -->
+          <div class="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-indigo-950/40 to-transparent z-10 pointer-events-none"></div>
+          <div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-indigo-950/40 to-transparent z-10 pointer-events-none"></div>
 
           <div class="flex items-center transition-transform duration-500 ease-out will-change-transform absolute h-full"
                [style.left]="'50%'"
@@ -36,22 +36,11 @@ import { SponsorsService } from '../../../core/services/sponsors.service';
                   'grayscale opacity-30 scale-90 z-0 hover:opacity-60': i !== currentIndex()
                 }"
               >
-                <img [src]="sponsor.logoUrl" [alt]="sponsor.name" appFallbackImg="sponsor" class="max-h-full max-w-full object-contain" />
+                <img [src]="sponsor.logoUrl" [alt]="sponsor.name" appFallbackImg="sponsor" class="max-h-full max-w-full object-contain opacity-90 group-hover:opacity-100 transition-all duration-300" />
               </div>
             }
           </div>
         </div>
-
-        <!-- Navigation Arrows Overlay -->
-        <button (click)="$event.stopPropagation(); prev()" 
-                class="absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 hover:bg-white text-slate-400 hover:text-slate-800 shadow border border-slate-200 z-30 transition hover:scale-110">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-        </button>
-
-        <button (click)="$event.stopPropagation(); next()" 
-                class="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 hover:bg-white text-slate-400 hover:text-slate-800 shadow border border-slate-200 z-30 transition hover:scale-110">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-        </button>
       </div>
     }
   `,

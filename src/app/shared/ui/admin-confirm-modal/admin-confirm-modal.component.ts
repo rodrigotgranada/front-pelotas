@@ -59,7 +59,7 @@ export class AdminConfirmModalComponent {
   @Input() message = 'Esta ação não poderá ser desfeita.';
   @Input() confirmText = 'Confirmar';
   @Input() cancelText = 'Cancelar';
-  @Input() type: 'danger' | 'warning' | 'success' = 'danger';
+  @Input() type: 'danger' | 'warning' | 'success' | string = 'danger';
 
   @Output() confirmed = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();

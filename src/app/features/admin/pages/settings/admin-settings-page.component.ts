@@ -59,6 +59,14 @@ import { compressImage } from '../../../../shared/utils/image-compress.util';
         >
           Rodapé & Contato
         </button>
+        <button 
+          (click)="activeTab.set('politicas')"
+          [class]="activeTab() === 'politicas' 
+            ? 'px-6 py-2 bg-white rounded-xl text-sm font-bold text-slate-900 shadow-sm' 
+            : 'px-6 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-50 transition'"
+        >
+          Políticas
+        </button>
       </div>
 
       <!-- Tab: Identidade Visual -->
@@ -703,6 +711,53 @@ import { compressImage } from '../../../../shared/utils/image-compress.util';
           </form>
         </section>
       }
+
+      <!-- Tab: Políticas / Código de Conduta -->
+      @if (activeTab() === 'politicas') {
+        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Código de Conduta</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Texto exibido para novos sócios durante o registro</p>
+            </div>
+            <button
+               type="button"
+               (click)="saveTerms()"
+               [disabled]="politicasSaving() || !termsDraft()"
+               class="px-4 py-2 rounded-lg bg-brand-600 text-white text-xs font-bold hover:bg-brand-700 transition disabled:opacity-50 flex items-center gap-2"
+            >
+              @if (politicasSaving()) {
+                <svg class="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Salvando...
+              } @else {
+                Salvar Alterações
+              }
+            </button>
+          </div>
+          <div class="p-6">
+            <div class="space-y-4">
+              <label class="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">Conteúdo dos Termos</label>
+              <textarea 
+                [ngModel]="termsDraft()" 
+                (ngModelChange)="termsDraft.set($event)"
+                rows="15" 
+                class="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 outline-none text-sm leading-relaxed text-slate-700 placeholder:text-slate-300 font-medium"
+                placeholder="Escreva aqui as regras, deveres e direitos dos torcedores do Pelotas..."
+              ></textarea>
+              <div class="flex items-start gap-3 p-4 bg-amber-50 rounded-xl border border-amber-100">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <p class="text-[10px] text-amber-800 font-bold uppercase tracking-wide leading-normal">
+                  Este texto será apresentado em um Modal Premium para o torcedor no momento do cadastro. 
+                  Seja claro e acolhedor nas diretrizes da Alcateia!
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      }
     </div>
   `,
 })
@@ -719,7 +774,7 @@ export class AdminSettingsPageComponent implements OnInit {
   readonly defaultCompUrl = this.appSettings.defaultCompetitionLogoUrl;
   readonly selectedTheme = signal(this.appSettings.themePreset());
 
-  readonly activeTab = signal<'identidade' | 'tema' | 'modulos' | 'rodape'>('identidade');
+  readonly activeTab = signal<'identidade' | 'tema' | 'modulos' | 'rodape' | 'politicas'>('identidade');
   readonly badgeSaving = signal(false);
   readonly defaultNewsSaving = signal(false);
   readonly defaultTeamSaving = signal(false);
@@ -732,6 +787,8 @@ export class AdminSettingsPageComponent implements OnInit {
   readonly footerSaving = signal(false);
   readonly idolsSaving = signal(false);
   readonly matchesSaving = signal(false);
+  readonly politicasSaving = signal(false);
+  readonly termsDraft = signal(this.appSettings.termsOfConduct());
   readonly isMembershipEnabled = this.appSettings.isMembershipEnabled;
   readonly isSponsorsEnabled = this.appSettings.isSponsorsEnabled;
   readonly isSquadsEnabled = this.appSettings.isSquadsEnabled;
@@ -795,6 +852,7 @@ export class AdminSettingsPageComponent implements OnInit {
 
   ngOnInit() {
     this.selectedTheme.set(this.appSettings.themePreset());
+    this.termsDraft.set(this.appSettings.termsOfConduct());
   }
 
   addSocialLink() {
@@ -1161,6 +1219,18 @@ export class AdminSettingsPageComponent implements OnInit {
       this.toast.showSuccess('Logo padrão removida.');
     } finally {
       this.defaultCompSaving.set(false);
+    }
+  }
+  async saveTerms() {
+    this.politicasSaving.set(true);
+    try {
+      await this.appSettings.saveSetting('termsOfConduct', this.termsDraft());
+      this.appSettings.termsOfConduct.set(this.termsDraft());
+      this.toast.showSuccess('Código de Conduta atualizado!');
+    } catch {
+      this.toast.showError('Erro ao salvar os termos.');
+    } finally {
+      this.politicasSaving.set(false);
     }
   }
 }

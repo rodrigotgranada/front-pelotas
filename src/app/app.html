@@ -3,49 +3,42 @@
     <app-spinner-overlay label="Carregando dados..." />
   }
 
-  <!-- Sticky Global Topbar -->
+  <!-- Sticky Global Topbar (Âmbar Transparente Premium) -->
   @if (showHeader()) {
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm w-full">
-      <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+    <header class="bg-amber-400/90 backdrop-blur-md sticky top-0 z-50 border-b border-amber-500/20 shadow-md w-full transition-all duration-300">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
 
         <!-- Hamburger Menu Toggle & Logo -->
-        <div class="flex items-center gap-4 shrink-0">
-          <button (click)="toggleGlobalMenu()" class="p-2 -ml-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:ring-2 focus:ring-brand-500 focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        <div class="flex items-center gap-2 sm:gap-4 shrink-0">
+          <button (click)="toggleGlobalMenu()" class="p-2 -ml-1 rounded-lg text-indigo-950 hover:bg-black/5 transition-colors focus:ring-2 focus:ring-indigo-950 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
             <span class="sr-only">Abrir menu principal</span>
           </button>
           
-          <a routerLink="/" class="flex items-center gap-3 shrink-0 group" aria-label="Ir para a home">
+          <a routerLink="/" class="flex items-center gap-2 sm:gap-3 shrink-0 group" aria-label="Ir para a home">
             @if (badgeUrl()) {
               <img
                 [src]="badgeUrl()"
                 alt="Distintivo do clube"
-                class="h-10 w-10 object-contain rounded-lg group-hover:scale-105 transition duration-200"
+                class="h-8 w-8 sm:h-9 sm:w-9 object-contain rounded-lg group-hover:scale-105 transition duration-200 drop-shadow-sm"
               />
-            } @else {
-              <!-- Fallback SVG Shield -->
-              <div class="h-10 w-10 flex items-center justify-center rounded-lg bg-brand-600 text-white group-hover:bg-brand-700 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.35C17.25 23.15 21 18.25 21 13V7L12 2Z"/>
-                </svg>
-              </div>
             }
           </a>
         </div>
 
-        <!-- Search Bar -->
-        <div class="hidden md:flex flex-1 max-w-md mx-8">
+        <!-- Search Bar (Desktop only) -->
+        <div class="hidden md:flex flex-1 max-w-md mx-8 transition-all">
           <div class="relative w-full group">
             <input
               type="text"
               [(ngModel)]="searchQuery"
               (keyup.enter)="onSearch()"
               placeholder="Buscar notícias..."
-              class="w-full bg-slate-100 border-none rounded-xl py-2 px-10 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all duration-200"
+              class="w-full bg-white/30 backdrop-blur-sm border-none rounded-xl py-2 px-10 text-sm placeholder-indigo-900/60 text-indigo-950 font-bold focus:ring-2 focus:ring-indigo-950 focus:bg-white/60 transition-all duration-200"
             />
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                  stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-                 class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-500 transition-colors">
+                 class="absolute left-3 top-1/2 -translate-y-1/2 text-indigo-900 group-focus-within:text-indigo-950 transition-colors">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
             </svg>
             @if (searchQuery()) {
@@ -57,10 +50,7 @@
         </div>
 
         <!-- Navigation & Actions -->
-        <div class="flex items-center gap-3 ml-auto">
-          <!-- Desktop Navigation -->
-
-
+        <div class="flex items-center gap-2 sm:gap-3 ml-auto">
           @if (hasToken() && me()) {
             <!-- User Avatar Dropdown -->
             <div class="relative">
@@ -68,21 +58,21 @@
                 id="user-menu-button"
                 type="button"
                 (click)="toggleDropdown()"
-                class="flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 transition"
+                class="flex items-center gap-1.5 sm:gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 transition"
                 aria-haspopup="true"
                 [attr.aria-expanded]="dropdownOpen()"
               >
                 @if (me()?.photoUrl) {
                   <img [src]="me()!.photoUrl" alt="Foto de perfil"
-                       class="h-9 w-9 rounded-full object-cover border-2 border-slate-200 hover:border-brand-400 transition" />
+                       class="h-8 w-8 sm:h-9 sm:w-9 rounded-full object-cover border-2 border-slate-200 hover:border-brand-400 transition" />
                 } @else {
-                  <div class="h-9 w-9 rounded-full bg-brand-600 text-white font-bold flex items-center justify-center text-sm border-2 border-transparent hover:border-brand-400 transition">
+                  <div class="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-brand-600 text-white font-bold flex items-center justify-center text-xs sm:text-sm border-2 border-transparent hover:border-brand-400 transition">
                     {{ me()?.firstName?.charAt(0)?.toUpperCase() || 'U' }}
                   </div>
                 }
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-                     class="text-slate-500 transition-transform duration-200" [class.rotate-180]="dropdownOpen()">
+                     stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+                     class="text-indigo-900 transition-transform duration-200 hidden xs:block" [class.rotate-180]="dropdownOpen()">
                   <path d="m6 9 6 6 6-6"/>
                 </svg>
               </button>
@@ -132,9 +122,9 @@
               }
             </div>
           } @else {
-            <!-- Not logged in: simple Login link -->
+            <!-- Botão de Login Mobile Optimized -->
             <a [routerLink]="['/login']" [queryParams]="{ returnUrl: router.url }"
-               class="px-4 py-1.5 rounded-lg text-xs font-bold text-brand-700 border border-brand-200 bg-brand-50 hover:bg-brand-100 transition">
+               class="px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-black text-white bg-indigo-950 hover:bg-black transition-all shadow-lg shadow-indigo-950/20 active:scale-95 uppercase tracking-widest leading-none">
               Login
             </a>
           }
@@ -143,65 +133,95 @@
     </header>
   }
 
-  <!-- Global Sidebar Overlay (GloboEsporte Style) -->
+  <!-- Global Sidebar Overlay (Pelotas Premium Drawer) -->
   @if (isGlobalMenuOpen()) {
-    <div class="fixed inset-0 z-[100] flex">
+    <div class="fixed inset-0 z-[100] flex animate-in fade-in duration-300">
       <!-- Backdrop -->
-      <div class="fixed inset-0 bg-slate-900/60 transition-opacity backdrop-blur-sm" (click)="closeGlobalMenu()"></div>
+      <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" (click)="closeGlobalMenu()"></div>
       
       <!-- Drawer Panel -->
-      <div class="relative flex w-full max-w-xs md:max-w-sm flex-col overflow-y-auto bg-slate-900 shadow-2xl animate-in slide-in-from-left duration-300">
+      <div class="relative flex w-full max-w-xs md:max-w-sm flex-col h-full bg-gradient-to-b from-indigo-950 via-[#0a0a1a] to-black shadow-2xl border-r border-white/5 animate-in slide-in-from-left duration-500 overflow-hidden">
+        
+        <!-- Subtle Pattern Overlay -->
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none"></div>
+
         <!-- Header -->
-        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
-          <span class="text-lg font-black text-white tracking-tight flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" class="text-brand-500">
-              <path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.35C17.25 23.15 21 18.25 21 13V7L12 2Z"/>
-            </svg>
-            E.C. Pelotas
-          </span>
-          <button type="button" (click)="closeGlobalMenu()" class="rounded-lg p-2 text-slate-400 hover:text-white hover:bg-slate-800 transition">
+        <div class="flex items-center justify-between px-6 py-6 border-b border-white/5 relative z-10">
+          <div class="flex items-center gap-3">
+            @if (badgeUrl()) {
+              <img [src]="badgeUrl()" alt="Badge" class="h-8 w-8 object-contain drop-shadow-[0_0_8px_rgba(250,204,21,0.2)]" />
+            }
+            <span class="text-xl font-black text-white tracking-widest uppercase">Pelotas</span>
+          </div>
+          <button type="button" (click)="closeGlobalMenu()" class="rounded-full p-2 text-white/40 hover:text-white hover:bg-white/10 transition-all duration-300 backdrop-blur-md">
             <span class="sr-only">Fechar Menu</span>
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
         
         <!-- Navigation Links -->
-        <nav class="flex-1 px-4 py-6 space-y-2">
-          <a routerLink="/" class="flex items-center gap-3 rounded-xl px-4 py-3 text-base font-bold text-slate-300 hover:bg-slate-800 hover:text-brand-400 transition" (click)="closeGlobalMenu()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <nav class="flex-1 px-4 py-8 space-y-3 relative z-10 overflow-y-auto">
+          <a routerLink="/" class="flex items-center gap-4 rounded-2xl px-5 py-4 text-base font-black text-slate-300 hover:bg-white/5 hover:text-amber-400 transition-all group" (click)="closeGlobalMenu()">
+            <div class="p-2 rounded-lg bg-indigo-900/50 text-indigo-400 group-hover:text-amber-400 group-hover:bg-amber-400/10 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
             Início / O Lobo
           </a>
 
-          <a routerLink="/historia" class="flex items-center gap-3 rounded-xl px-4 py-3 text-base font-bold text-slate-300 hover:bg-slate-800 hover:text-brand-400 transition" (click)="closeGlobalMenu()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M8 7h6"/><path d="M8 11h8"/></svg>
+          <a routerLink="/historia" class="flex items-center gap-4 rounded-2xl px-5 py-4 text-base font-black text-slate-300 hover:bg-white/5 hover:text-amber-400 transition-all group" (click)="closeGlobalMenu()">
+             <div class="p-2 rounded-lg bg-indigo-900/50 text-indigo-400 group-hover:text-amber-400 group-hover:bg-amber-400/10 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M8 7h6"/><path d="M8 11h8"/></svg>
+            </div>
             Nossa História
           </a>
 
           @if (isIdolsEnabled()) {
-            <a routerLink="/idolos" class="flex items-center gap-3 rounded-xl px-4 py-3 text-base font-bold text-slate-300 hover:bg-slate-800 hover:text-brand-400 transition" (click)="closeGlobalMenu()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <a routerLink="/idolos" class="flex items-center gap-4 rounded-2xl px-5 py-4 text-base font-black text-slate-300 hover:bg-white/5 hover:text-amber-400 transition-all group" (click)="closeGlobalMenu()">
+               <div class="p-2 rounded-lg bg-indigo-900/50 text-indigo-400 group-hover:text-amber-400 group-hover:bg-amber-400/10 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
               Mural de Ídolos
             </a>
           }
 
           @if (isSquadsEnabled()) {
-            <a routerLink="/elenco" class="flex items-center gap-3 rounded-xl px-4 py-3 text-base font-bold text-slate-300 hover:bg-slate-800 hover:text-brand-400 transition" (click)="closeGlobalMenu()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <a routerLink="/elenco" class="flex items-center gap-4 rounded-2xl px-5 py-4 text-base font-black text-slate-300 hover:bg-white/5 hover:text-amber-400 transition-all group" (click)="closeGlobalMenu()">
+               <div class="p-2 rounded-lg bg-indigo-900/50 text-indigo-400 group-hover:text-amber-400 group-hover:bg-amber-400/10 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
               Elenco do Lobo
             </a>
           }
 
           @if (isMembershipEnabled()) {
-            <div class="pt-4 mt-6 border-t border-slate-800">
-              <a routerLink="/seja-socio" class="flex items-center justify-between rounded-xl px-4 py-4 text-base font-black text-slate-900 bg-gradient-to-r from-amber-400 to-amber-500 shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-[0.98] transition-transform" (click)="closeGlobalMenu()">
+            <div class="pt-6 mt-8 border-t border-white/5 space-y-4">
+              <a routerLink="/seja-socio" class="flex items-center justify-between rounded-2xl px-6 py-5 text-base font-black text-indigo-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 shadow-2xl shadow-amber-500/20 hover:scale-[1.03] active:scale-[0.97] transition-all animate-shimmer" (click)="closeGlobalMenu()">
                 <div class="flex items-center gap-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                   Seja Sócio do Lobo
                 </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
               </a>
             </div>
           }
         </nav>
+
+        <!-- Social Footer Decor -->
+        <div class="p-6 border-t border-white/5 bg-black/40 relative z-10">
+          <div class="flex items-center justify-center gap-6 mb-2">
+            @for (social of appSettings.footerSocialLinks(); track social.type) {
+              <a [href]="social.url" target="_blank" class="text-white/30 hover:text-amber-400 transition-colors transform hover:scale-110">
+                @if (social.type === 'instagram') {
+                   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                } @else if (social.type === 'facebook') {
+                   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                } @else if (social.type === 'youtube') {
+                   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 2-2 58.38 58.38 0 0 1 15 0 2 2 0 0 1 2 2 24.12 24.12 0 0 1 0 10 2 2 0 0 1-2 2 58.38 58.38 0 0 1-15 0 2 2 0 0 1-2-2z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+                }
+              </a>
+            }
+          </div>
+        </div>
       </div>
     </div>
   }

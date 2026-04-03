@@ -18,6 +18,7 @@ import { CepInputComponent } from '../../../shared/ui/cep-input/cep-input.compon
 import { CodeInputComponent } from '../../../shared/ui/code-input/code-input.component';
 import { PhotoUploadComponent } from '../../../shared/ui/photo-upload/photo-upload.component';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
+import { TermsModalComponent } from '../../../shared/ui/modals/terms-modal.component';
 
 interface ViaCepResponse {
   cep: string;
@@ -43,6 +44,7 @@ interface ViaCepResponse {
     CepInputComponent,
     CodeInputComponent,
     PhotoUploadComponent,
+    TermsModalComponent,
   ],
   templateUrl: './register-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -105,6 +107,7 @@ export class RegisterPageComponent {
   imageChangedEvent: any = undefined;
   private selectedPhoto: File | Blob | null = null;
   readonly photoPreviewUrl = signal<string | null>(null); // To show preview on the form
+  readonly showTermsModal = signal(false);
 
   constructor() {
     this.addContact();

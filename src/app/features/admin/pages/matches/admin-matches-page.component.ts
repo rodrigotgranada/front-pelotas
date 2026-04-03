@@ -49,64 +49,75 @@ import { AdminConfirmModalComponent } from '../../../../shared/ui/admin-confirm-
         }
 
         @if (matches().length > 0) {
-          <div class="grid grid-cols-1 gap-4">
+          <div class="grid grid-cols-1 gap-4 sm:gap-6">
             @for (match of matches(); track match.id) {
-              <div class="group bg-white border border-slate-200 rounded-2xl p-5 transition-all hover:shadow-xl flex flex-col md:flex-row items-center gap-6">
-                <!-- Data e Competição -->
-                <div class="flex flex-col items-center md:items-start min-w-[120px]">
-                  <span class="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 mb-1">
-                    {{ getCompetitionName(match.competitionId) }}
-                  </span>
-                  <span class="text-xl font-black text-slate-900">{{ match.date | date:'dd/MM' }}</span>
-                  <span class="text-xs font-bold text-slate-400">{{ match.date | date:'HH:mm' }}</span>
+              <div class="group bg-white border border-slate-200 rounded-[24px] sm:rounded-2xl p-5 sm:p-6 transition-all hover:shadow-xl flex flex-col md:flex-row items-stretch md:items-center gap-6">
+                
+                <!-- ID/Data/Comp (Top mobile, Side desktop) -->
+                <div class="flex md:flex-col items-center md:items-start justify-between md:justify-center min-w-[120px] pb-4 md:pb-0 border-b md:border-b-0 md:border-r border-slate-100 pr-0 md:pr-6">
+                  <div class="flex flex-col items-start">
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 mb-1">
+                      {{ getCompetitionName(match.competitionId) }}
+                    </span>
+                    <span class="text-xl font-black text-slate-900 leading-none">{{ match.date | date:'dd/MM' }}</span>
+                    <span class="text-xs font-bold text-slate-400 mt-1">{{ match.date | date:'HH:mm' }}</span>
+                  </div>
+                  <div class="md:hidden">
+                    <span [class]="match.status === 'LIVE' ? 'bg-rose-100 text-rose-600 animate-pulse' : 'bg-slate-100 text-slate-500'" 
+                          class="px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest">
+                       {{ getStatusLabel(match.status) }}
+                    </span>
+                  </div>
                 </div>
 
-                <!-- Confronto -->
-                <div class="flex-1 flex items-center justify-center gap-8">
+                <!-- Confronto (Centered mobile/desktop) -->
+                <div class="flex-1 flex items-center justify-between sm:justify-center gap-4 sm:gap-12 py-2 sm:py-0">
                   <!-- Pelotas -->
-                  <div class="flex flex-col items-center gap-2 w-1/3">
-                    <div class="w-16 h-16 rounded-full bg-slate-50 p-2 border border-slate-100 flex items-center justify-center overflow-hidden">
+                  <div class="flex flex-col items-center gap-2 w-20 sm:w-24">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-slate-50 p-2 border border-slate-100 flex items-center justify-center overflow-hidden shadow-sm group-hover:scale-105 transition-transform">
                        <img src="https://s.sde.globo.com/media/organizations/2019/01/03/Pelotas-01.svg" class="w-full h-full object-contain">
                     </div>
-                    <span class="text-sm font-black text-slate-900 uppercase tracking-tighter">Pelotas</span>
+                    <span class="text-[10px] sm:text-xs font-black text-slate-900 uppercase tracking-tighter">Pelotas</span>
                   </div>
 
                   <!-- Placar -->
                   <div class="flex flex-col items-center gap-1">
-                    <div class="flex items-center gap-3">
-                      <span class="text-3xl font-black text-slate-900">{{ match.isHome ? match.homeScore : match.awayScore }}</span>
-                      <span class="text-slate-300 font-black">X</span>
-                      <span class="text-3xl font-black text-slate-900">{{ match.isHome ? match.awayScore : match.homeScore }}</span>
+                    <div class="flex items-center gap-3 sm:gap-5">
+                      <span class="text-2xl sm:text-4xl font-black text-slate-900 tabular-nums">{{ match.isHome ? match.homeScore : match.awayScore }}</span>
+                      <span class="text-slate-300 font-black italic">X</span>
+                      <span class="text-2xl sm:text-4xl font-black text-slate-900 tabular-nums">{{ match.isHome ? match.awayScore : match.homeScore }}</span>
                     </div>
-                    <span class="px-2 py-0.5 rounded bg-slate-100 text-[9px] font-black uppercase text-slate-500 tracking-widest">
-                       {{ getStatusLabel(match.status) }}
-                    </span>
+                    <div class="hidden md:block mt-1">
+                       <span class="px-2 py-0.5 rounded bg-slate-100 text-[9px] font-black uppercase text-slate-500 tracking-widest">
+                          {{ getStatusLabel(match.status) }}
+                       </span>
+                    </div>
                   </div>
 
                   <!-- Adversário -->
-                  <div class="flex flex-col items-center gap-2 w-1/3">
-                    <div class="w-16 h-16 rounded-full bg-slate-50 p-2 border border-slate-100 flex items-center justify-center overflow-hidden">
+                  <div class="flex flex-col items-center gap-2 w-20 sm:w-24">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-slate-50 p-2 border border-slate-100 flex items-center justify-center overflow-hidden shadow-sm group-hover:scale-105 transition-transform">
                        <img [src]="getOpponentLogo(match.opponentId)" appFallbackImg="team" class="w-full h-full object-contain">
                     </div>
-                    <span class="text-sm font-black text-slate-900 uppercase tracking-tighter truncate max-w-full">
+                    <span class="text-[10px] sm:text-xs font-black text-slate-900 uppercase tracking-tighter truncate max-w-full">
                        {{ getOpponentName(match.opponentId) }}
                     </span>
                   </div>
                 </div>
 
-                <!-- Ações -->
-                <div class="flex gap-2">
+                <!-- Ações (Bottom mobile, Side desktop) -->
+                <div class="flex items-center justify-center md:justify-end gap-2 pt-4 md:pt-0 border-t md:border-t-0 md:border-l border-slate-100 pl-0 md:pl-6">
                   <a [routerLink]="['live', match.id]" 
-                     [class]="match.status === 'LIVE' ? 'bg-rose-600 text-white animate-pulse' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'"
-                     class="p-3 rounded-xl transition-all active:scale-90 shadow-sm border border-transparent" 
+                     [class]="match.status === 'LIVE' ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/30 animate-pulse scale-105' : 'bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600'"
+                     class="flex-1 md:flex-none h-11 w-11 flex items-center justify-center rounded-xl transition-all active:scale-90" 
                      title="War Room - Cobertura ao Vivo">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.4"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.4"/><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.4"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.4"/><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/></svg>
                   </a>
-                  <a [routerLink]="['editor', match.id]" class="p-3 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-all active:scale-90 shadow-sm border border-indigo-100" title="Editar Detalhes">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                  <a [routerLink]="['editor', match.id]" class="flex-1 md:flex-none h-11 w-11 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all active:scale-90 shadow-sm" title="Editar Detalhes">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                   </a>
-                  <button (click)="openDeleteConfirm(match)" class="p-3 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-100 transition-all active:scale-90 shadow-sm border border-rose-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                  <button (click)="openDeleteConfirm(match)" class="flex-1 md:flex-none h-11 w-11 flex items-center justify-center bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all active:scale-90 shadow-sm" title="Excluir Jogo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
                   </button>
                 </div>
               </div>

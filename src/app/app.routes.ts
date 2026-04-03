@@ -105,6 +105,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/membership/pages/subscription/membership-subscription.component').then((m) => m.MembershipSubscriptionComponent),
   },
   {
+    path: 'noticias',
+    loadComponent: () => import('./features/public-news/pages/news-list-page.component').then((m) => m.NewsListPageComponent),
+  },
+  {
     path: 'noticias/:slug',
     loadComponent: () => import('./features/public-news/pages/news-article-page.component').then((m) => m.NewsArticlePageComponent),
   },

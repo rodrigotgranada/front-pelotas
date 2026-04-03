@@ -17,7 +17,8 @@ import { CommonModule } from '@angular/common';
         (blur)="onTouchedCallback()"
         [disabled]="disabled()"
         maxlength="15"
-        class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm text-slate-800 placeholder-slate-400 outline-none ring-cyan-200 transition focus:ring disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-75"
+        [class]="dark ? 'bg-white/5 border-white/5 text-white placeholder:text-white/10 focus:ring-amber-400/20 focus:border-amber-400/50 focus:bg-white/10' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:ring-indigo-500/10 focus:border-indigo-500'"
+        class="w-full rounded-2xl border py-4 px-4 text-sm font-bold outline-none transition-all disabled:cursor-not-allowed disabled:bg-slate-50/5 disabled:opacity-50"
       />
     </div>
   `,
@@ -32,6 +33,7 @@ import { CommonModule } from '@angular/common';
 export class PhoneInputComponent implements ControlValueAccessor {
   @Input() id = 'phone';
   @Input() placeholder = '(00) 00000-0000';
+  @Input() dark = false;
 
   readonly value = signal('');
   readonly disabled = signal(false);

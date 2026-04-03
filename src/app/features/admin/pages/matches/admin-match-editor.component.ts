@@ -405,7 +405,7 @@ import { AppSettingsService } from '../../../../core/services/app-settings.servi
         title="Finalizar Partida?"
         message="Isso marcará o jogo como encerrado e abrirá o editor para o relato pós-jogo."
         confirmText="Sim, Finalizar"
-        type="success"
+        [type]="'success'"
         (confirmed)="finishMatch()"
         (cancelled)="showFinishConfirm.set(false)"
       />
