@@ -1,7 +1,7 @@
 import { ApplicationConfig, provideZoneChangeDetection, APP_INITIALIZER } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { AppSettingsService } from './core/services/app-settings.service';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideToastr } from 'ngx-toastr';
 import { registerLocaleData } from '@angular/common';
@@ -25,7 +25,7 @@ export const appConfig: ApplicationConfig = {
       progressBar: true,
       closeButton: true,
     }),
-    provideRouter(routes),
+    provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'enabled' })),
     provideHttpClient(withInterceptors([loadingInterceptor, authInterceptor])),
     { provide: LOCALE_ID, useValue: 'pt-BR' },
     {
