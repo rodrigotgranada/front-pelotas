@@ -132,10 +132,12 @@ export class App implements OnInit {
 
   onSearch(): void {
     const query = this.searchQuery().trim();
+    this.closeGlobalMenu(); // Close drawer on search
+    
     if (query) {
-      this.router.navigate(['/'], { queryParams: { search: query } });
+      this.router.navigate(['/noticias'], { queryParams: { search: query } });
     } else {
-      this.router.navigate(['/']);
+      this.router.navigate(['/noticias']);
     }
   }
 }

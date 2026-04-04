@@ -198,6 +198,15 @@ import { FallbackImgDirective } from '../../../shared/directives/fallback-img.di
                       <a routerLink="/register" class="px-8 py-3 bg-amber-400 text-indigo-950 font-black uppercase text-[9px] tracking-widest rounded-xl hover:bg-amber-500 transition shadow-lg shadow-amber-400/20">Alistar-se</a>
                     </div>
                   </div>
+                } @else if (!isSocio()) {
+                  <div class="text-center py-12 px-6">
+                    <p class="text-amber-400 mb-4 font-black uppercase tracking-[0.2em] text-xs leading-relaxed italic animate-pulse">Privilégio da Alcateia</p>
+                    <p class="text-white/60 mb-8 font-bold text-sm max-w-sm mx-auto">A resenha nos comentários é um privilégio exclusivo para Sócios do Pelotas.</p>
+                    <a routerLink="/membership" class="inline-flex items-center gap-3 px-10 py-4 bg-amber-400 text-indigo-950 font-black uppercase text-[10px] tracking-widest rounded-xl hover:bg-amber-500 transition shadow-lg shadow-amber-400/20 group">
+                      Seja Sócio Agora
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </a>
+                  </div>
                 } @else {
                   <div class="flex flex-col p-4">
                     <textarea 
@@ -234,12 +243,29 @@ import { FallbackImgDirective } from '../../../shared/directives/fallback-img.di
                     <div class="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 font-black uppercase shrink-0 text-xs shadow-lg">
                       {{ comment.author?.name?.charAt(0) || 'U' }}
                     </div>
-                    <div class="flex-1 bg-white/5 border border-white/5 rounded-[2rem] p-8 group hover:border-amber-400/20 transition-all duration-300 shadow-xl">
+                    <div class="flex-1 bg-white/5 border border-white/5 rounded-[2rem] p-8 group hover:border-amber-400/20 transition-all duration-300 shadow-xl"
+                         [class.opacity-50]="comment.isModerated">
                       <div class="flex items-center justify-between mb-4">
                         <h4 class="font-black text-white uppercase text-[10px] tracking-widest italic leading-none">{{ comment.author?.name || 'Torcedor' }}</h4>
                         <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">{{ comment.createdAt | date:'shortDate' }}</span>
                       </div>
-                      <p class="text-white/80 text-sm leading-relaxed whitespace-pre-wrap font-medium">{{ comment.content }}</p>
+                      <p class="text-white/80 text-sm leading-relaxed whitespace-pre-wrap font-medium"
+                         [class.italic]="comment.isModerated"
+                         [class.text-white/40]="comment.isModerated">
+                        {{ comment.content }}
+                      </p>
+                      
+                      @if (comment.moderationInfo) {
+                        <div class="mt-4 p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl animate-in slide-in-from-left duration-500">
+                          <p class="text-rose-400 text-[10px] font-black uppercase tracking-widest leading-relaxed">
+                            <span class="flex items-center gap-2 mb-1">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+                              Ação de Moderação
+                            </span>
+                            {{ comment.moderationInfo }}
+                          </p>
+                        </div>
+                      }
                     </div>
                   </div>
                 }
@@ -271,6 +297,11 @@ export class NewsArticlePageComponent implements OnInit {
   readonly comments = signal<any[]>([]);
   readonly commentInput = signal<string>('');
   readonly isSubmittingComment = signal<boolean>(false);
+
+  readonly isSocio = computed(() => {
+    const role = this.tokenService.getRoleCode();
+    return ['owner', 'admin', 'editor', 'socio'].includes(role || '');
+  });
 
   readonly parsedContent = computed(() => {
     const data = this.article();

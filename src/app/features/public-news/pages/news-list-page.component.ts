@@ -1,6 +1,6 @@
 import { Component, inject, signal, OnInit, effect } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NewsApiService } from '../../../core/services/news-api.service';
 import { AppSettingsService } from '../../../core/services/app-settings.service';
@@ -26,47 +26,33 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
                  Central de Notícias
                </h1>
             </div>
-            <p class="text-slate-400 font-bold uppercase tracking-[0.3em] text-xs sm:text-sm max-w-2xl animate-in fade-in slide-in-from-bottom duration-1000">
-              Acompanhe cada detalhe, cada vitória e cada história da Alcateia Alve-Azul
+            <p class="text-[8px] sm:text-[10px] font-black text-white/40 uppercase tracking-[0.4em] mb-4 animate-in fade-in slide-in-from-bottom duration-700 delay-100">
+              Acompanhe cada detalhe, cada vitória e cada história da Alcateia Áureo-Cerúlea
             </p>
           </div>
 
           <!-- Search & Filters -->
-          <div class="mt-12 max-w-4xl mx-auto">
-            <div class="bg-indigo-950/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-4 sm:p-6 shadow-2xl flex flex-col md:flex-row gap-4 animate-in zoom-in-95 duration-500">
-              <!-- Search Input -->
-              <div class="flex-1 relative group">
-                <div class="absolute inset-y-0 left-5 flex items-center pointer-events-none text-white/20 group-focus-within:text-amber-400 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                </div>
-                <input 
-                  type="text" 
-                  [ngModel]="searchQuery()" 
-                  (ngModelChange)="onSearchChange($event)"
-                  placeholder="Pesquisar matérias..." 
-                  class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-14 pr-6 text-white placeholder:text-white/20 font-bold outline-none focus:ring-4 focus:ring-amber-400/10 focus:border-amber-400 transition-all"
-                >
+          <!-- Minimalist Search Input -->
+          <div class="mt-8 max-w-2xl mx-auto animate-in zoom-in-95 duration-500">
+            <div class="relative group">
+              <div class="absolute inset-y-0 left-5 flex items-center pointer-events-none text-white/20 group-focus-within:text-amber-400 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
               </div>
-
-              <!-- Category Filter -->
-              <div class="flex flex-wrap items-center gap-2">
+              <input 
+                type="text" 
+                [ngModel]="searchQuery()" 
+                (ngModelChange)="onSearchChange($event)"
+                placeholder="O que você está procurando na Alcateia?" 
+                class="w-full bg-indigo-950/40 backdrop-blur-2xl border border-white/10 rounded-2xl py-5 pl-16 pr-14 text-white placeholder:text-white/20 font-bold outline-none focus:ring-4 focus:ring-amber-400/10 focus:border-amber-400 transition-all shadow-2xl"
+              >
+              @if (searchQuery()) {
                 <button 
-                  (click)="selectCategory('')"
-                  [class]="!selectedCategory() ? 'bg-amber-400 text-indigo-950 shadow-lg shadow-amber-400/20' : 'bg-white/5 text-white/40 hover:bg-white/10'"
-                  class="px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all min-w-[80px]"
+                  (click)="clearSearch()"
+                  class="absolute inset-y-0 right-5 flex items-center text-white/20 hover:text-amber-400 transition-colors"
                 >
-                  Todas
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
-                @for (cat of categories(); track cat.id) {
-                  <button 
-                     (click)="selectCategory(cat.name)"
-                     [class]="selectedCategory() === cat.name ? 'bg-amber-400 text-indigo-950 shadow-lg shadow-amber-400/20' : 'bg-white/5 text-white/40 hover:bg-white/10'"
-                     class="px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap"
-                  >
-                    {{ cat.name }}
-                  </button>
-                }
-              </div>
+              }
             </div>
           </div>
         </div>
@@ -106,7 +92,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
                     <div class="absolute inset-0 bg-gradient-to-t from-indigo-950 via-transparent to-transparent opacity-60 group-hover:opacity-20 transition-opacity"></div>
                     
                     <!-- Categories -->
-                    <div class="absolute top-6 left-6 flex flex-wrap gap-2">
+                    <div class="absolute top-6 left-6 flex flex-col items-start gap-2">
                       @for (cat of item.categories.slice(0,2); track cat) {
                         <span class="px-3 py-1 bg-amber-400 text-indigo-950 text-[9px] font-black uppercase tracking-widest rounded-lg shadow-xl">
                           {{ cat }}
@@ -184,6 +170,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 })
 export class NewsListPageComponent implements OnInit {
   private readonly newsApi = inject(NewsApiService);
+  private readonly route = inject(ActivatedRoute);
   readonly appSettings = inject(AppSettingsService);
 
   readonly news = signal<News[]>([]);
@@ -218,6 +205,17 @@ export class NewsListPageComponent implements OnInit {
 
   ngOnInit() {
     this.loadCategories();
+    
+    // Captura busca vinda da URL (ex: drawer mobile)
+    this.route.queryParams.subscribe(params => {
+      const q = params['q'] || params['search'];
+      if (q) {
+        this.searchQuery.set(q);
+        this.refresh();
+      } else {
+        this.fetchNews(true); // Carga inicial padrão
+      }
+    });
   }
 
   private loadCategories() {
@@ -229,7 +227,17 @@ export class NewsListPageComponent implements OnInit {
   }
 
   selectCategory(name: string) {
-    this.selectedCategory.set(name);
+    // Toggle: if clicking same category, clear it to show all
+    if (this.selectedCategory() === name) {
+      this.selectedCategory.set('');
+    } else {
+      this.selectedCategory.set(name);
+    }
+  }
+
+  clearSearch() {
+    this.searchQuery.set('');
+    this.searchSubject.next('');
   }
 
   refresh() {

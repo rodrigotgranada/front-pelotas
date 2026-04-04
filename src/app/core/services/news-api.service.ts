@@ -40,7 +40,7 @@ export class NewsApiService {
   }
 
   getCategories(): Observable<NewsCategory[]> {
-    return this.http.get<NewsCategory[]>(`${this.apiUrl}/categories`);
+    return this.http.get<NewsCategory[]>(`${environment.apiBaseUrl}/public-news/categories`);
   }
 
   createCategory(name: string, description?: string): Observable<NewsCategory> {

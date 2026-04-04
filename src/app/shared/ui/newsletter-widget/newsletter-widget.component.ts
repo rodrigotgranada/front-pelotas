@@ -63,7 +63,7 @@ import { SpinnerComponent } from '../spinner/spinner.component';
             <p class="mt-4 text-rose-400 text-[10px] font-black uppercase tracking-widest bg-rose-500/5 py-3 px-6 rounded-xl border border-rose-500/20 shadow-lg">{{ error() }}</p>
           }
           <p class="mt-8 text-[9px] uppercase font-black tracking-[0.3em] opacity-20 text-white">
-            Unidos pela mesma paixão. Alcateia Alve-Azul.
+            Unidos pela mesma paixão. Alcateia Áureo-Cerúlea.
           </p>
         }
       </div>
