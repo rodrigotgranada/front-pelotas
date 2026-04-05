@@ -68,18 +68,21 @@ export class LogsPageComponent implements OnInit {
   };
 
   private readonly entityMap: Record<string, string> = {
-    'News': 'Notícias',
-    'User': 'Usuários',
-    'Sponsor': 'Patrocinadores',
-    'History': 'História',
-    'Newsletter': 'Newsletter',
-    'Auth': 'Segurança',
-    'Athlete': 'Elenco',
-    'Squad': 'Time/Temporada',
-    'Idol': 'Ídolos',
-    'Match': 'Jogos/Partidas',
+    'news': 'Notícias',
+    'news-category': 'Categorias Editorial',
+    'user': 'Usuários',
+    'sponsor': 'Patrocinadores',
+    'history': 'História',
+    'newsletter': 'Newsletter',
+    'auth': 'Segurança/Acessos',
+    'athlete': 'Atletas/Elenco',
+    'squad': 'Time/Temporada',
+    'idol': 'Ídolos',
+    'match': 'Jogos/Batalhas',
+    'competition': 'Campeonatos',
     'membership-plan': 'Planos de Sócio',
     'membership-subscription': 'Assinaturas',
+    'comment': 'Comentários/Voz',
   };
 
   getFriendlyAction(action: string): string {
