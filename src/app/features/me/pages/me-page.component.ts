@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -30,6 +31,7 @@ import { PhotoUploadComponent } from '../../../shared/ui/photo-upload/photo-uplo
 @Component({
   selector: 'app-me-page',
   imports: [
+    CommonModule,
     SpinnerComponent,
     ReactiveFormsModule,
     SecuritySettingsComponent,
@@ -66,6 +68,25 @@ export class MePageComponent implements OnInit {
 
     return draft;
   });
+
+  readonly roleDisplayName = computed(() => {
+    const profile = this.me();
+    if (!profile) return 'TORCEDOR';
+    
+    if (profile.roleName) return profile.roleName.toUpperCase();
+    if (profile.role?.name) return profile.role.name.toUpperCase();
+    
+    const code = profile.roleCode || profile.roleSlug || '';
+    const mapping: Record<string, string> = {
+      'owner': 'MASTER',
+      'admin': 'ADMINISTRADOR',
+      'editor': 'PUBLICADOR',
+      'socio': 'SÓCIO',
+      'user': 'USUÁRIO'
+    };
+    
+    return mapping[code] || 'LOBO ELITE';
+  });
   
   imageChangedEvent: any = undefined;
 
@@ -75,7 +96,9 @@ export class MePageComponent implements OnInit {
     email: ['', [Validators.required, Validators.email]],
     document: [{ value: '', disabled: true }],
     documentType: [{ value: '', disabled: true }],
+    currentPassword: [''],
     password: ['', [Validators.minLength(6)]],
+    confirmPassword: [''],
     contacts: this.formBuilder.array([]),
     addresses: this.formBuilder.array([]),
   });
@@ -136,9 +159,13 @@ export class MePageComponent implements OnInit {
   }
 
   removeContact(index: number): void {
-    this.contactsFormArray.removeAt(index);
-    if (this.contactsFormArray.length === 1) {
-      this.contactsFormArray.at(0).get('isPrimary')?.setValue(true, { emitEvent: false });
+    if (this.contactsFormArray.length > 1) {
+      this.contactsFormArray.removeAt(index);
+      if (this.contactsFormArray.length === 1) {
+        this.contactsFormArray.at(0).get('isPrimary')?.setValue(true, { emitEvent: false });
+      }
+    } else {
+      this.toast.showWarning('Voce deve manter pelo menos um canal de contato ativo.', ToastTitle.Warning);
     }
   }
 
@@ -147,9 +174,13 @@ export class MePageComponent implements OnInit {
   }
 
   removeAddress(index: number): void {
-    this.addressesFormArray.removeAt(index);
-    if (this.addressesFormArray.length === 1) {
-      this.addressesFormArray.at(0).get('isPrimary')?.setValue(true, { emitEvent: false });
+    if (this.addressesFormArray.length > 1) {
+      this.addressesFormArray.removeAt(index);
+      if (this.addressesFormArray.length === 1) {
+        this.addressesFormArray.at(0).get('isPrimary')?.setValue(true, { emitEvent: false });
+      }
+    } else {
+      this.toast.showWarning('Voce deve manter pelo menos um endereco vinculado a conta.', ToastTitle.Warning);
     }
   }
 
@@ -260,17 +291,21 @@ export class MePageComponent implements OnInit {
     }
 
     const raw = this.profileForm.getRawValue();
-    const payload: UpdateOwnUserPayload = {};
-
-    if (raw.firstName && raw.firstName.trim() !== current.firstName) {
-      payload.firstName = raw.firstName.trim();
-    }
-    
-    if (raw.lastName && raw.lastName.trim() !== current.lastName) {
-      payload.lastName = raw.lastName.trim();
-    }
+    const payload: UpdateOwnUserPayload = {
+      firstName: raw.firstName!.trim(),
+      lastName: raw.lastName!.trim(),
+    };
 
     if ((raw.password ?? '').trim()) {
+      if (!(raw.currentPassword ?? '').trim()) {
+        this.toast.showWarning('Para alterar a senha, voce deve informar a senha atual.', ToastTitle.Warning);
+        return;
+      }
+      if (raw.password !== raw.confirmPassword) {
+        this.toast.showWarning('A nova senha e a confirmacao nao conferem.', ToastTitle.Warning);
+        return;
+      }
+      payload.currentPassword = raw.currentPassword!.trim();
       payload.password = raw.password!.trim();
     }
 
@@ -368,7 +403,9 @@ export class MePageComponent implements OnInit {
       email: profile.email ?? '',
       document: profile.document ?? '',
       documentType: profile.documentType ?? '',
+      currentPassword: '',
       password: '',
+      confirmPassword: '',
     });
 
     this.photoDraft.set(undefined);
@@ -497,37 +534,27 @@ export class MePageComponent implements OnInit {
     }));
   }
 
-  private isPhoneContact(typeValue: string): boolean {
+  isPhoneContact(typeValue: string): boolean {
     return /(cel|telefone|phone|whats)/i.test(typeValue);
   }
 
-  private isEmailContact(typeValue: string): boolean {
+  isEmailContact(typeValue: string): boolean {
     return /email/i.test(typeValue);
   }
 
-  private maskPhone(value: string): string {
+  maskPhone(value: string): string {
     const digits = value.replace(/\D/g, '').slice(0, 11);
-    if (digits.length <= 2) {
-      return digits;
-    }
-
-    if (digits.length <= 6) {
-      return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-    }
-
-    if (digits.length <= 10) {
-      return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
-    }
-
+    if (!digits) return value;
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
   }
 
-  private maskZipCode(value: string): string {
+  maskZipCode(value: string): string {
     const digits = value.replace(/\D/g, '').slice(0, 8);
-    if (digits.length <= 5) {
-      return digits;
-    }
-
+    if (!digits) return value;
+    if (digits.length <= 5) return digits;
     return `${digits.slice(0, 5)}-${digits.slice(5)}`;
   }
 }

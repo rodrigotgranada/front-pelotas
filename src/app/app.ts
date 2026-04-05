@@ -69,8 +69,8 @@ export class App implements OnInit {
 
   readonly showHeader = computed(() => {
     const url = this.currentUrl();
-    const authRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
-    return !authRoutes.some(route => url.startsWith(route));
+    const excludedRoutes = ['/admin', '/login', '/register', '/forgot-password', '/reset-password'];
+    return !excludedRoutes.some(route => url.startsWith(route));
   });
 
   readonly showFooter = computed(() => {

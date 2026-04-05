@@ -17,8 +17,8 @@ import { CommonModule } from '@angular/common';
         (blur)="onTouchedCallback()"
         [disabled]="disabled()"
         maxlength="14"
-        [class]="dark ? 'bg-white/5 border-white/5 text-white placeholder:text-white/10 focus:ring-amber-400/20 focus:border-amber-400/50 focus:bg-white/10' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:ring-indigo-500/10 focus:border-indigo-500'"
-        class="w-full rounded-2xl border py-4 px-4 text-sm font-bold outline-none transition-all disabled:cursor-not-allowed disabled:bg-slate-50/5 disabled:opacity-50"
+        [class]="dark ? 'bg-slate-950/40 border-white/10 text-white placeholder:text-white/5 focus:ring-amber-400/20 focus:border-amber-400/50 focus:bg-slate-950/60' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:ring-indigo-500/10 focus:border-indigo-500'"
+        class="w-full rounded-2xl border py-4 px-4 text-sm font-bold outline-none transition-all disabled:cursor-not-allowed disabled:bg-slate-950/20 disabled:text-white/60"
       />
     </div>
   `,

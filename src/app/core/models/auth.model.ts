@@ -55,6 +55,7 @@ export interface UpdateOwnUserPayload {
   firstName?: string;
   lastName?: string;
   email?: string;
+  currentPassword?: string;
   password?: string;
   document?: string;
   documentType?: string;

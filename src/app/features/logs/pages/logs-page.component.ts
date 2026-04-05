@@ -35,17 +35,36 @@ export class LogsPageComponent implements OnInit {
   readonly canClearLogs = signal(this.auth.me()?.roleCode === 'owner');
 
   private readonly actionMap: Record<string, string> = {
-    'CREATE': 'Criação',
-    'UPDATE': 'Atualização',
-    'DELETE': 'Exclusão',
-    'LOGIN': 'Acesso ao Sistema',
-    'LOGOUT': 'Saída do Sistema',
-    'UPLOAD_IMAGE': 'Upload de Mídia',
-    'SUBSCRIBE': 'Inscrição Newsletter',
-    'MEMBERSHIP.PLAN.CREATE': 'Novo Plano de Sócio',
-    'MEMBERSHIP.PLAN.UPDATE': 'Plano de Sócio Atualizado',
-    'MEMBERSHIP.PLAN.DELETE': 'Plano de Sócio Removido',
-    'MEMBERSHIP.SUBSCRIPTION.ACTIVATE': 'Adesão de Sócio Concluída',
+    // Auth & Usuários
+    'LOGIN': 'Entrada no Comando (Login)',
+    'LOGOUT': 'Saída do Comando (Logout)',
+    'USER.PHOTO.UPDATE': 'Foto de Perfil Atualizada',
+    'USER.UPDATE': 'Dados de Usuário Modificados',
+    'USER.CREATE': 'Novo Operador Cadastrado',
+    
+    // Notícias & Editorial
+    'NEWS.CREATE': 'Nova Matéria Publicada',
+    'NEWS.UPDATE': 'Matéria Editada/Atualizada',
+    'NEWS.DELETE': 'Matéria Removida (Lixeira)',
+    'NEWS.HARD-DELETE': 'Matéria Excluída Permanentemente',
+    'NEWS.CATEGORY.CREATE': 'Nova Categoria de Notícias',
+    'NEWS.CATEGORY.DELETE': 'Categoria de Notícias Removida',
+    'NEWS.COMMENT.MODERATE': 'Comentário da Torcida Moderado',
+    
+    // Futebol & Batalhas
+    'MATCH.CREATE': 'Próxima Batalha Agendada',
+    'MATCH.UPDATE': 'Dados da Batalha Atualizados',
+    'MATCH.DELETE': 'Partida Removida do Calendário',
+    'ATHLETE.CREATE': 'Novo Atleta Integrado ao Elenco',
+    'ATHLETE.UPDATE': 'Ficha de Atleta Atualizada',
+    
+    // Sócios & Administrativo
+    'MEMBERSHIP.PLAN.CREATE': 'Novo Plano de Sócio Criado',
+    'MEMBERSHIP.PLAN.UPDATE': 'Regras de Plano Alteradas',
+    'MEMBERSHIP.PLAN.DELETE': 'Plano de Sócio Desativado',
+    'MEMBERSHIP.SUBSCRIPTION.ACTIVATE': 'Nova Adesão de Sócio Concluída',
+    'UPLOAD_IMAGE': 'Mídia Enviada ao Servidor',
+    'SUBSCRIBE': 'Novo Assinante na Newsletter',
   };
 
   private readonly entityMap: Record<string, string> = {

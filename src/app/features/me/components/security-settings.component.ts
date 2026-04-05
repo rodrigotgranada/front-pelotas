@@ -50,7 +50,7 @@ export class SecuritySettingsComponent implements OnDestroy {
 
   readonly phoneVerificationRequestForm = this.formBuilder.nonNullable.group({
     phone: ['', [Validators.required]],
-    channel: ['sms' as 'sms' | 'whatsapp', [Validators.required]],
+    channel: ['whatsapp' as 'whatsapp', [Validators.required]],
   });
 
   readonly phoneVerificationConfirmForm = this.formBuilder.nonNullable.group({
@@ -156,7 +156,7 @@ export class SecuritySettingsComponent implements OnDestroy {
 
     const payload: RequestPhoneVerificationPayload = {
       phone: raw.phone,
-      channel: raw.channel,
+      channel: 'whatsapp',
     };
 
     this.requestingPhoneVerification.set(true);

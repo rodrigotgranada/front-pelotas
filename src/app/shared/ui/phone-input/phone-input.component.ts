@@ -17,8 +17,8 @@ import { CommonModule } from '@angular/common';
         (blur)="onTouchedCallback()"
         [disabled]="disabled()"
         maxlength="15"
-        [class]="dark ? 'bg-white/5 border-white/5 text-white placeholder:text-white/10 focus:ring-amber-400/20 focus:border-amber-400/50 focus:bg-white/10' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:ring-indigo-500/10 focus:border-indigo-500'"
-        class="w-full rounded-2xl border py-4 px-4 text-sm font-bold outline-none transition-all disabled:cursor-not-allowed disabled:bg-slate-50/5 disabled:opacity-50"
+        [class]="dark ? 'bg-slate-950/40 border-white/10 text-white placeholder:text-white/5 focus:ring-amber-400/20 focus:border-amber-400/50 focus:bg-slate-950/60' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:ring-indigo-500/10 focus:border-indigo-500'"
+        class="w-full rounded-2xl border py-4 px-4 text-sm font-bold outline-none transition-all disabled:cursor-not-allowed disabled:bg-slate-950/20 disabled:text-white/60"
       />
     </div>
   `,
@@ -43,20 +43,9 @@ export class PhoneInputComponent implements ControlValueAccessor {
 
   onInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    let rawValue = input.value.replace(/\D/g, '').slice(0, 11);
+    const maskedValue = this.applyMask(input.value);
     
-    let maskedValue = rawValue;
-    if (rawValue.length > 10) {
-      maskedValue = `(${rawValue.slice(0, 2)}) ${rawValue.slice(2, 7)}-${rawValue.slice(7)}`;
-    } else if (rawValue.length > 6) {
-      maskedValue = `(${rawValue.slice(0, 2)}) ${rawValue.slice(2, 6)}-${rawValue.slice(6)}`;
-    } else if (rawValue.length > 2) {
-      maskedValue = `(${rawValue.slice(0, 2)}) ${rawValue.slice(2)}`;
-    } else if (rawValue.length > 0) {
-      maskedValue = `(${rawValue}`;
-    }
-
-    // Update UI instantly
+    // Force update on the native element for immediate UI feedback
     input.value = maskedValue;
 
     // Save and emit mask
@@ -64,13 +53,20 @@ export class PhoneInputComponent implements ControlValueAccessor {
     this.onChangeCallback(maskedValue);
   }
 
+  private applyMask(val: string): string {
+    const digits = val.replace(/\D/g, '').slice(0, 11);
+    
+    if (digits.length === 0) return '';
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  }
+
   // --- ControlValueAccessor methods ---
   writeValue(val: any): void {
-    if (val !== undefined && val !== null) {
-      this.value.set(String(val));
-    } else {
-      this.value.set('');
-    }
+    const stringVal = val !== undefined && val !== null ? String(val) : '';
+    this.value.set(this.applyMask(stringVal));
   }
 
   registerOnChange(fn: any): void {
