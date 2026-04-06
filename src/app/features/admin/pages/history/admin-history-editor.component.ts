@@ -75,9 +75,9 @@ import { firstValueFrom } from 'rxjs';
             <!-- Cover Image -->
             <div class="w-full md:w-64 shrink-0">
                <label class="mb-1.5 block text-xs font-black text-slate-400 uppercase tracking-widest px-1">Imagem de Capa (16:9)</label>
-               @if (form.value.coverImageUrl) {
+               @if (form.get('coverImageUrl')?.value) {
                 <div class="relative w-full rounded-2xl overflow-hidden border-4 border-white shadow-xl group aspect-video">
-                  <img [src]="form.value.coverImageUrl" class="w-full h-full object-cover" />
+                  <img [src]="form.get('coverImageUrl')?.value" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=1000&auto=format&fit=crop'" />
                   <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <button type="button" (click)="removeCover()" class="bg-white text-rose-600 rounded-xl p-3 shadow-lg hover:scale-110 active:scale-95 transition-all">
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>

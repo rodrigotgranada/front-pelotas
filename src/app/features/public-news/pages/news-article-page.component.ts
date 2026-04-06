@@ -33,11 +33,12 @@ import { FallbackImgDirective } from '../../../shared/directives/fallback-img.di
         @if (article()) {
           <!-- Luxury Hero Header -->
           <div class="relative w-full rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5 mb-12 animate-in zoom-in-95 duration-700">
-            <div class="aspect-[16/9] sm:aspect-[21/9] relative">
-              <img [src]="article()!.coverImageUrl || appSettings.defaultNewsImageUrl()" 
-                   appFallbackImg="cover" 
-                   class="w-full h-full object-cover grayscale-[0.2]" 
-                   alt="Capa">
+            <div [class]="article()!.coverImageUrl ? 'aspect-[16/9] sm:aspect-[21/9] relative' : 'aspect-[16/9] sm:aspect-[21/9] relative bg-gradient-to-br from-indigo-900 to-amber-500'">
+              @if (article()!.coverImageUrl) {
+                <img [src]="article()!.coverImageUrl" 
+                     class="w-full h-full object-cover grayscale-[0.2]" 
+                     alt="Capa">
+              }
               <!-- Deep Gradient Overlay -->
               <div class="absolute inset-0 bg-gradient-to-t from-indigo-950 via-indigo-950/40 to-transparent"></div>
               
@@ -166,7 +167,7 @@ import { FallbackImgDirective } from '../../../shared/directives/fallback-img.di
                     @for (news of relatedNews(); track news.id) {
                       <a [routerLink]="['/noticias', news.slug]" class="group block space-y-4">
                         <div class="aspect-video rounded-2xl overflow-hidden border border-white/5 relative">
-                          <img [src]="news.coverImageUrl || appSettings.defaultNewsImageUrl() || '/placeholder-cover.svg'" appFallbackImg="cover" class="w-full h-full object-cover group-hover:scale-110 transition duration-1000 grayscale-[0.2] group-hover:grayscale-0" />
+                          <img [src]="news.coverImageUrl" appFallbackImg="cover" class="w-full h-full object-cover group-hover:scale-110 transition duration-1000 grayscale-[0.2] group-hover:grayscale-0" />
                           <div class="absolute inset-0 bg-gradient-to-t from-indigo-950/40 to-transparent"></div>
                         </div>
                         <h4 class="text-white/80 font-bold leading-snug group-hover:text-amber-400 transition-colors line-clamp-2 uppercase text-xs tracking-tight text-left italic">
@@ -239,7 +240,7 @@ import { FallbackImgDirective } from '../../../shared/directives/fallback-img.di
                   <p class="text-white/10 text-center py-12 italic uppercase font-black text-[10px] tracking-widest">Nenhum comentário ainda. Dê o primeiro uivo!</p>
                 }
                 @for (comment of comments(); track comment.id) {
-                  <div class="flex gap-6 animate-in fade-in slide-in-from-top-4 duration-500">
+                  <div [id]="'comment-' + comment.id" class="flex gap-6 animate-in fade-in slide-in-from-top-4 duration-500 scroll-mt-32">
                     <div class="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 font-black uppercase shrink-0 text-xs shadow-lg">
                       {{ comment.author?.name?.charAt(0) || 'U' }}
                     </div>

@@ -65,7 +65,12 @@ import { AppSettingsService } from '../../../../../core/services/app-settings.se
                 </div>
                 <div class="text-center">
                   <p class="text-xs font-black text-slate-900 uppercase tracking-tight">Distintivo do Clube</p>
-                  <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">PNG ou SVG recomendado</p>
+                  <div class="mt-2 flex justify-center items-center gap-2">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">PNG ou SVG</p>
+                    @if (previewUrl()) {
+                      <button type="button" (click)="removeLogo()" class="text-[10px] bg-rose-50 text-rose-600 font-bold uppercase tracking-widest px-2 py-1 rounded-md hover:bg-rose-100 border border-rose-100 transition">Remover</button>
+                    }
+                  </div>
                 </div>
               </div>
 
@@ -169,6 +174,11 @@ export class AdminTeamDrawerComponent {
     } finally {
       this.uploading.set(false);
     }
+  }
+
+  removeLogo() {
+    this.previewUrl.set(null);
+    this.form.patchValue({ logoUrl: '' });
   }
 
   save() {

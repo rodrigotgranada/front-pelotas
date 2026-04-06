@@ -16,7 +16,7 @@ import { catchError } from 'rxjs/operators';
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <div class="space-y-6 min-h-full animate-in fade-in duration-700 pb-10">
+    <div class="space-y-6 min-h-full animate-in fade-in duration-700 pb-10 w-full">
       <!-- Dashboard Header -->
       <header class="flex flex-col md:flex-row md:items-end justify-between gap-4 text-left">
         <div>
@@ -99,35 +99,35 @@ import { catchError } from 'rxjs/operators';
       <div class="grid gap-6 lg:grid-cols-5">
         
         <!-- Próxima Batalha (Largo) -->
-        <div class="lg:col-span-3 rounded-[40px] border border-white/50 bg-indigo-950 p-8 shadow-2xl relative overflow-hidden group min-h-[340px] flex flex-col">
-           <div class="absolute top-0 right-0 p-10 opacity-5 -mr-10 -mt-10 group-hover:scale-110 transition-transform duration-700">
+        <a routerLink="/admin/matches" class="lg:col-span-3 rounded-[40px] border border-white/50 bg-indigo-950 p-6 md:p-8 shadow-2xl relative overflow-hidden group min-h-[340px] flex flex-col cursor-pointer block hover:scale-[1.01] hover:shadow-indigo-900/40 transition-all duration-300">
+           <div class="absolute top-0 right-0 p-10 opacity-5 -mr-10 -mt-10 group-hover:scale-110 transition-transform duration-700 pointer-events-none">
              <svg xmlns="http://www.w3.org/2000/svg" width="220" height="220" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
            </div>
            
-           <div class="relative z-10 text-left h-full flex flex-col">
-              <header class="flex items-center justify-between mb-8">
-                 <span class="text-[10px] font-black text-amber-400 uppercase tracking-[0.4em] italic flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                    Próxima Batalha
+           <div class="relative z-10 text-left h-full flex flex-col min-w-0">
+              <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 mb-6 sm:mb-8">
+                 <span class="text-[10px] font-black text-amber-400 uppercase tracking-[0.2em] sm:tracking-[0.4em] italic flex items-center gap-2">
+                    <span class="w-2 h-2 shrink-0 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span class="truncate">Próxima Batalha</span>
                  </span>
-                 <a routerLink="/admin/matches" class="text-[9px] font-black text-white/40 hover:text-amber-400 uppercase tracking-widest italic transition-colors">Gerenciar Agenda</a>
+                 <span class="text-[9px] font-black text-white/40 group-hover:text-amber-400 uppercase tracking-widest italic transition-colors truncate">Gerenciar Agenda</span>
               </header>
               
               @if (nextMatch()) {
-                <div class="flex-1 flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
-                   <div class="flex items-center gap-8 order-2 lg:order-1">
-                      <div class="w-24 h-24 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center p-4">
+                <div class="flex-1 flex flex-col lg:flex-row items-center gap-6 lg:gap-16">
+                   <div class="flex items-center gap-4 sm:gap-8 order-2 lg:order-1">
+                      <div class="w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center p-3 sm:p-4">
                          <img src="/assets/logo-pelotas.png" class="w-full h-auto drop-shadow-xl" alt="EC Pelotas">
                       </div>
-                      <span class="text-4xl font-black text-white italic opacity-10">VS</span>
-                      <div class="w-24 h-24 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center p-4">
+                      <span class="text-2xl sm:text-4xl font-black text-white italic opacity-10">VS</span>
+                      <div class="w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center p-3 sm:p-4">
                          <img [src]="nextMatch()?.opponent?.logoUrl || '/assets/placeholder-team.png'" class="w-full h-auto drop-shadow-xl" [alt]="nextMatch()?.opponent?.name">
                       </div>
                    </div>
                    
-                   <div class="order-1 lg:order-2 text-center lg:text-left flex-1">
-                      <h3 class="text-4xl font-black text-white uppercase italic tracking-tighter leading-tight">{{ nextMatch()?.opponent?.name }}</h3>
-                      <p class="text-amber-400/80 text-sm font-black uppercase tracking-[0.2em] mt-2 italic">{{ nextMatch()?.competition?.name || 'Grande Amistoso' }}</p>
+                   <div class="order-1 lg:order-2 text-center lg:text-left flex-1 min-w-0 w-full overflow-hidden">
+                      <h3 class="text-3xl sm:text-4xl font-black text-white uppercase italic tracking-tighter leading-tight truncate">{{ nextMatch()?.opponent?.name }}</h3>
+                      <p class="text-amber-400/80 text-sm font-black uppercase tracking-[0.2em] mt-2 italic truncate">{{ nextMatch()?.competition?.name || 'Grande Amistoso' }}</p>
                       
                       <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 mt-6">
                          <div class="px-5 py-2.5 rounded-2xl bg-white/10 border border-white/5 flex flex-col">
@@ -147,20 +147,20 @@ import { catchError } from 'rxjs/operators';
                 </div>
               } @else {
                 <div class="flex-1 flex flex-col items-center justify-center opacity-40">
-                   <p class="text-xs font-black text-white uppercase italic tracking-[0.3em]">Horizonte Livre de Batalhas</p>
+                   <p class="text-[10px] sm:text-xs font-black text-white uppercase italic tracking-[0.2em] sm:tracking-[0.3em] text-center w-full truncate">Horizonte Livre de Batalhas</p>
                 </div>
               }
            </div>
-        </div>
+        </a>
 
         <!-- Rastro de Comando Compacto (2/5) -->
-        <div class="lg:col-span-2 rounded-[40px] border border-white/50 bg-white/95 backdrop-blur-xl p-8 shadow-xl shadow-indigo-950/5 flex flex-col min-h-[340px]">
-           <header class="flex items-center justify-between mb-8 text-left">
-             <div>
-                <h2 class="text-xl font-black tracking-tighter text-indigo-950 uppercase italic leading-none">Últimos Rastros</h2>
-                <p class="text-[8px] font-black text-indigo-900/40 uppercase tracking-[0.2em] mt-2 italic">Ação em Tempo Real</p>
+        <a routerLink="/admin/logs" class="lg:col-span-2 rounded-[40px] border border-white/50 bg-white/95 backdrop-blur-xl p-6 md:p-8 shadow-xl shadow-indigo-950/5 flex flex-col min-h-[340px] cursor-pointer block hover:scale-[1.01] hover:shadow-indigo-900/10 transition-all duration-300 group min-w-0">
+           <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 mb-6 sm:mb-8 text-left">
+             <div class="min-w-0">
+                <h2 class="text-lg sm:text-xl font-black tracking-tighter text-indigo-950 uppercase italic leading-none truncate">Últimos Rastros</h2>
+                <p class="text-[8px] font-black text-indigo-900/40 uppercase tracking-[0.2em] mt-1 sm:mt-2 italic truncate">Ação em Tempo Real</p>
              </div>
-             <a routerLink="/admin/logs" class="text-[9px] font-black text-indigo-600 hover:text-indigo-800 uppercase tracking-widest italic border-b-2 border-indigo-600/10 pb-0.5 transition-all">Histórico</a>
+             <span class="text-[9px] shrink-0 font-black text-indigo-950/30 group-hover:text-indigo-600 uppercase tracking-widest italic border-b-2 border-transparent group-hover:border-indigo-600/10 pb-0.5 transition-all">Histórico</span>
            </header>
 
            <div class="flex-1 space-y-3">
@@ -186,7 +186,7 @@ import { catchError } from 'rxjs/operators';
                  </div>
               }
            </div>
-        </div>
+        </a>
       </div>
 
       <!-- Voz da Torcida: Comentários Recentes (Largo) -->
@@ -203,7 +203,8 @@ import { catchError } from 'rxjs/operators';
 
          <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             @for (comment of latestComments(); track comment.id) {
-               <div class="p-5 rounded-[32px] bg-indigo-950/5 border border-indigo-950/5 hover:bg-white hover:shadow-2xl hover:shadow-indigo-950/10 transition-all group relative">
+               <a [routerLink]="['/noticias', comment.newsSlug]" [fragment]="'comment-' + comment.id" target="_blank"
+                   class="block cursor-pointer p-5 rounded-[32px] bg-indigo-950/5 border border-indigo-950/5 hover:bg-white hover:shadow-2xl hover:shadow-indigo-950/10 transition-all group relative">
                   <div class="absolute -top-3 -right-3 opacity-0 group-hover:opacity-100 transition-all transform group-hover:rotate-12 translate-y-2 group-hover:translate-y-0">
                      <button class="h-8 w-8 rounded-full bg-indigo-950 text-amber-400 flex items-center justify-center shadow-xl">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -222,7 +223,7 @@ import { catchError } from 'rxjs/operators';
                         </div>
                      </div>
                   </div>
-               </div>
+               </a>
             } @empty {
                <div class="col-span-full py-16 flex flex-col items-center justify-center opacity-30">
                   <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-4"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -268,7 +269,8 @@ export class DashboardPageComponent implements OnInit {
       users: this.usersService.list({ limit: 1 }).pipe(catchError(() => of({ total: 0 }))),
       matches: this.matchesService.listMatches().pipe(catchError(() => of([]))),
       nextMatch: this.matchesService.getNextMatch().pipe(catchError(() => of(null))),
-      logs: this.logsService.list({ limit: 4 }).pipe(catchError(() => of([])))
+      logs: this.logsService.list({ limit: 4 }).pipe(catchError(() => of([]))),
+      comments: this.newsService.getLatestGlobalComments(6).pipe(catchError(() => of([])))
     }).subscribe({
       next: (res) => {
         this.newsCount.set((res.news as any).total || 0);
@@ -278,10 +280,7 @@ export class DashboardPageComponent implements OnInit {
         
         this.nextMatch.set(res.nextMatch);
         this.latestLogs.set(res.logs);
-        
-        // Simulação de comentários (já que não há API global)
-        // Em um cenário real, o backend teria um /comments/latest
-        this.latestComments.set([]); 
+        this.latestComments.set((res as any).comments || []); 
 
         this.lastSync.set(new Date());
         this.loading.set(false);

@@ -48,7 +48,7 @@ import { AdminConfirmModalComponent } from '../../../../shared/ui/admin-confirm-
             class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-lg transition-all group flex flex-col items-center gap-3 text-center"
           >
             <div class="w-20 h-20 rounded-xl bg-slate-50 border border-slate-100 p-2 flex items-center justify-center relative overflow-hidden">
-               <img [src]="team.logoUrl || '/assets/placeholder-team.png'" appFallbackImg="team" class="max-w-full max-h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-500">
+               <img [src]="team.logoUrl" appFallbackImg="team" class="max-w-full max-h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-500">
                @if (team.isPelotas) {
                   <span class="absolute bottom-0 inset-x-0 bg-indigo-600 text-white text-[8px] font-black uppercase tracking-tighter py-0.5">Principal</span>
                }

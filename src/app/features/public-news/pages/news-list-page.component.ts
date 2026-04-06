@@ -84,7 +84,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
                   <!-- Cover Image -->
                   <div class="aspect-[16/10] overflow-hidden relative">
                     <img 
-                      [src]="item.coverImageUrl || appSettings.defaultNewsImageUrl() || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80'" 
+                      [src]="item.coverImageUrl" 
                       [alt]="item.title"
                       appFallbackImg="cover"
                       class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale-[0.2] group-hover:grayscale-0"

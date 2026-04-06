@@ -6,11 +6,12 @@ import { AppSettingsService, THEME_PRESETS } from '../../../../core/services/app
 import { NewsApiService } from '../../../../core/services/news-api.service';
 import { ToastMessagesService } from '../../../../core/notifications/toast-messages.service';
 import { compressImage } from '../../../../shared/utils/image-compress.util';
+import { ImageCropperDialogComponent } from '../../../../shared/ui/image-cropper/image-cropper-dialog.component';
 
 @Component({
   selector: 'app-admin-settings-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule, ImageCropperDialogComponent],
   template: `
     <div class="max-w-3xl mx-auto pb-20 flex flex-col gap-8">
 
@@ -758,6 +759,17 @@ import { compressImage } from '../../../../shared/utils/image-compress.util';
           </div>
         </section>
       }
+
+      @if (imageSelectedEvent()) {
+        <app-image-cropper-dialog
+          [imageChangedEvent]="imageSelectedEvent()!"
+          [aspectRatio]="1.777"
+          [maintainAspectRatio]="true"
+          [resizeToWidth]="1200"
+          (imageCroppedEvent)="onImageCropped($event)"
+          (cancel)="onCropCancel()"
+        ></app-image-cropper-dialog>
+      }
     </div>
   `,
 })
@@ -795,6 +807,9 @@ export class AdminSettingsPageComponent implements OnInit {
   readonly isNewsletterEnabled = this.appSettings.isNewsletterEnabled;
   readonly isIdolsEnabled = this.appSettings.isIdolsEnabled;
   readonly isMatchesEnabled = this.appSettings.isMatchesEnabled;
+
+  readonly imageSelectedEvent = signal<Event | null>(null);
+  private fileInputElement: HTMLInputElement | null = null;
 
   readonly footerForm: FormGroup = this.fb.group({
     footerPhone: [''],
@@ -1031,23 +1046,31 @@ export class AdminSettingsPageComponent implements OnInit {
     }
   }
 
-  async onDefaultNewsImageSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-    input.value = '';
+  onDefaultNewsImageSelected(event: Event) {
+    this.imageSelectedEvent.set(event);
+    this.fileInputElement = event.target as HTMLInputElement;
+  }
+
+  async onImageCropped(fileBlob: Blob) {
+    this.imageSelectedEvent.set(null);
+    if (this.fileInputElement) {
+      this.fileInputElement.value = '';
+      this.fileInputElement = null;
+    }
     
     this.defaultNewsSaving.set(true);
-    // Compress before upload (max 1280px, JPEG 82%)
-    const compressed = await compressImage(file).catch(() => file) as File;
-    const fileToUpload = compressed instanceof File ? compressed : new File([compressed], 'news-default.jpg', { type: 'image/jpeg' });
+    
+    // O ImageCropper já me deu o Blob redimensionado. Não precisamos de outra compressImage() que pode corromper os Headers Multer.
+    const ext = fileBlob.type === 'image/jpeg' ? 'jpg' : (fileBlob.type.split('/')[1] || 'png');
+    const fileToUpload = new File([fileBlob], `news-default.${ext}`, { type: fileBlob.type || 'image/jpeg' });
+      
     this.newsApi.uploadImage(fileToUpload).subscribe({
       next: async (res) => {
         if (res.success && res.file?.url) {
           try {
             await this.appSettings.saveSetting('defaultNewsImageUrl', res.file.url);
             this.appSettings.defaultNewsImageUrl.set(res.file.url);
-            this.toast.showSuccess('Imagem padrão de notícias atualizada!');
+            this.toast.showSuccess('Imagem padrão de notícias atualizada com corte perfeito!');
           } catch {
             this.toast.showError('Erro ao salvar URL da imagem padrão.');
           }
@@ -1055,10 +1078,18 @@ export class AdminSettingsPageComponent implements OnInit {
         this.defaultNewsSaving.set(false);
       },
       error: () => {
-        this.toast.showError('Erro ao enviar imagem.');
+        this.toast.showError('Erro ao enviar imagem padrão.');
         this.defaultNewsSaving.set(false);
       },
     });
+  }
+
+  onCropCancel() {
+    this.imageSelectedEvent.set(null);
+    if (this.fileInputElement) {
+      this.fileInputElement.value = '';
+      this.fileInputElement = null;
+    }
   }
 
   async removeDefaultNewsImage() {

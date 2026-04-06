@@ -25,7 +25,7 @@ import { FallbackImgDirective } from '../../../../shared/directives/fallback-img
 @Component({
   selector: 'app-admin-news-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, QuillModule, ImageCropperDialogComponent, FallbackImgDirective],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, QuillModule, ImageCropperDialogComponent],
   template: `
     <div class="flex flex-col gap-6 max-w-5xl mx-auto pb-20">
       <div class="flex items-center justify-between">
@@ -231,7 +231,7 @@ import { FallbackImgDirective } from '../../../../shared/directives/fallback-img
         </div>
 
         <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm min-h-[500px]">
-          @if (form.value.format === 'HTML') {
+          @if (form.getRawValue().format === 'HTML') {
             <!-- Quill Editor (Word Like) -->
             <quill-editor formControlName="contentHtml" [styles]="{height: '400px'}"></quill-editor>
           } @else {
@@ -272,11 +272,11 @@ import { FallbackImgDirective } from '../../../../shared/directives/fallback-img
                           <p class="mt-2 text-sm text-slate-500 font-medium">{{ form.value.subtitle }}</p>
                         }
                         
-                        @if (form.value.coverImageUrl || appSettings.defaultNewsImageUrl()) {
-                          <div class="mt-4 rounded-xl overflow-hidden h-40 bg-slate-100">
-                             <img [src]="form.value.coverImageUrl || appSettings.defaultNewsImageUrl()" appFallbackImg="cover" class="w-full h-full object-cover" />
-                          </div>
-                        }
+                        <div [class]="form.value.coverImageUrl ? 'mt-4 rounded-xl overflow-hidden h-40 bg-slate-100' : 'mt-4 rounded-xl overflow-hidden h-40 bg-gradient-to-br from-indigo-900 to-amber-500'">
+                           @if (form.value.coverImageUrl) {
+                             <img [src]="form.value.coverImageUrl" class="w-full h-full object-cover" />
+                           }
+                        </div>
 
                         <div class="mt-5 mb-5 border-t border-slate-200"></div>
 
@@ -469,7 +469,14 @@ export class AdminNewsEditorComponent implements OnInit, OnDestroy {
         if (news.format === 'HTML') {
           this.form.patchValue({ contentHtml: news.content });
         } else {
-          setTimeout(() => this.initEditorJs(news.content), 100);
+          let editorData = news.content;
+          if (typeof editorData === 'string') {
+             try { editorData = JSON.parse(editorData); } catch(e) { editorData = { blocks: [] }; }
+          }
+          if (!editorData || typeof editorData !== 'object') {
+             editorData = { blocks: [] };
+          }
+          setTimeout(() => this.initEditorJs(editorData), 100);
         }
         
         this.loading.set(false);
@@ -558,7 +565,7 @@ export class AdminNewsEditorComponent implements OnInit, OnDestroy {
     this.previewLoading.set(true);
     this.showPreview.set(true);
 
-    if (this.form.value.format === 'HTML') {
+    if (this.form.getRawValue().format === 'HTML') {
       this.previewBlocksHtml.set(this.form.value.contentHtml || '<p class="text-slate-400">Conteúdo vazio</p>');
       this.previewLoading.set(false);
     } else {

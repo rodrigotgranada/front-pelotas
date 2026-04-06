@@ -93,6 +93,12 @@ export class NewsApiService {
     return this.http.post<any>(`${environment.apiBaseUrl}/public-news/${slug}/comments`, { content });
   }
 
+  getLatestGlobalComments(limit: number = 6): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/comments/latest`, {
+      params: new HttpParams().set('limit', limit.toString())
+    });
+  }
+
   getRelated(slug: string, limit: number = 3): Observable<News[]> {
     return this.http.get<News[]>(`${environment.apiBaseUrl}/public-news/${slug}/related`, {
       params: new HttpParams().set('limit', limit.toString())

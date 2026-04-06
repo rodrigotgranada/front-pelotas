@@ -9,7 +9,7 @@ export class FallbackImgDirective implements OnInit, OnDestroy {
   /** Opcional: Define um tipo de fallback. Pode ser 'cover', 'sponsor', 'badge', 'team' ou passa o URL direto */
   @Input() appFallbackImg: 'cover' | 'sponsor' | 'badge' | 'team' | string = 'cover';
   private retryCount = 0;
-  private readonly MAX_RETRIES = 2;
+  private readonly MAX_RETRIES = 3;
   private errorListener?: () => void;
 
   // SVG de 1x1 transparente para calar o navegador em caso de erro total
@@ -30,6 +30,14 @@ export class FallbackImgDirective implements OnInit, OnDestroy {
       const img = this.eRef.nativeElement;
       this.errorListener = () => this.loadFallback();
       img.addEventListener('error', this.errorListener);
+      
+      // Auto-ativar o escudo protetor se src vier nulo/vazio do banco de dados (Angular binding empty)
+      setTimeout(() => {
+        const src = img.getAttribute('src');
+        if (!src || src === 'null' || src === '') {
+          this.loadFallback();
+        }
+      }, 0);
     });
   }
 
@@ -43,7 +51,7 @@ export class FallbackImgDirective implements OnInit, OnDestroy {
     const imgElement = this.eRef.nativeElement;
     
     if ((window as any).LOBO_DEBUG) {
-       console.warn(`[🐺 Fallback] Erro na imagem: ${imgElement.src.substring(0, 50)}... Tentativa: ${this.retryCount + 1}/${this.MAX_RETRIES}`);
+       console.warn(`[🐺 Fallback] Erro na imagem. Tentativa: ${this.retryCount + 1}/${this.MAX_RETRIES}`);
     }
 
     if (this.retryCount >= this.MAX_RETRIES) {
@@ -56,19 +64,22 @@ export class FallbackImgDirective implements OnInit, OnDestroy {
     }
     
     this.retryCount++;
+    
+    let nextSrc = '';
 
     if (!this.appFallbackImg || this.appFallbackImg === 'cover') {
-      imgElement.src = this.appSettings.defaultNewsImageUrl() || '/assets/placeholder-cover.svg';
+      nextSrc = this.retryCount === 1 && this.appSettings.defaultNewsImageUrl() ? this.appSettings.defaultNewsImageUrl()! : '/assets/placeholder-cover.svg';
     } else if (this.appFallbackImg === 'sponsor') {
-      imgElement.src = '/assets/placeholder-sponsor.svg';
+      nextSrc = '/assets/placeholder-sponsor.svg';
     } else if (this.appFallbackImg === 'badge' || this.appFallbackImg === 'team') {
-      imgElement.src = this.appSettings.defaultTeamLogoUrl() || '/assets/placeholder-badge.svg';
+      nextSrc = this.retryCount === 1 && this.appSettings.defaultTeamLogoUrl() ? this.appSettings.defaultTeamLogoUrl()! : '/assets/placeholder-badge.svg';
     } else if (this.appFallbackImg === 'competition') {
-      imgElement.src = this.appSettings.defaultCompetitionLogoUrl() || '/assets/placeholder-badge.svg';
+      nextSrc = this.retryCount === 1 && this.appSettings.defaultCompetitionLogoUrl() ? this.appSettings.defaultCompetitionLogoUrl()! : '/assets/placeholder-badge.svg';
     } else {
-      imgElement.src = this.appFallbackImg;
+      nextSrc = this.appFallbackImg;
     }
     
+    imgElement.src = nextSrc;
     imgElement.style.objectFit = 'contain';
   }
 }
